@@ -1,8 +1,5 @@
-use crate::ast_node::ASTNode;
-use crate::binary_op::BinaryOp;
-use crate::interpreter::Interpreter;
-use crate::marker::Expression;
-use crate::value::Value;
+use super::{ASTNode, BinaryOp, Expression, Value};
+use crate::runtime::Interpreter;
 
 #[derive(Debug, Clone)]
 pub struct BinaryExpression {

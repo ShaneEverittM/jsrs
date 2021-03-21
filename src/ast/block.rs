@@ -1,7 +1,5 @@
-use crate::ast_node::ASTNode;
-use crate::interpreter::Interpreter;
-use crate::marker::Statement;
-use crate::value::Value;
+use super::{ASTNode, Statement, Value};
+use crate::runtime::Interpreter;
 
 #[derive(Debug, Clone)]
 pub struct Block {

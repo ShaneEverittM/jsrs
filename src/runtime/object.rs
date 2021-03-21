@@ -1,4 +1,4 @@
-use crate::value::Value;
+use crate::ast::Value;
 use std::fmt::Debug;
 
 pub trait Object: Debug + ObjectClone {

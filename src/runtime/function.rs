@@ -1,8 +1,8 @@
-use crate::object::Object;
-use crate::block::Block;
-use crate::value::Value;
 use std::any::Any;
 use std::collections::HashMap;
+
+use super::Object;
+use crate::ast::{Block, Value};
 
 #[derive(Debug, Clone)]
 pub struct Function {

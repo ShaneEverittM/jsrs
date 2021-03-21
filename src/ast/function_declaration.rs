@@ -1,9 +1,5 @@
-use crate::ast_node::ASTNode;
-use crate::function::Function;
-use crate::interpreter::Interpreter;
-use crate::marker::{Declaration, Statement};
-use crate::block::Block;
-use crate::value::Value;
+use super::{ASTNode, Block, Declaration, Statement, Value};
+use crate::runtime::{Function, Interpreter};
 
 #[derive(Debug, Clone)]
 pub struct FunctionDeclaration {
@@ -24,7 +20,9 @@ impl ASTNode for FunctionDeclaration {
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
         let function = Function::new(self.name.clone(), self.body.clone());
-        interpreter.global_object.put(self.name.clone(), Value::Object(function));
+        interpreter
+            .global_object
+            .put(self.name.clone(), Value::Object(function));
         Value::Undefined
     }
 }

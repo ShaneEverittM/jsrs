@@ -1,13 +1,13 @@
-use crate::object::Object;
-use crate::block::Block;
-use crate::value::Value;
 use std::any::Any;
 use std::collections::HashMap;
+
+use super::Object;
+use crate::ast::{Block, Value};
 
 pub struct Interpreter {
     pub global_object: Box<dyn Object>,
     #[allow(clippy::vec_box)]
-    scope_stack: Vec<Box<Block>>,
+    scope_stack: Vec<Block>,
 }
 
 #[derive(Debug, Clone)]
@@ -53,7 +53,7 @@ impl Default for Interpreter {
 impl Interpreter {
     pub fn run(&mut self, mut block: Box<Block>) -> Value {
         // TODO: is this clone avoidable, and if not is it really really bad?
-        self.enter_scope(block.clone());
+        self.enter_scope(*block.clone());
 
         let mut last_value = Value::Undefined;
 
@@ -66,7 +66,7 @@ impl Interpreter {
         last_value
     }
 
-    fn enter_scope(&mut self, scope: Box<Block>) {
+    fn enter_scope(&mut self, scope: Block) {
         self.scope_stack.push(scope);
     }
 

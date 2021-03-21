@@ -1,32 +1,13 @@
-use crate::binary_expression::BinaryExpression;
-use crate::binary_op::BinaryOp;
-use crate::call_expression::CallExpression;
-use crate::expression_statement::ExpressionStatement;
-use crate::function_declaration::FunctionDeclaration;
-use crate::interpreter::Interpreter;
-use crate::literal::Literal;
-use crate::return_statement::ReturnStatement;
-use crate::value::Value;
+mod ast;
+mod runtime;
 
-mod ast_node;
-mod binary_expression;
-mod binary_op;
-mod call_expression;
-mod expression_statement;
-mod function_declaration;
-mod interpreter;
-mod literal;
-mod marker;
-mod object;
-mod return_statement;
-mod block;
-mod value;
-mod function;
+use ast::*;
+use runtime::Interpreter;
 
 fn main() {
-    let mut program = block::Block::new();
+    let mut program = Block::new();
 
-    let mut block = block::Block::new();
+    let mut block = Block::new();
 
     block.append(ReturnStatement::new(BinaryExpression::new(
         BinaryOp::Add,

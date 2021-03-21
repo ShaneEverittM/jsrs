@@ -1,4 +1,4 @@
-use crate::ast_node::ASTNode;
+use super::ASTNode;
 use std::fmt::Debug;
 
 pub trait StatementClone {

@@ -1,5 +1,5 @@
-use crate::value::Value;
-use crate::interpreter::Interpreter;
+use super::Value;
+use crate::runtime::Interpreter;
 
 pub trait ASTNode {
     fn dump(&self) -> String;
