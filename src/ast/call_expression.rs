@@ -13,8 +13,9 @@ impl CallExpression {
 }
 
 impl ASTNode for CallExpression {
-    fn dump(&self) -> String {
-        unimplemented!()
+    fn dump(&self, indent: u32) -> String {
+        let indent_str = crate::util::make_indent(indent);
+        format!("{}CallExpression: {}\n", indent_str, self.name)
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {

@@ -1,13 +1,14 @@
 mod ast;
 mod runtime;
+mod util;
 
 use ast::*;
 use runtime::Interpreter;
 
 fn main() {
-    let mut program = Block::new();
+    let mut program = Block::new("Program");
 
-    let mut block = Block::new();
+    let mut block = Block::new("FunctionBlock");
 
     block.append(ReturnStatement::new(BinaryExpression::new(
         BinaryOp::Add,
@@ -23,7 +24,9 @@ fn main() {
 
     let mut interpreter = Interpreter::default();
 
+    println!("{}", program.dump(0));
+
     let result = interpreter.run(program);
 
-    dbg!(result);
+    println!("Output: {}", result);
 }

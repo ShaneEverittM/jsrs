@@ -14,8 +14,11 @@ impl FunctionDeclaration {
 }
 
 impl ASTNode for FunctionDeclaration {
-    fn dump(&self) -> String {
-        unimplemented!()
+    fn dump(&self, indent: u32) -> String {
+        let indent_str = crate::util::make_indent(indent);
+        let mut output = format!("{}FunctionDeclaration: {}\n", indent_str, self.name);
+        output += &self.body.dump(indent + 1);
+        output
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {

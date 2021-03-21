@@ -12,8 +12,10 @@ impl Literal {
     }
 }
 impl ASTNode for Literal {
-    fn dump(&self) -> String {
-        unimplemented!()
+    fn dump(&self, indent: u32) -> String {
+        let indent_str = crate::util::make_indent(indent);
+        let output = format!("{}{}\n", indent_str, self.val);
+        output
     }
 
     fn evaluate(&mut self, _interpreter: &mut Interpreter) -> Value {

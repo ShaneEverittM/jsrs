@@ -13,8 +13,11 @@ impl ExpressionStatement {
 }
 
 impl ASTNode for ExpressionStatement {
-    fn dump(&self) -> String {
-        unimplemented!()
+    fn dump(&self, indent: u32) -> String {
+        let indent_str = crate::util::make_indent(indent);
+        let mut output = format!("{}ExpressionStatement\n", indent_str);
+        output += &self.expr.dump(indent + 1);
+        output
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {

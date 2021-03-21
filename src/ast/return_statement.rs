@@ -21,8 +21,12 @@ impl Default for ReturnStatement {
 }
 
 impl ASTNode for ReturnStatement {
-    fn dump(&self) -> String {
-        unimplemented!()
+    fn dump(&self, indent: u32) -> String {
+        let indent_str = crate::util::make_indent(indent);
+        let mut output = format!("{}ReturnStatement\n", indent_str);
+        output += &self.expression.as_ref().unwrap().dump(indent + 1);
+        output
+
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {

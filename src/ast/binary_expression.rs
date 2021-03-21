@@ -14,8 +14,12 @@ impl BinaryExpression {
     }
 }
 impl ASTNode for BinaryExpression {
-    fn dump(&self) -> String {
-        unimplemented!()
+    fn dump(&self, indent: u32) -> String {
+        let indent_str = crate::util::make_indent(indent);
+        let mut output = format!("{}{}\n", indent_str, self.op);
+        output += &self.lhs.dump(indent + 1);
+        output += &self.rhs.dump(indent + 1);
+        output
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
