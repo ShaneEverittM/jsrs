@@ -1,6 +1,6 @@
 use crate::{
     ast::{marker::Expression, ASTNode},
-    runtime::{Function, Interpreter, Value},
+    runtime::{Function, Interpreter, ObjectType, Value},
 };
 
 #[derive(Debug, Clone)]
@@ -9,7 +9,11 @@ pub struct CallExpression {
 }
 
 impl CallExpression {
-    pub fn new(name: String) -> Box<Self> {
+    pub fn new(name: String) -> Self {
+        Self { name }
+    }
+
+    pub fn boxed(name: String) -> Box<Self> {
         Box::new(Self { name })
     }
 }
@@ -24,7 +28,7 @@ impl ASTNode for CallExpression {
         let val = interpreter.global_object.get(&self.name);
         assert!(val.is_some());
         if let Value::Object(mut obj) = val.unwrap() {
-            if obj.is_function() {
+            if obj.get_type() == ObjectType::Function {
                 let func = obj.as_any().downcast_mut::<Function>().unwrap();
                 // TODO: update interpreter context to have param info here
                 interpreter.run(func.body.clone())

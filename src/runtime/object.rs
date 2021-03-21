@@ -1,13 +1,18 @@
 use crate::runtime::Value;
 
+#[derive(Eq, PartialEq)]
+pub enum Type {
+    Function,
+    Global,
+    Object,
+}
+
 pub trait Object: std::fmt::Debug + ObjectClone {
     fn put(&mut self, name: String, value: Value);
 
     fn get(&mut self, name: &str) -> Option<Value>;
 
-    fn is_function(&self) -> bool {
-        false
-    }
+    fn get_type(&self) -> Type { Type::Object }
 
     fn as_any(&mut self) -> &mut dyn std::any::Any;
 }

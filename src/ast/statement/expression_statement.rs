@@ -12,7 +12,11 @@ pub struct ExpressionStatement {
 }
 
 impl ExpressionStatement {
-    pub fn new(expr: Box<dyn Expression>) -> Box<Self> {
+    pub fn new(expr: Box<dyn Expression>) -> Self {
+        Self { expr }
+    }
+    
+    pub fn boxed(expr: Box<dyn Expression>) -> Box<Self> {
         Box::new(Self { expr })
     }
 }

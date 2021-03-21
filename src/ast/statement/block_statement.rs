@@ -21,11 +21,11 @@ impl Default for BlockStatement {
 }
 
 impl BlockStatement {
-    pub fn new(name: &str) -> Box<Self> {
-        Box::new(Self {
+    pub fn new(name: &str) -> Self {
+        Self {
             name: name.to_owned(),
             children: Vec::new(),
-        })
+        }
     }
     pub fn append(&mut self, statement: Box<dyn Statement>) {
         self.children.push(statement);

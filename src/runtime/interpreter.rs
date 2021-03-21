@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use crate::{
     ast::statement::BlockStatement,
-    runtime::{Object, Value},
+    runtime::{Object, Value, ObjectType},
 };
 
 pub struct Interpreter {
@@ -13,7 +13,7 @@ pub struct Interpreter {
 
 #[derive(Debug, Clone)]
 pub struct GlobalObject {
-    properties: HashMap<String, Box<Value>>,
+    properties: HashMap<String, Value>,
 }
 
 impl GlobalObject {
@@ -26,15 +26,15 @@ impl GlobalObject {
 
 impl Object for GlobalObject {
     fn put(&mut self, name: String, value: Value) {
-        self.properties.insert(name, Box::new(value));
+        self.properties.insert(name, value);
     }
 
     fn get(&mut self, name: &str) -> Option<Value> {
-        self.properties.get_mut(name).map(|b| *b.clone())
+        self.properties.get(name).cloned()
     }
 
-    fn is_function(&self) -> bool {
-        true
+    fn get_type(&self) -> ObjectType {
+        ObjectType::Global
     }
 
     fn as_any(&mut self) -> &mut dyn Any {
@@ -52,9 +52,9 @@ impl Default for Interpreter {
 }
 
 impl Interpreter {
-    pub fn run(&mut self, mut block: Box<BlockStatement>) -> Value {
+    pub fn run(&mut self, mut block: BlockStatement) -> Value {
         // TODO: is this clone avoidable, and if not is it really really bad?
-        self.enter_scope(*block.clone());
+        self.enter_scope(block.clone());
 
         let mut last_value = Value::Undefined;
 

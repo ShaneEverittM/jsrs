@@ -10,11 +10,15 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct FunctionDeclaration {
     name: String,
-    body: Box<BlockStatement>,
+    body: BlockStatement,
 }
 
 impl FunctionDeclaration {
-    pub fn new(name: String, body: Box<BlockStatement>) -> Box<Self> {
+    pub fn new(name: String, body: BlockStatement) -> Self {
+        Self { name, body }
+    }
+
+    pub fn boxed(name: String, body: BlockStatement) -> Box<Self> {
         Box::new(Self { name, body })
     }
 }
