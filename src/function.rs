@@ -1,5 +1,5 @@
 use crate::object::Object;
-use crate::scope_node::Block;
+use crate::block::Block;
 use crate::value::Value;
 use std::any::Any;
 use std::collections::HashMap;

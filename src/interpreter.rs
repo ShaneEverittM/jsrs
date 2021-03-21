@@ -1,5 +1,5 @@
 use crate::object::Object;
-use crate::scope_node::Block;
+use crate::block::Block;
 use crate::value::Value;
 use std::any::Any;
 use std::collections::HashMap;
@@ -51,11 +51,13 @@ impl Default for Interpreter {
 }
 
 impl Interpreter {
-    pub fn run(&mut self, program: Box<Block>) -> Value {
-        self.enter_scope(program);
+    pub fn run(&mut self, mut block: Box<Block>) -> Value {
+        // TODO: is this clone avoidable, and if not is it bad?
+        self.enter_scope(block.clone());
 
         let mut last_value = Value::Undefined;
-        for node in self.scope_stack.clone().last_mut().unwrap().children.iter_mut() {
+
+        for node in block.children.iter_mut() {
             last_value = node.evaluate(self);
         }
 

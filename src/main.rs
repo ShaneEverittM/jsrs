@@ -19,14 +19,14 @@ mod literal;
 mod marker;
 mod object;
 mod return_statement;
-mod scope_node;
+mod block;
 mod value;
 mod function;
 
 fn main() {
-    let mut program = scope_node::Block::new();
+    let mut program = block::Block::new();
 
-    let mut block = scope_node::Block::new();
+    let mut block = block::Block::new();
 
     block.append(ReturnStatement::new(BinaryExpression::new(
         BinaryOp::Add,

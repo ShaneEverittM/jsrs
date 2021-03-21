@@ -2,7 +2,7 @@ use crate::ast_node::ASTNode;
 use crate::function::Function;
 use crate::interpreter::Interpreter;
 use crate::marker::{Declaration, Statement};
-use crate::scope_node::Block;
+use crate::block::Block;
 use crate::value::Value;
 
 #[derive(Debug, Clone)]
