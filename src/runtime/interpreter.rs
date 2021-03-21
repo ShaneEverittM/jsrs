@@ -6,7 +6,6 @@ use crate::ast::{Block, Value};
 
 pub struct Interpreter {
     pub global_object: Box<dyn Object>,
-    #[allow(clippy::vec_box)]
     scope_stack: Vec<Block>,
 }
 
