@@ -1,5 +1,10 @@
-use super::{ASTNode, Expression, Statement, Value};
-use crate::runtime::Interpreter;
+use crate::{
+    ast::{
+        marker::{Expression, Statement},
+        ASTNode,
+    },
+    runtime::{Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct ExpressionStatement {

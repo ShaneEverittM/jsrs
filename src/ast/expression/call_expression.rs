@@ -1,5 +1,7 @@
-use super::{ASTNode, Expression, Value};
-use crate::runtime::{Function, Interpreter};
+use crate::{
+    ast::{marker::Expression, ASTNode},
+    runtime::{Function, Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
@@ -24,6 +26,7 @@ impl ASTNode for CallExpression {
         if let Value::Object(mut obj) = val.unwrap() {
             if obj.is_function() {
                 let func = obj.as_any().downcast_mut::<Function>().unwrap();
+                // TODO: update interpreter context to have param info here
                 interpreter.run(func.body.clone())
             } else {
                 unimplemented!()

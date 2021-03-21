@@ -1,18 +1,23 @@
 use std::any::Any;
 use std::collections::HashMap;
 
-use super::Object;
-use crate::ast::{Block, Value};
+use crate::{
+    ast::statement::BlockStatement,
+    runtime::{Object, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct Function {
+    // TODO: Properties should contain the arguments, caller, callee
+    //       and number of args while the function is executing as per
+    //       https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions#the_arguments_object
     properties: HashMap<String, Box<Value>>,
     pub name: String,
-    pub body: Box<Block>,
+    pub body: Box<BlockStatement>,
 }
 
 impl Function {
-    pub fn new(name: String, body: Box<Block>) -> Box<Self> {
+    pub fn new(name: String, body: Box<BlockStatement>) -> Box<Self> {
         Box::new(Self {
             properties: HashMap::new(),
             name,

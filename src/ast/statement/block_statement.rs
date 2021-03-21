@@ -1,15 +1,17 @@
-use super::{ASTNode, Statement, Value};
-use crate::runtime::Interpreter;
+use crate::{
+    ast::{marker::Statement, ASTNode},
+    runtime::{Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
-pub struct Block {
+pub struct BlockStatement {
     name: String,
     pub children: Vec<Box<dyn Statement>>,
     // variables
     // function declarations
 }
 
-impl Default for Block {
+impl Default for BlockStatement {
     fn default() -> Self {
         Self {
             name: String::from("Block"),
@@ -18,7 +20,7 @@ impl Default for Block {
     }
 }
 
-impl Block {
+impl BlockStatement {
     pub fn new(name: &str) -> Box<Self> {
         Box::new(Self {
             name: name.to_owned(),
@@ -29,7 +31,7 @@ impl Block {
         self.children.push(statement);
     }
 }
-impl ASTNode for Block {
+impl ASTNode for BlockStatement {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}{}\n", indent_str, self.name);
@@ -44,4 +46,4 @@ impl ASTNode for Block {
     }
 }
 
-impl Statement for Block {}
+impl Statement for BlockStatement {}

@@ -1,4 +1,4 @@
-use super::ASTNode;
+use crate::ast::ASTNode;
 use std::fmt::Debug;
 
 pub trait Statement: ASTNode + Debug + StatementClone {}
@@ -36,4 +36,3 @@ impl Clone for Box<dyn Expression> {
         self.clone_box()
     }
 }
-

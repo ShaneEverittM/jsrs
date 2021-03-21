@@ -1,23 +1,11 @@
-mod ast_node;
-mod binary_expression;
-mod binary_op;
-mod block;
-mod call_expression;
-mod expression_statement;
-mod function_declaration;
-mod literal;
-mod marker;
-mod return_statement;
-mod value;
+pub mod expression;
+pub mod marker;
+pub mod ops;
+pub mod statement;
 
-pub use ast_node::ASTNode;
-pub use binary_expression::BinaryExpression;
-pub use binary_op::BinaryOp;
-pub use block::Block;
-pub use call_expression::CallExpression;
-pub use expression_statement::ExpressionStatement;
-pub use function_declaration::FunctionDeclaration;
-pub use literal::Literal;
-pub use marker::*;
-pub use return_statement::ReturnStatement;
-pub use value::Value;
+use crate::runtime::{Interpreter, Value};
+
+pub trait ASTNode {
+    fn dump(&self, indent: u32) -> String;
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value;
+}

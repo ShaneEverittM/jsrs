@@ -1,5 +1,7 @@
-use super::{ASTNode, Expression, Value};
-use crate::runtime::Interpreter;
+use crate::{
+    ast::{marker::Expression, ASTNode},
+    runtime::{Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct Literal {

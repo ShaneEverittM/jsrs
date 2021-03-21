@@ -1,14 +1,20 @@
-use super::{ASTNode, Block, Declaration, Statement, Value};
-use crate::runtime::{Function, Interpreter};
+use crate::{
+    ast::{
+        marker::{Declaration, Statement},
+        statement::BlockStatement,
+        ASTNode,
+    },
+    runtime::{Function, Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct FunctionDeclaration {
     name: String,
-    body: Box<Block>,
+    body: Box<BlockStatement>,
 }
 
 impl FunctionDeclaration {
-    pub fn new(name: String, body: Box<Block>) -> Box<Self> {
+    pub fn new(name: String, body: Box<BlockStatement>) -> Box<Self> {
         Box::new(Self { name, body })
     }
 }

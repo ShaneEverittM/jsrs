@@ -1,5 +1,7 @@
-use super::{ASTNode, Expression, Statement, Value};
-use crate::runtime::Interpreter;
+use crate::{
+    ast::{marker::Expression, marker::Statement, ASTNode},
+    runtime::{Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct ReturnStatement {
@@ -26,7 +28,6 @@ impl ASTNode for ReturnStatement {
         let mut output = format!("{}ReturnStatement\n", indent_str);
         output += &self.expression.as_ref().unwrap().dump(indent + 1);
         output
-
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
