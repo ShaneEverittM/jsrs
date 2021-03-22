@@ -5,10 +5,14 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct Literal {
-    val: Value,
+    pub val: Value,
 }
 
 impl Literal {
+    pub fn new(val: Value) -> Self {
+        Self { val }
+    }
+
     pub fn boxed(val: Value) -> Box<Self> {
         Box::new(Self { val })
     }

@@ -1,5 +1,9 @@
 use crate::{
-    ast::{marker::{Statement, BlockStatement}, ASTNode},
+    ast::{
+        marker::{BlockStatement, Statement},
+        statement::VariableDeclaration,
+        ASTNode,
+    },
     runtime::{Interpreter, Value},
 };
 
@@ -7,8 +11,7 @@ use crate::{
 pub struct Scope {
     name: String,
     pub children: Vec<Box<dyn Statement>>,
-    // variables
-    // function declarations
+    pub variables: Vec<VariableDeclaration>, // function declarations
 }
 
 impl Default for Scope {
@@ -16,6 +19,7 @@ impl Default for Scope {
         Self {
             name: String::from("Block"),
             children: Vec::new(),
+            variables: Vec::new(),
         }
     }
 }
@@ -25,6 +29,7 @@ impl Scope {
         Self {
             name: name.to_owned(),
             children: Vec::new(),
+            variables: Vec::new(),
         }
     }
     pub fn append(&mut self, statement: Box<dyn Statement>) {

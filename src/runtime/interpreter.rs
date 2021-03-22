@@ -3,17 +3,23 @@ use std::collections::HashMap;
 
 use crate::{
     ast::statement::Scope,
-    runtime::{Object, Value, ObjectType},
+    runtime::{Object, ObjectType, Value},
 };
 
 pub struct Interpreter {
     pub global_object: Box<dyn Object>,
-    scope_stack: Vec<Scope>,
+    pub scope_stack: Vec<Scope>,
 }
 
 #[derive(Debug, Clone)]
 pub struct GlobalObject {
     properties: HashMap<String, Value>,
+}
+
+impl Default for GlobalObject {
+    fn default() -> Self {
+        GlobalObject::new()
+    }
 }
 
 impl GlobalObject {

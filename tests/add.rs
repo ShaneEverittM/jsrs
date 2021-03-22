@@ -7,9 +7,14 @@ fn test() {
 
     let mut block = Scope::default();
 
+    block.append(VariableDeclaration::boxed(
+        "x",
+        Literal::new(Value::Number(1.5f64)),
+    ));
+
     block.append(ReturnStatement::boxed(BinaryExpression::boxed(
         BinaryOp::Add,
-        Literal::boxed(Value::Number(1.5f64)),
+        Variable::boxed("x"),
         Literal::boxed(Value::Number(3.5f64)),
     )));
 
