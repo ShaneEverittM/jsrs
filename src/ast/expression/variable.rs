@@ -29,17 +29,13 @@ impl ASTNode for Variable {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
-        let current_scope_vars = interpreter
-            .scope_stack
-            .last_mut()
-            .cloned()
-            .unwrap()
-            .variables;
-        let me = current_scope_vars
-            .iter()
-            .find(|v| v.name == self.name)
-            .expect("Variable not in scope");
-        me.value.val.clone()
+        for scope in interpreter.scope_stack.iter().rev() {
+            match scope.variables.iter().find(|v| v.name == self.name) {
+                None => continue,
+                Some(var) => return var.value.val.clone(),
+            }
+        }
+        Value::Undefined
     }
 }
 impl Expression for Variable {}

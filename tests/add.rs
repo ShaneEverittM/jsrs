@@ -5,6 +5,11 @@ use javascript_rs::runtime::{Interpreter, Value};
 fn test() {
     let mut program = Scope::named("Program");
 
+    program.append(VariableDeclaration::boxed(
+        "x",
+        Literal::new(Value::Number(2.0f64)),
+    ));
+
     let mut block = Scope::default();
 
     block.append(VariableDeclaration::boxed(

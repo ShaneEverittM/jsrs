@@ -25,16 +25,15 @@ impl ASTNode for BinaryExpression {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+        use Value::*;
         let lhs_val = self.lhs.evaluate(interpreter);
         let rhs_val = self.rhs.evaluate(interpreter);
-        if let Value::Number(lhs_num) = lhs_val {
-            if let Value::Number(rhs_num) = rhs_val {
-                Value::Number(lhs_num + rhs_num)
-            } else {
-                unimplemented!()
-            }
-        } else {
-            unimplemented!()
+
+        match (lhs_val, rhs_val) {
+            (Number(lhs_num), Number(rhs_num)) => Value::Number(lhs_num + rhs_num),
+            // TODO: Some sort of crash mechanism
+            (Undefined, Number(val)) => panic!("Attempt to add Undefined with {}", val),
+            _ => panic!("Unsupported binary operation"),
         }
     }
 }
