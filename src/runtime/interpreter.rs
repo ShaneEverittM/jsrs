@@ -2,13 +2,13 @@ use std::any::Any;
 use std::collections::HashMap;
 
 use crate::{
-    ast::statement::BlockStatement,
+    ast::statement::Scope,
     runtime::{Object, Value, ObjectType},
 };
 
 pub struct Interpreter {
     pub global_object: Box<dyn Object>,
-    scope_stack: Vec<BlockStatement>,
+    scope_stack: Vec<Scope>,
 }
 
 #[derive(Debug, Clone)]
@@ -52,7 +52,7 @@ impl Default for Interpreter {
 }
 
 impl Interpreter {
-    pub fn run(&mut self, mut block: BlockStatement) -> Value {
+    pub fn run(&mut self, mut block: Scope) -> Value {
         // TODO: is this clone avoidable, and if not is it really really bad?
         self.enter_scope(block.clone());
 
@@ -67,7 +67,7 @@ impl Interpreter {
         last_value
     }
 
-    fn enter_scope(&mut self, scope: BlockStatement) {
+    fn enter_scope(&mut self, scope: Scope) {
         self.scope_stack.push(scope);
     }
 

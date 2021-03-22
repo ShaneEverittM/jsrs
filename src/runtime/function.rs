@@ -2,7 +2,7 @@ use std::any::Any;
 use std::collections::HashMap;
 
 use crate::{
-    ast::statement::BlockStatement,
+    ast::statement::Scope,
     runtime::{Object, Value, ObjectType},
 };
 
@@ -14,11 +14,11 @@ pub struct Function {
     //       https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions#the_arguments_object
     properties: HashMap<String, Value>,
     pub name: String,
-    pub body: BlockStatement,
+    pub body: Scope,
 }
 
 impl Function {
-    pub fn new(name: String, body: BlockStatement) -> Box<Self> {
+    pub fn new(name: String, body: Scope) -> Box<Self> {
         Box::new(Self {
             properties: HashMap::new(),
             name,

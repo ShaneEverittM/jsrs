@@ -9,7 +9,7 @@ pub struct Literal {
 }
 
 impl Literal {
-    pub fn new(val: Value) -> Box<Self> {
+    pub fn boxed(val: Value) -> Box<Self> {
         Box::new(Self { val })
     }
 }

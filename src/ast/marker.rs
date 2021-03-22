@@ -3,6 +3,8 @@ use std::fmt::Debug;
 
 pub trait Statement: ASTNode + Debug + StatementClone {}
 pub trait Expression: ASTNode + Debug + ExpressionClone {}
+
+pub trait BlockStatement: ASTNode + Debug + Statement {}
 pub trait Declaration: Statement {}
 
 pub trait StatementClone {

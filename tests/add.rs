@@ -3,14 +3,14 @@ use javascript_rs::runtime::{Interpreter, Value};
 
 #[test]
 fn test() {
-    let mut program = BlockStatement::new("Program");
+    let mut program = Scope::named("Program");
 
-    let mut block = BlockStatement::new("FunctionBlock");
+    let mut block = Scope::default();
 
-    block.append(ReturnStatement::new(BinaryExpression::new(
+    block.append(ReturnStatement::boxed(BinaryExpression::boxed(
         BinaryOp::Add,
-        Literal::new(Value::Number(1.5f64)),
-        Literal::new(Value::Number(3.5f64)),
+        Literal::boxed(Value::Number(1.5f64)),
+        Literal::boxed(Value::Number(3.5f64)),
     )));
 
     program.append(FunctionDeclaration::boxed("add".to_owned(), block));

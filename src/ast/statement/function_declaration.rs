@@ -1,7 +1,7 @@
 use crate::{
     ast::{
         marker::{Declaration, Statement},
-        statement::BlockStatement,
+        statement::Scope,
         ASTNode,
     },
     runtime::{Function, Interpreter, Value},
@@ -10,15 +10,15 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct FunctionDeclaration {
     name: String,
-    body: BlockStatement,
+    body: Scope,
 }
 
 impl FunctionDeclaration {
-    pub fn new(name: String, body: BlockStatement) -> Self {
+    pub fn new(name: String, body: Scope) -> Self {
         Self { name, body }
     }
 
-    pub fn boxed(name: String, body: BlockStatement) -> Box<Self> {
+    pub fn boxed(name: String, body: Scope) -> Box<Self> {
         Box::new(Self { name, body })
     }
 }

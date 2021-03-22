@@ -1,17 +1,17 @@
 use crate::{
-    ast::{marker::Statement, ASTNode},
+    ast::{marker::{Statement, BlockStatement}, ASTNode},
     runtime::{Interpreter, Value},
 };
 
 #[derive(Debug, Clone)]
-pub struct BlockStatement {
+pub struct Scope {
     name: String,
     pub children: Vec<Box<dyn Statement>>,
     // variables
     // function declarations
 }
 
-impl Default for BlockStatement {
+impl Default for Scope {
     fn default() -> Self {
         Self {
             name: String::from("Block"),
@@ -20,8 +20,8 @@ impl Default for BlockStatement {
     }
 }
 
-impl BlockStatement {
-    pub fn new(name: &str) -> Self {
+impl Scope {
+    pub fn named(name: &str) -> Self {
         Self {
             name: name.to_owned(),
             children: Vec::new(),
@@ -31,7 +31,7 @@ impl BlockStatement {
         self.children.push(statement);
     }
 }
-impl ASTNode for BlockStatement {
+impl ASTNode for Scope {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}{}\n", indent_str, self.name);
@@ -46,4 +46,5 @@ impl ASTNode for BlockStatement {
     }
 }
 
-impl Statement for BlockStatement {}
+impl Statement for Scope {}
+impl BlockStatement for Scope {}

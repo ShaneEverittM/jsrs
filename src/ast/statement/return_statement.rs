@@ -9,7 +9,7 @@ pub struct ReturnStatement {
 }
 
 impl ReturnStatement {
-    pub fn new(expr: Box<dyn Expression>) -> Box<Self> {
+    pub fn boxed(expr: Box<dyn Expression>) -> Box<Self> {
         Box::new(Self {
             expression: Some(expr),
         })

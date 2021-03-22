@@ -11,7 +11,7 @@ pub struct BinaryExpression {
 }
 
 impl BinaryExpression {
-    pub fn new(op: BinaryOp, lhs: Box<dyn Expression>, rhs: Box<dyn Expression>) -> Box<Self> {
+    pub fn boxed(op: BinaryOp, lhs: Box<dyn Expression>, rhs: Box<dyn Expression>) -> Box<Self> {
         Box::new(Self { op, lhs, rhs })
     }
 }
