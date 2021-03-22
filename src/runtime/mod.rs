@@ -8,3 +8,5 @@ mod function;
 mod interpreter;
 mod object;
 mod value;
+mod literal_object;
+mod string;

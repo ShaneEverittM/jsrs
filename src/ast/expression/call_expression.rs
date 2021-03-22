@@ -1,6 +1,6 @@
 use crate::{
     ast::{marker::Expression, ASTNode},
-    runtime::{Function, Interpreter, ObjectType, Value},
+    runtime::{Interpreter, ObjectType, Value},
 };
 
 #[derive(Debug, Clone)]
@@ -29,7 +29,7 @@ impl ASTNode for CallExpression {
         assert!(val.is_some());
         if let Value::Object(mut obj) = val.unwrap() {
             if obj.get_type() == ObjectType::Function {
-                let func = obj.as_any().downcast_mut::<Function>().unwrap();
+                let func = obj.as_function();
                 // TODO: update interpreter context to have param info here
                 interpreter.run(func.body.clone())
             } else {
