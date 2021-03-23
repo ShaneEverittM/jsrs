@@ -3,8 +3,8 @@ use javascript_rs::parser::parse_program;
 use javascript_rs::runtime::Interpreter;
 use std::io::Read;
 
+#[test]
 fn main() {
-    // read from stdin
     let stdin = std::io::stdin();
     let mut lock = stdin.lock();
     let mut buffer = String::new();
@@ -13,9 +13,9 @@ fn main() {
     let program = parse_program(&buffer);
 
     println!("{}", program.dump(0));
-    // construct interpreter
+
     let mut interpreter = Interpreter::default();
-    // output: interpreter.run(program)
+
     let result = interpreter.run(program);
 
     println!("Output: {}", result);

@@ -18,8 +18,8 @@ impl FunctionDeclaration {
         Self { name, body }
     }
 
-    pub fn boxed(name: String, body: Scope) -> Box<Self> {
-        Box::new(Self { name, body })
+    pub fn boxed(name: &str, body: Scope) -> Box<Self> {
+        Box::new(Self { name: name.to_owned(), body })
     }
 }
 

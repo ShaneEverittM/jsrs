@@ -13,8 +13,8 @@ impl CallExpression {
         Self { name }
     }
 
-    pub fn boxed(name: String) -> Box<Self> {
-        Box::new(Self { name })
+    pub fn boxed(name: &str) -> Box<Self> {
+        Box::new(Self { name: name.to_owned() })
     }
 }
 

@@ -23,10 +23,10 @@ fn test() {
         Literal::boxed(Value::Number(3.5f64)),
     )));
 
-    program.append(FunctionDeclaration::boxed("add".to_owned(), block));
+    program.append(FunctionDeclaration::boxed("add", block));
 
     program.append(ExpressionStatement::boxed(CallExpression::boxed(
-        "add".to_owned(),
+        "add",
     )));
 
     let mut interpreter = Interpreter::default();
