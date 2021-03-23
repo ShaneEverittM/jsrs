@@ -61,31 +61,24 @@ impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
     }
 }
 
-impl From<resast::expr::BinaryExpr<'_>> for Box<dyn Expression> {
-    fn from(bin_exp: BinaryExpr) -> Self {
-        match (*bin_exp.left, *bin_exp.right) {
-            (Expr::Lit(left), Expr::Lit(right)) => crate::ir::expression::BinaryExpression::boxed(
-                bin_exp.operator.into(),
-                left.into(),
-                right.into(),
-            ),
-            (Expr::Ident(left), Expr::Ident(right)) => crate::ir::expression::BinaryExpression::boxed(
-                bin_exp.operator.into(),
-                left.into(),
-                right.into(),
-            ),
-            (Expr::Ident(left), Expr::Lit(right)) => crate::ir::expression::BinaryExpression::boxed(
-                bin_exp.operator.into(),
-                left.into(),
-                right.into(),
-            ),
-            (Expr::Lit(left), Expr::Ident(right)) => crate::ir::expression::BinaryExpression::boxed(
-                bin_exp.operator.into(),
-                left.into(),
-                right.into(),
-            ),
+impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
+    fn from(e: Expr<'_>) -> Self {
+        match e {
+            Expr::Ident(i) => i.into(),
+            Expr::Lit(l) => l.into(),
             _ => unimplemented!(),
         }
+    }
+}
+
+
+impl From<resast::expr::BinaryExpr<'_>> for Box<dyn Expression> {
+    fn from(bin_exp: BinaryExpr) -> Self {
+        BinaryExpression::boxed(
+            bin_exp.operator.into(),
+            (*bin_exp.left).into(),
+            (*bin_exp.right).into(),
+        )
     }
 }
 
