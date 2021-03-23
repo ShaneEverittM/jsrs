@@ -59,7 +59,7 @@ impl Default for Interpreter {
 
 impl Interpreter {
     pub fn run(&mut self, mut block: Scope) -> Value {
-        // TODO: is this clone avoidable, and if not is it really really bad?
+        // ?: is this clone avoidable, and if not is it really really bad?
         self.enter_scope(block.clone());
 
         let mut last_value = Value::Undefined;
