@@ -6,6 +6,7 @@ use crate::runtime::Object;
 pub enum Value {
     Number(f64),
     Undefined,
+    Boolean(bool),
     Object(Box<dyn Object>),
 }
 
@@ -14,6 +15,7 @@ impl fmt::Display for Value {
         match self {
             Value::Number(n) => f.write_str(&n.to_string()),
             Value::Undefined => f.write_str("Undefined"),
+            Value::Boolean(b) => f.write_str(&b.to_string()),
             Value::Object(_) => {
                 unimplemented!()
             }

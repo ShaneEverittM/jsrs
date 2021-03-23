@@ -1,2 +1,2 @@
 mod binary;
-pub use binary::BinaryOp;
+pub use binary::BinaryOperator;

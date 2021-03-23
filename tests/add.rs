@@ -18,7 +18,7 @@ fn test() {
     ));
 
     block.append(ReturnStatement::boxed(BinaryExpression::boxed(
-        BinaryOp::Add,
+        BinaryOperator::Plus,
         Variable::boxed("x"),
         Literal::boxed(Value::Number(3.5f64)),
     )));

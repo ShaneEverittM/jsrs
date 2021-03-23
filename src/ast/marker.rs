@@ -38,3 +38,9 @@ impl Clone for Box<dyn Expression> {
         self.clone_box()
     }
 }
+
+impl From<f64> for Box<dyn Expression> {
+    fn from(num: f64) -> Self {
+        crate::ast::expression::Literal::boxed(crate::runtime::Value::Number(num))
+    }
+}
