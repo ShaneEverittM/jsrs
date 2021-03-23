@@ -5,6 +5,7 @@
     - Call frames (~analogous to interpreter scope stack)
     - Exception handling
     - Stack unwinding
+- Will want to implement a REPL, shouldn' be to bad, but will require maybe some special interpreter support? Might be able to just use standard `Interpreter::run` and `IRNode::evaluate` on each incoming line.
 
 ## Problems
 - How to handle objects pointing to same memory? This is generally disallowed in Rust.
