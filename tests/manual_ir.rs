@@ -1,5 +1,5 @@
-use javascript_rs::ir::{expression::*, ops::*, statement::*, IRNode};
-use javascript_rs::runtime::{Interpreter, Value};
+use javascript_rs::{ir::{expression::*, ops::*, statement::*, IRNode}, runtime::{Interpreter, Value}};
+
 
 #[test]
 fn test() {

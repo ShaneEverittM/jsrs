@@ -31,13 +31,13 @@ pub fn parse_block(statements: Vec<ProgramPart>, block: &mut Scope) {
     }
 }
 
-pub fn parse_program(input: &str) -> Scope {
+pub fn parse_program(input: &str, file_name: &str) -> Scope {
     // parse
     let mut parser = Parser::new(input).unwrap();
     let ast = parser.parse().expect("Failed to parse");
 
     // programmatically construct IR from AST
-    let mut ir = Scope::named("Script");
+    let mut ir = Scope::named(&file_name);
 
     if let Program::Script(ast_nodes) = ast {
         for node in ast_nodes {
