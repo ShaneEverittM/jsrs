@@ -2,7 +2,7 @@ use std::any::Any;
 use std::collections::HashMap;
 
 use crate::{
-    ast::statement::Scope,
+    ir::statement::Scope,
     runtime::{Object, ObjectType, Value},
 };
 

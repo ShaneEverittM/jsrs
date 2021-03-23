@@ -1,4 +1,4 @@
-use javascript_rs::ast::ASTNode;
+use javascript_rs::ir::IRNode;
 use javascript_rs::parser::parse_program;
 use javascript_rs::runtime::Interpreter;
 use std::io::Read;

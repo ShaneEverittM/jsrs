@@ -1,5 +1,5 @@
 use crate::{
-    ast::{marker::Expression, ASTNode},
+    ir::{marker::Expression, IRNode},
     runtime::{Interpreter, ObjectType, Value},
 };
 
@@ -18,7 +18,7 @@ impl CallExpression {
     }
 }
 
-impl ASTNode for CallExpression {
+impl IRNode for CallExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         format!("{}CallExpression: {}\n", indent_str, self.name)

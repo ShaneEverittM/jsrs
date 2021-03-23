@@ -1,7 +1,7 @@
 use crate::{
-    ast::{
+    ir::{
         marker::{Expression, Statement},
-        ASTNode,
+        IRNode,
     },
     runtime::{Interpreter, Value},
 };
@@ -21,7 +21,7 @@ impl ExpressionStatement {
     }
 }
 
-impl ASTNode for ExpressionStatement {
+impl IRNode for ExpressionStatement {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}ExpressionStatement\n", indent_str);

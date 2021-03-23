@@ -1,8 +1,8 @@
 use crate::{
-    ast::{
+    ir::{
         marker::{BlockStatement, Statement},
         statement::VariableDeclaration,
-        ASTNode,
+        IRNode,
     },
     runtime::{Interpreter, Value},
 };
@@ -36,7 +36,7 @@ impl Scope {
         self.children.push(statement);
     }
 }
-impl ASTNode for Scope {
+impl IRNode for Scope {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}{}\n", indent_str, self.name);

@@ -1,5 +1,5 @@
 use crate::{
-    ast::{marker::Expression, ASTNode},
+    ir::{marker::Expression, IRNode},
     runtime::{Interpreter, Value},
 };
 
@@ -17,7 +17,7 @@ impl Literal {
         Box::new(Self { val })
     }
 }
-impl ASTNode for Literal {
+impl IRNode for Literal {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let output = format!("{}{}\n", indent_str, self.val);

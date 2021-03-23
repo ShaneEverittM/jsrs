@@ -5,7 +5,7 @@ pub mod statement;
 
 use crate::runtime::{Interpreter, Value};
 
-pub trait ASTNode {
+pub trait IRNode {
     fn dump(&self, indent: u32) -> String;
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value;
 }

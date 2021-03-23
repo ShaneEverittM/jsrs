@@ -1,4 +1,4 @@
-use javascript_rs::ast::{expression::*, ops::*, statement::*, ASTNode};
+use javascript_rs::ir::{expression::*, ops::*, statement::*, IRNode};
 use javascript_rs::runtime::{Interpreter, Value};
 
 #[test]

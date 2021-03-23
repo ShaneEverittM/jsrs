@@ -2,106 +2,36 @@
 use resast::prelude::{Program as ParsedProgram, *};
 use ressa::Parser;
 
-use crate::ast::expression::{BinaryExpression, CallExpression, Literal, Variable};
-use crate::ast::{statement::*};
-use crate::runtime::Value;
-
-pub fn parse_var_declaration(dec: &mut VarDecl) -> Box<VariableDeclaration> {
-    let VarDecl { id, init } = dec;
-    if let Pat::Ident(id) = id {
-        match init.take().unwrap() {
-            Expr::Lit(l) => match l {
-                Lit::Number(n) => {
-                    let n = n.parse::<f64>().unwrap();
-                    VariableDeclaration::boxed(&id.name, Literal::boxed(Value::Number(n)))
-                }
-                _ => unimplemented!(),
-            },
-            Expr::Binary(bin_exp) => VariableDeclaration::boxed(&id.name, parse_bin_expr(bin_exp)),
-            _ => unimplemented!(),
-        }
-    } else {
-        unimplemented!()
-    }
-}
-
-pub fn parse_bin_expr(bin_exp: BinaryExpr) -> Box<BinaryExpression> {
-    match (*bin_exp.left, *bin_exp.right) {
-        (Expr::Lit(le), Expr::Lit(re)) => match (le, re) {
-            (Lit::Number(ln), Lit::Number(rn)) => {
-                let ln = ln.parse::<f64>().unwrap();
-                let rn = rn.parse::<f64>().unwrap();
-                BinaryExpression::boxed(
-                    bin_exp.operator.into(),
-                    ln.into(),
-                    rn.into(),
-                )
-            }
-            _ => unimplemented!(),
-        },
-        _ => unimplemented!(),
-    }
-}
-
-pub fn parse_call_expr(c: CallExpr) -> Box<ExpressionStatement> {
-    let callee = c.callee;
-    match *callee {
-        Expr::Ident(i) => ExpressionStatement::boxed(CallExpression::boxed(&i.name)),
-        _ => unimplemented!(),
-    }
-}
+use crate::ir::statement::*;
 
 pub fn parse_program(input: &str) -> Scope {
-    // lex + parse
-    let mut parser = Parser::new(input).expect("Failed to create parser");
+    // parse
+    let mut parser = Parser::new(input).unwrap();
     let script = parser.parse().expect("Failed to parse");
-    // programmatically construct IR from parsed repr => program
-    let mut program = Scope::named("Parsed");
-    if let ParsedProgram::Script(parts) = script {
-        for part in parts {
-            match part {
-                ProgramPart::Dir(_) => {
-                    unimplemented!()
-                }
+
+    // programmatically construct IR from AST
+    let mut program = Scope::named("Script");
+    if let ParsedProgram::Script(ast_nodes) = script {
+        for node in ast_nodes {
+            match node {
                 ProgramPart::Decl(dec) => match dec {
                     Decl::Var(_, mut dec) => {
-                        program.append(parse_var_declaration(dec.first_mut().unwrap()))
+                        for sub_dec in dec.drain(..) {
+                            program.append(sub_dec.into());
+                        }
                     }
                     Decl::Func(f) => {
-                        let mut block = Scope::default();
-                        for part in f.body.0 {
-                            match part {
-                                ProgramPart::Decl(d) => match d {
-                                    Decl::Var(_, mut dec) => block
-                                        .append(parse_var_declaration(dec.first_mut().unwrap())),
-                                    _ => unimplemented!(),
-                                },
-                                ProgramPart::Stmt(s) => match s {
-                                    Stmt::Return(e) => match e.unwrap() {
-                                        Expr::Binary(bin_exp) => block.append(
-                                            ReturnStatement::boxed(parse_bin_expr(bin_exp)),
-                                        ),
-                                        _ => unimplemented!(),
-                                    },
-
-                                    _ => unimplemented!(),
-                                },
-                                _ => unimplemented!(),
-                            }
-                        }
-                        program.append(FunctionDeclaration::boxed(&f.id.unwrap().name, block));
+                        program.append(f.into());
                     }
-                    Decl::Class(_) => {}
-                    Decl::Import(_) => {}
-                    Decl::Export(_) => {}
+                    _ => unimplemented!(),
                 },
                 ProgramPart::Stmt(s) => match s {
                     Stmt::Expr(e) => match e {
                         Expr::Call(c) => {
-                            program.append(parse_call_expr(c));
+                            program.append(c.into());
                         }
                         Expr::Ident(i) => {
-                            program.append(ExpressionStatement::boxed(Variable::boxed(&i.name)));
+                            program.append(i.into());
                         }
                         _ => unimplemented!(),
                     },
@@ -109,6 +39,7 @@ pub fn parse_program(input: &str) -> Scope {
                         unimplemented!()
                     }
                 },
+                _ => unimplemented!(),
             }
         }
     }

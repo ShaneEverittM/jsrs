@@ -1,10 +1,10 @@
-use javascript_rs::ast::ASTNode;
+use javascript_rs::ir::IRNode;
 use javascript_rs::parser::parse_program;
 use javascript_rs::runtime::Interpreter;
 use std::io::Read;
 
 #[test]
-fn main() {
+fn from_input() {
     let stdin = std::io::stdin();
     let mut lock = stdin.lock();
     let mut buffer = String::new();

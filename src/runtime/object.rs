@@ -36,7 +36,6 @@ pub trait Object: std::fmt::Debug + ObjectClone {
         let any = self.as_any();
         any.downcast_mut::<GlobalObject>().unwrap()
     }
-    
 }
 
 // Helper trait to allow object-safety

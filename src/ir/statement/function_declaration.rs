@@ -1,8 +1,8 @@
 use crate::{
-    ast::{
+    ir::{
         marker::{Declaration, Statement},
         statement::Scope,
-        ASTNode,
+        IRNode,
     },
     runtime::{Function, Interpreter, Value},
 };
@@ -23,7 +23,7 @@ impl FunctionDeclaration {
     }
 }
 
-impl ASTNode for FunctionDeclaration {
+impl IRNode for FunctionDeclaration {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}FunctionDeclaration: {}\n", indent_str, self.name);

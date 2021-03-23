@@ -1,5 +1,5 @@
 use crate::{
-    ast::{marker::Expression, ops::BinaryOperator, ASTNode},
+    ir::{marker::Expression, ops::BinaryOperator, IRNode},
     runtime::{Interpreter, Value},
 };
 
@@ -19,7 +19,7 @@ impl BinaryExpression {
         Box::new(Self { op, lhs, rhs })
     }
 }
-impl ASTNode for BinaryExpression {
+impl IRNode for BinaryExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}{}\n", indent_str, self.op);
@@ -32,15 +32,22 @@ impl ASTNode for BinaryExpression {
         use Value::*;
         let lhs_val = self.lhs.evaluate(interpreter);
         let rhs_val = self.rhs.evaluate(interpreter);
+        let error_margin = 0.000000001;
 
         match (lhs_val, rhs_val) {
             (Number(lhs_num), Number(rhs_num)) => match self.op {
                 BinaryOperator::Plus => Value::Number(lhs_num + rhs_num),
                 BinaryOperator::Minus => Value::Number(lhs_num - rhs_num),
-                BinaryOperator::Equal => Value::Boolean(lhs_num == rhs_num),
-                BinaryOperator::NotEqual => Value::Boolean(lhs_num != rhs_num),
-                BinaryOperator::StrictEqual => Value::Boolean(lhs_num == rhs_num),
-                BinaryOperator::StrictNotEqual => Value::Boolean(lhs_num != rhs_num),
+                BinaryOperator::Equal => Value::Boolean((lhs_num - rhs_num).abs() < error_margin),
+                BinaryOperator::NotEqual => {
+                    Value::Boolean((lhs_num - rhs_num).abs() > error_margin)
+                }
+                BinaryOperator::StrictEqual => {
+                    Value::Boolean((lhs_num - rhs_num).abs() < error_margin)
+                }
+                BinaryOperator::StrictNotEqual => {
+                    Value::Boolean((lhs_num - rhs_num).abs() > error_margin)
+                }
                 BinaryOperator::LessThan => Value::Boolean(lhs_num < rhs_num),
                 BinaryOperator::GreaterThan => Value::Boolean(lhs_num > rhs_num),
                 BinaryOperator::LessThanEqual => Value::Boolean(lhs_num <= rhs_num),
@@ -60,4 +67,5 @@ impl ASTNode for BinaryExpression {
         }
     }
 }
+
 impl Expression for BinaryExpression {}
