@@ -29,10 +29,11 @@ impl ASTNode for Variable {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
-        for scope in interpreter.scope_stack.iter().rev() {
-            match scope.variables.iter().find(|v| v.name == self.name) {
+        let mut scope_stack = interpreter.scope_stack.clone();
+        for scope in scope_stack.iter_mut().rev() {
+            match scope.variables.iter_mut().find(|v| v.name == self.name) {
                 None => continue,
-                Some(var) => return var.value.val.clone(),
+                Some(var) => return var.evaluate(interpreter),
             }
         }
         Value::Undefined

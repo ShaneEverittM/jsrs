@@ -1,5 +1,4 @@
-use crate::ast::expression::Literal;
-use crate::ast::marker::Statement;
+use crate::ast::marker::{Expression, Statement};
 use crate::ast::ASTNode;
 use crate::runtime::{Interpreter, Value};
 
@@ -7,18 +6,18 @@ use crate::runtime::{Interpreter, Value};
 pub struct VariableDeclaration {
     pub name: String,
     // TODO: Can be an expression
-    pub value: Literal,
+    pub value: Box<dyn Expression>,
 }
 
 impl VariableDeclaration {
-    pub fn new(name: &str, value: Literal) -> Self {
+    pub fn new(name: &str, value: Box<dyn Expression>) -> Self {
         Self {
             name: name.to_owned(),
             value,
         }
     }
 
-    pub fn boxed(name: &str, value: Literal) -> Box<Self> {
+    pub fn boxed(name: &str, value: Box<dyn Expression>) -> Box<Self> {
         Box::new(Self {
             name: name.to_owned(),
             value,
@@ -37,7 +36,7 @@ impl ASTNode for VariableDeclaration {
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
         let current_scope = interpreter.scope_stack.last_mut().unwrap();
         current_scope.variables.push(self.clone());
-        self.value.val.clone()
+        self.value.evaluate(interpreter).clone()
     }
 }
 

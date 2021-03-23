@@ -4,11 +4,20 @@ use javascript_rs::runtime::Interpreter;
 use std::io::Read;
 
 fn main() {
-    // read from stdin
-    let stdin = std::io::stdin();
-    let mut lock = stdin.lock();
+    let file_name = std::env::args().nth(1);
     let mut buffer = String::new();
-    lock.read_to_string(&mut buffer).unwrap();
+    match file_name {
+        None => {
+            // read from stdin
+            let stdin = std::io::stdin();
+            let mut lock = stdin.lock();
+            lock.read_to_string(&mut buffer).unwrap();
+        }
+        Some(file_name) => {
+            // read from file
+            buffer = std::fs::read_to_string(file_name).unwrap();
+        }
+    }
 
     let program = parse_program(&buffer);
 

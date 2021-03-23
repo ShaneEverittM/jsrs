@@ -2,7 +2,7 @@
 use resast::prelude::{Program as ParsedProgram, *};
 use ressa::Parser;
 
-use crate::ast::expression::{BinaryExpression, CallExpression, Literal};
+use crate::ast::expression::{BinaryExpression, CallExpression, Literal, Variable};
 use crate::ast::{ops, statement::*};
 use crate::runtime::Value;
 
@@ -13,10 +13,11 @@ pub fn parse_var_declaration(dec: &mut VarDecl) -> Box<VariableDeclaration> {
             Expr::Lit(l) => match l {
                 Lit::Number(n) => {
                     let n = n.parse::<f64>().unwrap();
-                    VariableDeclaration::boxed(&id.name, Literal::new(Value::Number(n)))
+                    VariableDeclaration::boxed(&id.name, Literal::boxed(Value::Number(n)))
                 }
                 _ => unimplemented!(),
             },
+            Expr::Binary(bin_exp) => VariableDeclaration::boxed(&id.name, parse_bin_expr(bin_exp)),
             _ => unimplemented!(),
         }
     } else {
@@ -102,10 +103,10 @@ pub fn parse_program(input: &str) -> Scope {
                         Expr::Call(c) => {
                             program.append(parse_call_expr(c));
                         }
-                        _ => {
-                            dbg!(e);
-                            unimplemented!()
+                        Expr::Ident(i) => {
+                            program.append(ExpressionStatement::boxed(Variable::boxed(&i.name)));
                         }
+                        _ => unimplemented!(),
                     },
                     _ => {
                         unimplemented!()
