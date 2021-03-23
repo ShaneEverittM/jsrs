@@ -1,5 +1,4 @@
-#![allow(clippy::collapsible_match)]
-use resast::prelude::{Program as ParsedProgram, *};
+use resast::prelude::*;
 use ressa::Parser;
 
 use crate::ir::statement::*;
@@ -7,41 +6,40 @@ use crate::ir::statement::*;
 pub fn parse_program(input: &str) -> Scope {
     // parse
     let mut parser = Parser::new(input).unwrap();
-    let script = parser.parse().expect("Failed to parse");
+    let ast = parser.parse().expect("Failed to parse");
 
     // programmatically construct IR from AST
-    let mut program = Scope::named("Script");
-    if let ParsedProgram::Script(ast_nodes) = script {
+    let mut ir = Scope::named("Script");
+
+    if let Program::Script(ast_nodes) = ast {
         for node in ast_nodes {
             match node {
                 ProgramPart::Decl(dec) => match dec {
-                    Decl::Var(_, mut dec) => {
+                    Decl::Var(VarKind::Let, mut dec) => {
                         for sub_dec in dec.drain(..) {
-                            program.append(sub_dec.into());
+                            ir.append(sub_dec.into());
                         }
                     }
                     Decl::Func(f) => {
-                        program.append(f.into());
+                        ir.append(f.into());
                     }
-                    _ => unimplemented!(),
+                    _ => panic!("Unsupported Declaration"),
                 },
                 ProgramPart::Stmt(s) => match s {
                     Stmt::Expr(e) => match e {
                         Expr::Call(c) => {
-                            program.append(c.into());
+                            ir.append(c.into());
                         }
                         Expr::Ident(i) => {
-                            program.append(i.into());
+                            ir.append(i.into());
                         }
-                        _ => unimplemented!(),
+                        _ => panic!("Unsupported expression"),
                     },
-                    _ => {
-                        unimplemented!()
-                    }
+                    _ => panic!("Unsupported statement"),
                 },
-                _ => unimplemented!(),
+                ProgramPart::Dir(_) => panic!("Directives not supported"),
             }
         }
     }
-    program
+    ir
 }

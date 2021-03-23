@@ -1,4 +1,3 @@
-#![allow(clippy::collapsible_match)]
 use std::fmt::Debug;
 
 use resast::prelude::*;
@@ -56,6 +55,7 @@ impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
     fn from(l: Lit<'_>) -> Self {
         match l {
             Lit::Number(n) => Literal::boxed(Value::Number(n.parse::<f64>().unwrap())),
+            Lit::Boolean(b) => Literal::boxed(Value::Boolean(b)),
             _ => unimplemented!(),
         }
     }
@@ -70,7 +70,6 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
         }
     }
 }
-
 
 impl From<resast::expr::BinaryExpr<'_>> for Box<dyn Expression> {
     fn from(bin_exp: BinaryExpr) -> Self {
@@ -91,6 +90,9 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
                     Lit::Number(n) => {
                         let n = n.parse::<f64>().unwrap();
                         VariableDeclaration::boxed(&id.name, Literal::boxed(Value::Number(n)))
+                    }
+                    Lit::Boolean(b) => {
+                        VariableDeclaration::boxed(&id.name, Literal::boxed(Value::Boolean(*b)))
                     }
                     _ => unimplemented!(),
                 },
@@ -122,6 +124,7 @@ impl From<resast::Func<'_>> for Box<dyn Statement> {
             match part {
                 ProgramPart::Decl(d) => match d {
                     Decl::Var(_, mut dec) => block.append(dec.first_mut().unwrap().clone().into()),
+                    Decl::Func(_) => panic!("Nested functions not supported"),
                     _ => unimplemented!(),
                 },
                 ProgramPart::Stmt(s) => match s {
@@ -129,9 +132,11 @@ impl From<resast::Func<'_>> for Box<dyn Statement> {
                         Expr::Binary(bin_exp) => {
                             block.append(ReturnStatement::boxed(bin_exp.into()))
                         }
+                        Expr::Ident(id) => block.append(ReturnStatement::boxed(id.into())),
+                        Expr::Lit(lit) => block.append(ReturnStatement::boxed(lit.into())),
                         _ => unimplemented!(),
                     },
-
+                    Stmt::Var(mut v) => block.append(v.first_mut().unwrap().clone().into()),
                     _ => unimplemented!(),
                 },
                 _ => unimplemented!(),
