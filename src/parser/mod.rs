@@ -1,7 +1,33 @@
+mod conversions;
+
 use resast::prelude::*;
 use ressa::Parser;
 
 use crate::ir::statement::*;
+
+pub fn parse_block(statements: Vec<ProgramPart>, block: &mut Scope) {
+    for part in statements {
+        match part {
+            ProgramPart::Decl(d) => match d {
+                Decl::Var(_, mut dec) => block.append(dec.first_mut().unwrap().clone().into()),
+                Decl::Func(_) => panic!("Nested functions not supported"),
+                _ => unimplemented!(),
+            },
+            ProgramPart::Stmt(s) => match s {
+                Stmt::Return(e) => {
+                    match e {
+                        None => block.append(ReturnStatement::boxed_empty()),
+                        Some(e) => block.append(ReturnStatement::boxed(e.into())),
+                    }
+                }
+                Stmt::Var(mut v) => block.append(v.first_mut().unwrap().clone().into()),
+                Stmt::If(is) => block.append(is.into()),
+                _ => unimplemented!(),
+            },
+            _ => unimplemented!(),
+        }
+    }
+}
 
 pub fn parse_program(input: &str) -> Scope {
     // parse

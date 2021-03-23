@@ -14,6 +14,12 @@ impl ReturnStatement {
             expression: Some(expr),
         })
     }
+
+    pub fn boxed_empty() -> Box<Self> {
+        Box::new(Self {
+            expression: None,
+        })
+    }
 }
 
 impl Default for ReturnStatement {
