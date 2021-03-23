@@ -9,7 +9,11 @@ pub fn parse_block(statements: Vec<ProgramPart>, block: &mut Scope) {
     for part in statements {
         match part {
             ProgramPart::Decl(d) => match d {
-                Decl::Var(_, mut dec) => block.append(dec.first_mut().unwrap().clone().into()),
+                Decl::Var(_, mut dec) => {
+                    for sub_dec in dec.drain(..) {
+                        block.append(sub_dec.into());
+                    }
+                }
                 Decl::Func(_) => panic!("Nested functions not supported"),
                 _ => unimplemented!(),
             },
