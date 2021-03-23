@@ -51,21 +51,39 @@ impl From<f64> for Box<dyn Expression> {
         crate::ir::expression::Literal::boxed(crate::runtime::Value::Number(num))
     }
 }
+
+impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
+    fn from(l: Lit<'_>) -> Self {
+        match l {
+            Lit::Number(n) => Literal::boxed(Value::Number(n.parse::<f64>().unwrap())),
+            _ => unimplemented!(),
+        }
+    }
+}
+
 impl From<resast::expr::BinaryExpr<'_>> for Box<dyn Expression> {
     fn from(bin_exp: BinaryExpr) -> Self {
         match (*bin_exp.left, *bin_exp.right) {
-            (Expr::Lit(le), Expr::Lit(re)) => match (le, re) {
-                (Lit::Number(ln), Lit::Number(rn)) => {
-                    let ln = ln.parse::<f64>().unwrap();
-                    let rn = rn.parse::<f64>().unwrap();
-                    crate::ir::expression::BinaryExpression::boxed(
-                        bin_exp.operator.into(),
-                        ln.into(),
-                        rn.into(),
-                    )
-                }
-                _ => unimplemented!(),
-            },
+            (Expr::Lit(left), Expr::Lit(right)) => crate::ir::expression::BinaryExpression::boxed(
+                bin_exp.operator.into(),
+                left.into(),
+                right.into(),
+            ),
+            (Expr::Ident(left), Expr::Ident(right)) => crate::ir::expression::BinaryExpression::boxed(
+                bin_exp.operator.into(),
+                left.into(),
+                right.into(),
+            ),
+            (Expr::Ident(left), Expr::Lit(right)) => crate::ir::expression::BinaryExpression::boxed(
+                bin_exp.operator.into(),
+                left.into(),
+                right.into(),
+            ),
+            (Expr::Lit(left), Expr::Ident(right)) => crate::ir::expression::BinaryExpression::boxed(
+                bin_exp.operator.into(),
+                left.into(),
+                right.into(),
+            ),
             _ => unimplemented!(),
         }
     }
@@ -85,7 +103,7 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
                 },
                 Expr::Binary(bin_exp) => {
                     VariableDeclaration::boxed(&id.name, bin_exp.clone().into())
-                },
+                }
                 _ => unimplemented!(),
             }
         } else {
@@ -110,9 +128,7 @@ impl From<resast::Func<'_>> for Box<dyn Statement> {
         for part in f.body.0 {
             match part {
                 ProgramPart::Decl(d) => match d {
-                    Decl::Var(_, mut dec) => {
-                        block.append(dec.first_mut().unwrap().clone().into())
-                    }
+                    Decl::Var(_, mut dec) => block.append(dec.first_mut().unwrap().clone().into()),
                     _ => unimplemented!(),
                 },
                 ProgramPart::Stmt(s) => match s {
@@ -135,5 +151,11 @@ impl From<resast::Func<'_>> for Box<dyn Statement> {
 impl From<resast::Ident<'_>> for Box<dyn Statement> {
     fn from(i: Ident<'_>) -> Self {
         ExpressionStatement::boxed(Variable::boxed(&i.name))
+    }
+}
+
+impl From<resast::Ident<'_>> for Box<dyn Expression> {
+    fn from(i: Ident<'_>) -> Self {
+        Variable::boxed(&i.name)
     }
 }
