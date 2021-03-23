@@ -27,6 +27,7 @@ impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => n1 == n2,
+            (Value::Boolean(b1), Value::Boolean(b2)) => b1 == b2,
             // ?: Is undefined == undefined? What about === ?
             (Value::Undefined, Value::Undefined) => true,
             (Value::Object(_), Value::Object(_)) => {
