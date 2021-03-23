@@ -100,7 +100,7 @@ impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
         match *is.consequent {
             Stmt::Expr(e) => consequent_expr = e.into(),
             Stmt::Block(b) => {
-                super::parse_block(b.0, &mut consequent_block);
+                super::parser::parse_block(b.0, &mut consequent_block);
                 consequent_expr = Box::new(consequent_block);
             }
             _ => panic!("Unsupported if statement consequent type"),
@@ -110,7 +110,7 @@ impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
             match *is.alternate.unwrap() {
                 Stmt::Expr(e) => alternate_expr = Some(e.into()),
                 Stmt::Block(b) => {
-                    super::parse_block(b.0, &mut alternate_block);
+                    super::parser::parse_block(b.0, &mut alternate_block);
                     alternate_expr = Some(Box::new(alternate_block))
                 }
                 _ => panic!("Unsupported if statement consequent type"),
@@ -124,7 +124,7 @@ impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
 impl From<resast::Func<'_>> for Box<dyn Statement> {
     fn from(f: Func<'_>) -> Self {
         let mut block = Scope::default();
-        super::parse_block(f.body.0, &mut block);
+        super::parser::parse_block(f.body.0, &mut block);
         FunctionDeclaration::boxed(&f.id.unwrap().name, block)
     }
 }

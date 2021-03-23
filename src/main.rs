@@ -1,5 +1,5 @@
 use javascript_rs::ir::IRNode;
-use javascript_rs::parser::parse_program;
+use javascript_rs::parse::parse_program;
 use javascript_rs::runtime::Interpreter;
 use std::io::Read;
 

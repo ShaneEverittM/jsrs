@@ -1,5 +1,5 @@
 use javascript_rs::ir::IRNode;
-use javascript_rs::parser::parse_program;
+use javascript_rs::parse::parse_program;
 use javascript_rs::runtime::{Interpreter, Value};
 use std::io::Read;
 
@@ -17,6 +17,8 @@ fn from_input() {
     let mut interpreter = Interpreter::default();
 
     let result = interpreter.run(program);
+
+    assert_eq!(result, Value::Boolean(true));
 
     println!("Output: {}", result);
 }
