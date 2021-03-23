@@ -30,7 +30,10 @@ impl ASTNode for BinaryExpression {
         let rhs_val = self.rhs.evaluate(interpreter);
 
         match (lhs_val, rhs_val) {
-            (Number(lhs_num), Number(rhs_num)) => Value::Number(lhs_num + rhs_num),
+            (Number(lhs_num), Number(rhs_num)) => match self.op {
+                BinaryOp::Add => Value::Number(lhs_num + rhs_num),
+                BinaryOp::Subtract => Value::Number(lhs_num - rhs_num),
+            },
             // TODO: Some sort of crash mechanism
             (Undefined, Number(val)) => panic!("Attempt to add Undefined with {}", val),
             _ => panic!("Unsupported binary operation"),

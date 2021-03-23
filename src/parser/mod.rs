@@ -31,14 +31,16 @@ pub fn parse_bin_expr(bin_exp: BinaryExpr) -> Box<BinaryExpression> {
             (Lit::Number(ln), Lit::Number(rn)) => {
                 let ln = ln.parse::<f64>().unwrap();
                 let rn = rn.parse::<f64>().unwrap();
-                match bin_exp.operator {
-                    BinaryOp::Plus => BinaryExpression::boxed(
-                        ops::BinaryOp::Add,
-                        Literal::boxed(Value::Number(ln)),
-                        Literal::boxed(Value::Number(rn)),
-                    ),
+                let op = match bin_exp.operator {
+                    BinaryOp::Plus => ops::BinaryOp::Add,
+                    BinaryOp::Minus => ops::BinaryOp::Subtract,
                     _ => unimplemented!(),
-                }
+                };
+                BinaryExpression::boxed(
+                    op,
+                    Literal::boxed(Value::Number(ln)),
+                    Literal::boxed(Value::Number(rn)),
+                )
             }
             _ => unimplemented!(),
         },
