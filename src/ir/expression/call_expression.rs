@@ -31,7 +31,7 @@ impl IRNode for CallExpression {
             if obj.get_type() == ObjectType::Function {
                 let func = obj.as_function();
                 // TODO: update interpreter context to have param info here
-                interpreter.run(func.body.clone())
+                func.body.evaluate(interpreter)
             } else {
                 unimplemented!()
             }

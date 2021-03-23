@@ -7,6 +7,7 @@ use crate::{
     runtime::{Interpreter, Value},
 };
 
+
 #[derive(Debug, Clone)]
 pub struct Scope {
     name: String,
@@ -46,8 +47,8 @@ impl IRNode for Scope {
         output
     }
 
-    fn evaluate(&mut self, _interpreter: &mut Interpreter) -> Value {
-        unimplemented!()
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+        interpreter.run(self.clone())
     }
 }
 

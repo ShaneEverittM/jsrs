@@ -4,6 +4,13 @@ function add() {
     return x + y
 }
 function is_true() {
+    if (true) {
+        let x = 5
+        return x
+    } else {
+        let y = 6
+        return y
+    }
     return true
 }
 add()
