@@ -5,7 +5,6 @@ use crate::{
     runtime::*,
 };
 
-
 impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
     fn from(l: Lit<'_>) -> Self {
         match l {
@@ -22,11 +21,7 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
             Expr::Ident(i) => i.into(),
             Expr::Lit(l) => l.into(),
             Expr::Binary(b) => {
-                BinaryExpression::boxed(
-                    b.operator.into(),
-                    (*b.left).into(),
-                    (*b.right).into(),
-                )
+                BinaryExpression::boxed(b.operator.into(), (*b.left).into(), (*b.right).into())
             }
             _ => unimplemented!(),
         }
@@ -103,6 +98,10 @@ impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
                 super::parser::parse_block(b.0, &mut consequent_block);
                 consequent_expr = Box::new(consequent_block);
             }
+            Stmt::Return(e) => match e {
+                None => consequent_expr = ReturnStatement::boxed_empty(),
+                Some(e) => consequent_expr = ReturnStatement::boxed(e.into()),
+            },
             _ => panic!("Unsupported if statement consequent type"),
         }
 
@@ -113,6 +112,10 @@ impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
                     super::parser::parse_block(b.0, &mut alternate_block);
                     alternate_expr = Some(Box::new(alternate_block))
                 }
+                Stmt::Return(e) => match e {
+                    None => alternate_expr = Some(ReturnStatement::boxed_empty()),
+                    Some(e) => alternate_expr = Some(ReturnStatement::boxed(e.into())),
+                },
                 _ => panic!("Unsupported if statement consequent type"),
             }
         }
