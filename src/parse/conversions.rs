@@ -10,7 +10,7 @@ impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
         match l {
             Lit::Number(n) => Literal::boxed(Value::Number(n.parse::<f64>().unwrap())),
             Lit::Boolean(b) => Literal::boxed(Value::Boolean(b)),
-            Lit::String(s) => Literal::boxed(Value::String((&s.clone_inner().to_owned()).parse().unwrap())),
+            Lit::String(s) => Literal::boxed(Value::String(s.clone_inner().into())),
             _ => unimplemented!(),
         }
     }
