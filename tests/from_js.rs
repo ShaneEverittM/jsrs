@@ -74,3 +74,21 @@ fn string_test() {
     println!("Output: {}", result);
     println!();
 }
+
+#[test]
+fn complicated() {
+    let input = common::get_test_input("tests/input/complicated.js");
+
+    let program = parse_program(&input, "complicated.js");
+
+    println!("{}", program.dump(0));
+
+    let mut interpreter = Interpreter::default();
+
+    let result = interpreter.run(program);
+
+    assert_eq!(result, Value::Number(6f64));
+
+    println!("Output: {}", result);
+    println!();
+}

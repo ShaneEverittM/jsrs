@@ -19,6 +19,7 @@ impl BinaryExpression {
         Box::new(Self { op, lhs, rhs })
     }
 }
+
 impl IRNode for BinaryExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
@@ -34,7 +35,7 @@ impl IRNode for BinaryExpression {
         let rhs_val = self.rhs.evaluate(interpreter);
         let error_margin = 0.000000001;
 
-        match (lhs_val, rhs_val) {
+        match (lhs_val.clone(), rhs_val.clone()) {
             (Number(lhs_num), Number(rhs_num)) => match self.op {
                 BinaryOperator::Plus => Value::Number(lhs_num + rhs_num),
                 BinaryOperator::Minus => Value::Number(lhs_num - rhs_num),
@@ -61,9 +62,13 @@ impl IRNode for BinaryExpression {
                     panic!("Cannot and numbers")
                 }
             },
+            (String(lhs_str), String(rhs_str)) => match self.op {
+                BinaryOperator::StrictEqual => Value::Boolean(lhs_str == rhs_str),
+                _ => panic!("Unsupported string operation")
+            }
             // TODO: Some sort of crash mechanism
             (Undefined, Number(val)) => panic!("Attempt to add Undefined with {}", val),
-            _ => panic!("Unsupported binary operation"),
+            _ => panic!("Unsupported binary operation: {:?} {:?} {:?}", lhs_val, self.op, rhs_val),
         }
     }
 }
