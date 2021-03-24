@@ -1,12 +1,10 @@
 use javascript_rs::prelude::*;
 
-fn get_test_input(file_name: &str) -> String {
-    std::fs::read_to_string(file_name).unwrap()
-}
+mod common;
 
 #[test]
 fn add_vars() {
-    let input = get_test_input("tests/input/add_vars.js");
+    let input = common::get_test_input("tests/input/add_vars.js");
 
     let program = parse_program(&input, "add_vars.js");
 
@@ -24,7 +22,7 @@ fn add_vars() {
 
 #[test]
 fn if_test() {
-    let input = get_test_input("tests/input/branches.js");
+    let input = common::get_test_input("tests/input/branches.js");
 
     let program = parse_program(&input, "branches.js");
 
@@ -61,7 +59,7 @@ fn if_no_block_test() {
 
 #[test]
 fn string_test() {
-    let input = get_test_input("tests/input/string.js");
+    let input = common::get_test_input("tests/input/string.js");
 
     let program = parse_program(&input, "string.js");
 

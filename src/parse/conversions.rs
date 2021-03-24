@@ -57,6 +57,10 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
                     Lit::Boolean(b) => {
                         VariableDeclaration::boxed(&id.name, Literal::boxed(Value::Boolean(b)))
                     }
+                    Lit::String(s) => {
+                        let s: String = s.clone_inner().into();
+                        VariableDeclaration::boxed(&id.name, Literal::boxed(Value::String(s)))
+                    }
                     _ => unimplemented!(),
                 },
                 Expr::Binary(bin_exp) => {
