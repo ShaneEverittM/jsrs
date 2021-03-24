@@ -6,6 +6,16 @@ use std::any::Any;
 #[derive(Debug, Clone)]
 pub struct JSString {
     properties: HashMap<String, Value>,
+    str: String,
+}
+
+impl JSString {
+    pub fn new(str: &str) -> Self {
+        Self { properties: HashMap::new(), str: str.to_owned() }
+    }
+    pub fn boxed(str: &str) -> Box<Self> {
+        Box::new(Self { properties: HashMap::new(), str: str.to_owned() })
+    }
 }
 
 impl Object for JSString {

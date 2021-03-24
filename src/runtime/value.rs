@@ -7,6 +7,7 @@ pub enum Value {
     Number(f64),
     Undefined,
     Boolean(bool),
+    String(String),
     Object(Box<dyn Object>),
 }
 
@@ -16,6 +17,7 @@ impl fmt::Display for Value {
             Value::Number(n) => f.write_str(&n.to_string()),
             Value::Undefined => f.write_str("Undefined"),
             Value::Boolean(b) => f.write_str(&b.to_string()),
+            Value::String(s) => f.write_str(&s),
             Value::Object(_) => {
                 unimplemented!()
             }
@@ -28,6 +30,7 @@ impl PartialEq for Value {
         match (self, other) {
             (Value::Number(n1), Value::Number(n2)) => n1 == n2,
             (Value::Boolean(b1), Value::Boolean(b2)) => b1 == b2,
+            (Value::String(s1), Value::String(s2)) => s1 == s2,
             // ?: Is undefined == undefined? What about === ?
             (Value::Undefined, Value::Undefined) => true,
             (Value::Object(_), Value::Object(_)) => {
@@ -35,7 +38,7 @@ impl PartialEq for Value {
                 //  So, how can you have object equality? May have to go unsafe with raw
                 //  pointers...
                 false
-            },
+            }
             _ => false,
         }
     }

@@ -27,7 +27,7 @@ pub trait Object: std::fmt::Debug + ObjectClone {
 
     fn as_global(&mut self) -> &mut GlobalObject {
         assert!(self.get_type() == Type::Global);
-        self.any().downcast_mut::<GlobalObject>().unwrap()
+        self.as_any().downcast_mut::<GlobalObject>().unwrap()
     }
 
     fn as_string(&mut self) -> &mut JSString {

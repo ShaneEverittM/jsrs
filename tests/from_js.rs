@@ -58,3 +58,21 @@ fn if_no_block_test() {
     println!("Output: {}", result);
     println!();
 }
+
+#[test]
+fn string_test() {
+    let input = get_test_input("tests/input/string.js");
+
+    let program = parse_program(&input, "string.js");
+
+    println!("{}", program.dump(0));
+
+    let mut interpreter = Interpreter::default();
+
+    let result = interpreter.run(program);
+
+    assert_eq!(result, Value::String(String::from("Strings!")));
+
+    println!("Output: {}", result);
+    println!();
+}
