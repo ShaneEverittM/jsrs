@@ -36,7 +36,14 @@ impl Scope {
     pub fn append(&mut self, statement: Box<dyn Statement>) {
         self.children.push(statement);
     }
+
+    pub fn append_all(&mut self, statements: Vec<Box<dyn Statement>>) {
+        for statement in statements {
+            self.children.push(statement);
+        }
+    }
 }
+
 impl IRNode for Scope {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
@@ -53,4 +60,5 @@ impl IRNode for Scope {
 }
 
 impl Statement for Scope {}
+
 impl BlockStatement for Scope {}

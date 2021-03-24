@@ -2,29 +2,29 @@ use resast::prelude::*;
 use ressa::Parser;
 
 use crate::ir::statement::*;
+use crate::ir::marker::Statement;
+
+pub fn parse_var_decl(mut var_decl: Vec<VarDecl>) -> Vec<Box<dyn Statement>> {
+    let mut statements = Vec::new();
+    for sub_dec in var_decl.drain(..) {
+        statements.push(sub_dec.into());
+    }
+    statements
+}
 
 pub fn parse_block(statements: Vec<ProgramPart>, block: &mut Scope) {
     for part in statements {
         match part {
             ProgramPart::Decl(d) => match d {
-                Decl::Var(_, mut dec) => {
-                    for sub_dec in dec.drain(..) {
-                        block.append(sub_dec.into());
-                    }
+                Decl::Var(VarKind::Let, dec) => {
+                    block.append_all(parse_var_decl(dec))
                 }
-                Decl::Func(_) => panic!("Nested functions not supported"),
-                _ => unimplemented!(),
+                Decl::Func(_) => unimplemented!("Nested functions not supported"),
+                _ => unimplemented!("{:?} not allowed in this context", d),
             },
             ProgramPart::Stmt(s) => match s {
-                Stmt::Return(e) => {
-                    match e {
-                        None => block.append(ReturnStatement::boxed_empty()),
-                        Some(e) => block.append(ReturnStatement::boxed(e.into())),
-                    }
-                }
-                Stmt::Var(mut v) => block.append(v.first_mut().unwrap().clone().into()),
-                Stmt::If(is) => block.append(is.into()),
-                _ => unimplemented!(),
+                Stmt::Var(v) => block.append_all(parse_var_decl(v)),
+                _ => block.append(s.into()),
             },
             _ => unimplemented!(),
         }
@@ -53,18 +53,7 @@ pub fn parse_program(input: &str, file_name: &str) -> Scope {
                     }
                     _ => panic!("Unsupported Declaration"),
                 },
-                ProgramPart::Stmt(s) => match s {
-                    Stmt::Expr(e) => match e {
-                        Expr::Call(c) => {
-                            ir.append(c.into());
-                        }
-                        Expr::Ident(i) => {
-                            ir.append(i.into());
-                        }
-                        _ => panic!("Unsupported expression"),
-                    },
-                    _ => panic!("Unsupported statement"),
-                },
+                ProgramPart::Stmt(s) => ir.append(s.into()),
                 ProgramPart::Dir(_) => panic!("Directives not supported"),
             }
         }

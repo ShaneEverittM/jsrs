@@ -1,1 +1,1 @@
-let v = "String";
+let a = 0, b = 0;

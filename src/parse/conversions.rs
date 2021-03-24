@@ -5,87 +5,73 @@ use crate::{
     runtime::*,
 };
 
+
+// Helps Rust figure out e.into() when e is in a Box..
+impl From<Box<resast::expr::Expr<'_>>> for Box<dyn Expression> {
+    fn from(expr: Box<Expr<'_>>) -> Self {
+        (*expr).into()
+    }
+}
+
+
+/* # Expressions # */
+
+impl From<resast::Ident<'_>> for Box<dyn Expression> {
+    fn from(i: Ident<'_>) -> Self {
+        Variable::boxed(&i.name)
+    }
+}
+
 impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
-    fn from(l: Lit<'_>) -> Self {
-        match l {
-            Lit::Number(n) => Literal::boxed(Value::Number(n.parse::<f64>().unwrap())),
-            Lit::Boolean(b) => Literal::boxed(Value::Boolean(b)),
-            Lit::String(s) => Literal::boxed(Value::String(s.clone_inner().into())),
+    fn from(lit: Lit<'_>) -> Self {
+        let value = match lit {
+            Lit::Number(number) => Value::Number(number.parse::<f64>().unwrap()),
+            Lit::Boolean(boolean) => Value::Boolean(boolean),
+            Lit::String(string) => Value::String(string.clone_inner().into()),
+            _ => unimplemented!(),
+        };
+        Literal::boxed(value)
+    }
+}
+
+impl From<resast::expr::BinaryExpr<'_>> for Box<dyn Expression> {
+    fn from(b: BinaryExpr<'_>) -> Self {
+        BinaryExpression::boxed(
+            b.operator.into(),
+            b.left.into(),
+            b.right.into(),
+        )
+    }
+}
+
+impl From<resast::expr::CallExpr<'_>> for Box<dyn Expression> {
+    fn from(c: CallExpr<'_>) -> Self {
+        let callee = c.callee;
+        match *callee {
+            Expr::Ident(i) => CallExpression::boxed(&i.name),
             _ => unimplemented!(),
         }
     }
 }
 
 impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
-    fn from(e: Expr<'_>) -> Self {
-        match e {
-            Expr::Ident(i) => i.into(),
-            Expr::Lit(l) => l.into(),
-            Expr::Binary(b) => {
-                BinaryExpression::boxed(b.operator.into(), (*b.left).into(), (*b.right).into())
-            }
+    fn from(expr: Expr<'_>) -> Self {
+        match expr {
+            Expr::Ident(ident) => ident.into(),
+            Expr::Lit(lit) => lit.into(),
+            Expr::Binary(bin_expr) => bin_expr.into(),
+            Expr::Call(call_expr) => call_expr.into(),
             _ => unimplemented!(),
         }
     }
 }
+
+
+/* # Statements # */
 
 impl From<resast::expr::Expr<'_>> for Box<dyn Statement> {
-    fn from(e: Expr<'_>) -> Self {
-        match e {
-            Expr::Ident(i) => ExpressionStatement::boxed(i.into()),
-            Expr::Lit(l) => ExpressionStatement::boxed(l.into()),
-            Expr::Binary(b) => ExpressionStatement::boxed(BinaryExpression::boxed(
-                b.operator.into(),
-                (*b.left).into(),
-                (*b.right).into(),
-            )),
-            _ => unimplemented!(),
-        }
-    }
-}
-
-impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
-    fn from(dec: VarDecl) -> Self {
-        let VarDecl { id, mut init } = dec;
-        if let Pat::Ident(id) = id {
-            match init.take().unwrap() {
-                Expr::Lit(l) => match l {
-                    Lit::Number(n) => {
-                        let n = n.parse::<f64>().unwrap();
-                        VariableDeclaration::boxed(&id.name, Literal::boxed(Value::Number(n)))
-                    }
-                    Lit::Boolean(b) => {
-                        VariableDeclaration::boxed(&id.name, Literal::boxed(Value::Boolean(b)))
-                    }
-                    Lit::String(s) => {
-                        let s: String = s.clone_inner().into();
-                        VariableDeclaration::boxed(&id.name, Literal::boxed(Value::String(s)))
-                    }
-                    _ => unimplemented!(),
-                },
-                Expr::Binary(bin_exp) => {
-                    let binary_expression = BinaryExpression::boxed(
-                        bin_exp.operator.into(),
-                        (*bin_exp.left).into(),
-                        (*bin_exp.right).into(),
-                    );
-                    VariableDeclaration::boxed(&id.name, binary_expression)
-                }
-                _ => unimplemented!(),
-            }
-        } else {
-            unimplemented!()
-        }
-    }
-}
-
-impl From<resast::expr::CallExpr<'_>> for Box<dyn Statement> {
-    fn from(c: CallExpr<'_>) -> Self {
-        let callee = c.callee;
-        match *callee {
-            Expr::Ident(i) => ExpressionStatement::boxed(CallExpression::boxed(&i.name)),
-            _ => unimplemented!(),
-        }
+    fn from(expr: Expr<'_>) -> Self {
+        ExpressionStatement::boxed(expr.into())
     }
 }
 
@@ -129,6 +115,36 @@ impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
     }
 }
 
+impl From<resast::stmt::Stmt<'_>> for Box<dyn Statement> {
+    fn from(stmt: Stmt<'_>) -> Self {
+        match stmt {
+            Stmt::Expr(expr) => expr.into(),
+            Stmt::Return(ret_stmt) => {
+                match ret_stmt {
+                    None => ReturnStatement::boxed_empty(),
+                    Some(e) => ReturnStatement::boxed(e.into()),
+                }
+            }
+            Stmt::If(if_stmt) => if_stmt.into(),
+            _ => unimplemented!()
+        }
+    }
+}
+
+
+/* # Declarations # */
+
+impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
+    fn from(dec: VarDecl) -> Self {
+        let VarDecl { id, mut init } = dec;
+        if let Pat::Ident(id) = id {
+            VariableDeclaration::boxed(&id.name, init.take().unwrap().into())
+        } else {
+            unimplemented!()
+        }
+    }
+}
+
 impl From<resast::Func<'_>> for Box<dyn Statement> {
     fn from(f: Func<'_>) -> Self {
         let mut block = Scope::default();
@@ -137,14 +153,11 @@ impl From<resast::Func<'_>> for Box<dyn Statement> {
     }
 }
 
-impl From<resast::Ident<'_>> for Box<dyn Statement> {
-    fn from(i: Ident<'_>) -> Self {
-        ExpressionStatement::boxed(Variable::boxed(&i.name))
-    }
-}
-
-impl From<resast::Ident<'_>> for Box<dyn Expression> {
-    fn from(i: Ident<'_>) -> Self {
-        Variable::boxed(&i.name)
+impl From<resast::decl::Decl<'_>> for Box<dyn Statement> {
+    fn from(dec: Decl<'_>) -> Self {
+        match dec {
+            Decl::Func(f) => f.into(),
+            _ => unimplemented!()
+        }
     }
 }

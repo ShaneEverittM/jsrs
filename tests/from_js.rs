@@ -41,7 +41,7 @@ fn if_test() {
 
 #[test]
 fn if_no_block_test() {
-    let input = get_test_input("tests/input/statement_branches.js");
+    let input = common::get_test_input("tests/input/statement_branches.js");
 
     let program = parse_program(&input, "statement_branches.js");
 
