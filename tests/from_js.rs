@@ -110,3 +110,21 @@ fn assignment() {
     println!("Output: {}", result);
     println!();
 }
+
+#[test]
+fn update() {
+    let input = common::get_test_input("tests/input/update.js");
+
+    let program = parse_program(&input, "update.js");
+
+    println!("{}", program.dump(0));
+
+    let mut interpreter = Interpreter::default();
+
+    let result = interpreter.run(program);
+
+    assert_eq!(result, Value::Number(6f64));
+
+    println!("Output: {}", result);
+    println!();
+}

@@ -1,5 +1,6 @@
 use resast::prelude::*;
 
+use crate::ir::ops::UnaryOperator;
 use crate::{
     ir::{expression::*, marker::*, statement::*},
     runtime::*,
@@ -70,6 +71,20 @@ impl From<resast::expr::AssignExpr<'_>> for Box<dyn Expression> {
     }
 }
 
+impl From<resast::expr::UpdateExpr<'_>> for Box<dyn Expression> {
+    fn from(up_expr: UpdateExpr<'_>) -> Self {
+        let id = match *up_expr.argument {
+            Expr::Ident(i) => i,
+            _ => unimplemented!(),
+        };
+        let op = match up_expr.operator {
+            UpdateOp::Increment => UnaryOperator::Increment,
+            UpdateOp::Decrement => UnaryOperator::Decrement,
+        };
+        UpdateExpression::boxed(Variable::new(&id.name), op, up_expr.prefix)
+    }
+}
+
 impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
     fn from(expr: Expr<'_>) -> Self {
         match expr {
@@ -78,6 +93,7 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
             Expr::Binary(bin_expr) => bin_expr.into(),
             Expr::Call(call_expr) => call_expr.into(),
             Expr::Assign(assn_expr) => assn_expr.into(),
+            Expr::Update(up_expr) => up_expr.into(),
             _ => unimplemented!(),
         }
     }
