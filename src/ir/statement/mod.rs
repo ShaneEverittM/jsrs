@@ -5,6 +5,7 @@ mod return_statement;
 mod variable_declaration;
 mod if_statement;
 mod update_expression;
+mod for_statement;
 
 pub use block_statement::Scope;
 pub use expression_statement::ExpressionStatement;
@@ -13,3 +14,4 @@ pub use return_statement::ReturnStatement;
 pub use variable_declaration::VariableDeclaration;
 pub use if_statement::IfStatement;
 pub use update_expression::UpdateExpression;
+pub use for_statement::ForStatement;

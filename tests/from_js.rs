@@ -128,3 +128,21 @@ fn update() {
     println!("Output: {}", result);
     println!();
 }
+
+#[test]
+fn for_loop() {
+    let input = common::get_test_input("tests/input/for.js");
+
+    let program = parse_program(&input, "for.js");
+
+    println!("{}", program.dump(0));
+
+    let mut interpreter = Interpreter::default();
+
+    let result = interpreter.run(program);
+
+    assert_eq!(result, Value::Number(5f64));
+
+    println!("Output: {}", result);
+    println!();
+}

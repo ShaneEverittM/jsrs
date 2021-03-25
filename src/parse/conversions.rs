@@ -1,6 +1,7 @@
 use resast::prelude::*;
 
 use crate::ir::ops::UnaryOperator;
+use crate::parse::parser::parse_block;
 use crate::{
     ir::{expression::*, marker::*, statement::*},
     runtime::*,
@@ -9,6 +10,12 @@ use crate::{
 // Helps Rust figure out e.into() when e is in a Box..
 impl From<Box<resast::expr::Expr<'_>>> for Box<dyn Expression> {
     fn from(expr: Box<Expr<'_>>) -> Self {
+        (*expr).into()
+    }
+}
+
+impl From<Box<resast::stmt::Stmt<'_>>> for Box<dyn Statement> {
+    fn from(expr: Box<Stmt<'_>>) -> Self {
         (*expr).into()
     }
 }
@@ -147,6 +154,39 @@ impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
     }
 }
 
+impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
+    fn from(for_stmt: ForStmt<'_>) -> Self {
+        let test: Option<Box<dyn Expression>> = for_stmt.test.map(|t| t.into());
+        let update: Option<Box<dyn Expression>> = for_stmt.update.map(|u| u.into());
+        let body: Box<dyn Statement>;
+
+        match *for_stmt.body {
+            Stmt::Expr(e) => body = e.into(),
+            Stmt::Block(b) => {
+                let mut body_block = Scope::default();
+                parse_block(b.0, &mut body_block);
+                body = Box::new(body_block);
+            }
+            _ => unimplemented!(),
+        }
+
+        match for_stmt.init {
+            None => ForStatement::boxed(None, None, test, update, body),
+            Some(init) => match init {
+                LoopInit::Variable(VarKind::Let, decls) => {
+                    assert_eq!(decls.len(), 1);
+                    let init_decl = decls.first().cloned().unwrap().into();
+                    ForStatement::boxed(None, Some(init_decl), test, update, body)
+                }
+                LoopInit::Variable(_, _) => {
+                    unimplemented!("Only let expressions supported in for loops")
+                }
+                LoopInit::Expr(e) => ForStatement::boxed(Some(e.into()), None, test, update, body),
+            },
+        }
+    }
+}
+
 impl From<resast::stmt::Stmt<'_>> for Box<dyn Statement> {
     fn from(stmt: Stmt<'_>) -> Self {
         match stmt {
@@ -156,7 +196,11 @@ impl From<resast::stmt::Stmt<'_>> for Box<dyn Statement> {
                 Some(e) => ReturnStatement::boxed(e.into()),
             },
             Stmt::If(if_stmt) => if_stmt.into(),
-            _ => unimplemented!(),
+            Stmt::For(for_stmt) => for_stmt.into(),
+            _ => {
+                dbg!(stmt);
+                unimplemented!()
+            }
         }
     }
 }
