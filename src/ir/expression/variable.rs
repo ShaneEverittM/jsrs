@@ -31,9 +31,9 @@ impl IRNode for Variable {
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
         let mut scope_stack = interpreter.scope_stack.clone();
         for scope in scope_stack.iter_mut().rev() {
-            match scope.variables.iter_mut().find(|v| v.name == self.name) {
+            match scope.get(&self.name) {
                 None => continue,
-                Some(var) => return var.evaluate(interpreter),
+                Some(val) => return val.clone(),
             }
         }
         Value::Undefined

@@ -8,7 +8,7 @@ use crate::{
 
 pub struct Interpreter {
     pub global_object: Box<dyn Object>,
-    pub scope_stack: Vec<Scope>,
+    pub scope_stack: Vec<HashMap<String, Value>>,
 }
 
 #[derive(Debug, Clone)]
@@ -59,8 +59,7 @@ impl Default for Interpreter {
 
 impl Interpreter {
     pub fn run(&mut self, mut block: Scope) -> Value {
-        // ?: is this clone avoidable, and if not is it really really bad?
-        self.enter_scope(block.clone());
+        self.enter_scope(HashMap::new());
 
         let mut last_value = Value::Undefined;
 
@@ -73,7 +72,7 @@ impl Interpreter {
         last_value
     }
 
-    fn enter_scope(&mut self, scope: Scope) {
+    fn enter_scope(&mut self, scope: HashMap<String, Value>) {
         self.scope_stack.push(scope);
     }
 

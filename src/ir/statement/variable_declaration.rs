@@ -34,9 +34,10 @@ impl IRNode for VariableDeclaration {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+        let value = self.value.evaluate(interpreter);
         let current_scope = interpreter.scope_stack.last_mut().unwrap();
-        current_scope.variables.push(self.clone());
-        self.value.evaluate(interpreter).clone()
+        current_scope.insert(self.name.clone(), value);
+        Value::Undefined
     }
 }
 
