@@ -1,6 +1,4 @@
-use javascript_rs::ir::IRNode;
-use javascript_rs::parse::*;
-use javascript_rs::runtime::Interpreter;
+use javascript_rs::prelude::*;
 
 fn main() {
     let (input, file_name) = javascript_rs::util::get_input();
