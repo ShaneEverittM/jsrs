@@ -52,6 +52,7 @@ impl Default for Interpreter {
     fn default() -> Self {
         Self {
             global_object: Box::new(GlobalObject::new()),
+            // TODO: Put global object alias here, like "window" or "globalThis"
             scope_stack: Vec::new(),
         }
     }
