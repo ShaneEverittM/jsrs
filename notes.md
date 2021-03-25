@@ -15,3 +15,7 @@
     
 ## Questions
 - Am I using clone too much?
+
+## Next Time
+- Improve variable lookup and how variable are stored. Maybe rewrite scopes? Maybe a Scope node and a current frame should be different concepts. So a Scope is the IR repr but a Frame is a runtime concept. A Scope is just a container for statements and a Frame could hold context? Or maybe just have easier lookup within a scope than just a list of decls.
+- After that, try for loops based off of branch "for_loop".
