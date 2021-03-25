@@ -73,6 +73,16 @@ impl Interpreter {
         last_value
     }
 
+    pub fn resolve_variable(&mut self, name: &str) -> Option<&mut Value> {
+        for scope in self.scope_stack.iter_mut().rev() {
+            match scope.get_mut(name) {
+                None => continue,
+                Some(v) => return Some(v),
+            }
+        }
+        None
+    }
+
     fn enter_scope(&mut self, scope: HashMap<String, Value>) {
         self.scope_stack.push(scope);
     }

@@ -92,3 +92,21 @@ fn complicated() {
     println!("Output: {}", result);
     println!();
 }
+
+#[test]
+fn assignment() {
+    let input = common::get_test_input("tests/input/assignment.js");
+
+    let program = parse_program(&input, "assignment.js");
+
+    println!("{}", program.dump(0));
+
+    let mut interpreter = Interpreter::default();
+
+    let result = interpreter.run(program);
+
+    assert_eq!(result, Value::Number(7f64));
+
+    println!("Output: {}", result);
+    println!();
+}

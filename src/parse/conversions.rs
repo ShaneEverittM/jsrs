@@ -5,14 +5,12 @@ use crate::{
     runtime::*,
 };
 
-
 // Helps Rust figure out e.into() when e is in a Box..
 impl From<Box<resast::expr::Expr<'_>>> for Box<dyn Expression> {
     fn from(expr: Box<Expr<'_>>) -> Self {
         (*expr).into()
     }
 }
-
 
 /* # Expressions # */
 
@@ -36,11 +34,7 @@ impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
 
 impl From<resast::expr::BinaryExpr<'_>> for Box<dyn Expression> {
     fn from(b: BinaryExpr<'_>) -> Self {
-        BinaryExpression::boxed(
-            b.operator.into(),
-            b.left.into(),
-            b.right.into(),
-        )
+        BinaryExpression::boxed(b.operator.into(), b.left.into(), b.right.into())
     }
 }
 
@@ -54,6 +48,28 @@ impl From<resast::expr::CallExpr<'_>> for Box<dyn Expression> {
     }
 }
 
+impl From<resast::expr::AssignExpr<'_>> for Box<dyn Expression> {
+    fn from(assn_expr: AssignExpr<'_>) -> Self {
+        match assn_expr.operator {
+            AssignOp::Equal => (),
+            _ => unimplemented!(),
+        }
+
+        let id = match assn_expr.left {
+            AssignLeft::Pat(p) => match p {
+                Pat::Ident(i) => i,
+                _ => unimplemented!(),
+            },
+            AssignLeft::Expr(e) => match *e {
+                Expr::Ident(i) => i,
+                _ => unimplemented!(),
+            },
+        };
+
+        AssignmentExpression::boxed(Variable::new(&id.name), assn_expr.right.into())
+    }
+}
+
 impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
     fn from(expr: Expr<'_>) -> Self {
         match expr {
@@ -61,11 +77,11 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
             Expr::Lit(lit) => lit.into(),
             Expr::Binary(bin_expr) => bin_expr.into(),
             Expr::Call(call_expr) => call_expr.into(),
+            Expr::Assign(assn_expr) => assn_expr.into(),
             _ => unimplemented!(),
         }
     }
 }
-
 
 /* # Statements # */
 
@@ -119,18 +135,15 @@ impl From<resast::stmt::Stmt<'_>> for Box<dyn Statement> {
     fn from(stmt: Stmt<'_>) -> Self {
         match stmt {
             Stmt::Expr(expr) => expr.into(),
-            Stmt::Return(ret_stmt) => {
-                match ret_stmt {
-                    None => ReturnStatement::boxed_empty(),
-                    Some(e) => ReturnStatement::boxed(e.into()),
-                }
-            }
+            Stmt::Return(ret_stmt) => match ret_stmt {
+                None => ReturnStatement::boxed_empty(),
+                Some(e) => ReturnStatement::boxed(e.into()),
+            },
             Stmt::If(if_stmt) => if_stmt.into(),
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
 }
-
 
 /* # Declarations # */
 
@@ -157,7 +170,7 @@ impl From<resast::decl::Decl<'_>> for Box<dyn Statement> {
     fn from(dec: Decl<'_>) -> Self {
         match dec {
             Decl::Func(f) => f.into(),
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
 }
