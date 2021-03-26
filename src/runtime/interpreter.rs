@@ -9,6 +9,7 @@ use crate::{
 pub struct Interpreter {
     pub global_object: Box<dyn Object>,
     pub scope_stack: Vec<HashMap<String, Value>>,
+    should_break: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -54,6 +55,7 @@ impl Default for Interpreter {
             global_object: Box::new(GlobalObject::new()),
             // TODO: Put global object alias here, like "window" or "globalThis"
             scope_stack: Vec::new(),
+            should_break: false,
         }
     }
 }
@@ -66,6 +68,15 @@ impl Interpreter {
 
         for node in block.children.iter_mut() {
             last_value = node.evaluate(self);
+            /*
+            Break out of evaluating block, but don't clear, since we are probably
+            running inside Loop::evaluate() and it needs to stop looping. Two rust breaks
+            are needed to get one JS break, one to stop evaluating the block, another to stop
+            iterating
+            */
+            if self.should_break {
+                break;
+            }
         }
 
         self.pop_scope();
@@ -81,6 +92,18 @@ impl Interpreter {
             }
         }
         None
+    }
+
+    pub fn notify_break(&mut self) {
+        self.should_break = true;
+    }
+
+    pub fn clear_break(&mut self) {
+        self.should_break = false;
+    }
+
+    pub fn broke(&self) -> bool {
+        self.should_break
     }
 
     fn enter_scope(&mut self, scope: HashMap<String, Value>) {

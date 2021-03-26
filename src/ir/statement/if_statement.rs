@@ -54,13 +54,11 @@ impl IRNode for IfStatement {
         };
 
         if b {
-            self.consequent.evaluate(interpreter)
-        } else {
-            match self.alternate.as_mut() {
-                None => Value::Undefined,
-                Some(expr) => expr.evaluate(interpreter),
-            }
+            self.consequent.evaluate(interpreter);
+        } else if self.alternate.is_some() {
+            self.alternate.as_mut().unwrap().evaluate(interpreter);
         }
+        Value::Undefined
     }
 }
 

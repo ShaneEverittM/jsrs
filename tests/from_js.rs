@@ -65,3 +65,8 @@ fn update() {
 fn for_loop() {
     validate_output("for", Value::Number(5f64));
 }
+
+#[test]
+fn break_test() {
+    validate_output("break", Value::Number(3f64));
+}

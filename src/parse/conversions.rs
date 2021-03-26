@@ -20,6 +20,7 @@ impl From<Box<resast::stmt::Stmt<'_>>> for Box<dyn Statement> {
     }
 }
 
+
 /* # Expressions # */
 
 impl From<resast::Ident<'_>> for Box<dyn Expression> {
@@ -106,7 +107,8 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
     }
 }
 
-/* # Statements # */
+
+/* # Expression to Statement# */
 
 impl From<resast::expr::Expr<'_>> for Box<dyn Statement> {
     fn from(expr: Expr<'_>) -> Self {
@@ -114,41 +116,15 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Statement> {
     }
 }
 
+
+/* # Statements # */
+
 impl From<resast::stmt::IfStmt<'_>> for Box<dyn Statement> {
     fn from(is: IfStmt<'_>) -> Self {
         let test: Box<dyn Expression> = is.test.into();
-        let mut consequent_block = Scope::default();
-        let consequent_expr: Box<dyn Statement>;
-        let mut alternate_block = Scope::default();
-        let mut alternate_expr: Option<Box<dyn Statement>> = None;
+        let consequent_expr: Box<dyn Statement> = is.consequent.into();
 
-        match *is.consequent {
-            Stmt::Expr(e) => consequent_expr = e.into(),
-            Stmt::Block(b) => {
-                super::parser::parse_block(b.0, &mut consequent_block);
-                consequent_expr = Box::new(consequent_block);
-            }
-            Stmt::Return(e) => match e {
-                None => consequent_expr = ReturnStatement::boxed_empty(),
-                Some(e) => consequent_expr = ReturnStatement::boxed(e.into()),
-            },
-            _ => panic!("Unsupported if statement consequent type"),
-        }
-
-        if is.alternate.is_some() {
-            match *is.alternate.unwrap() {
-                Stmt::Expr(e) => alternate_expr = Some(e.into()),
-                Stmt::Block(b) => {
-                    super::parser::parse_block(b.0, &mut alternate_block);
-                    alternate_expr = Some(Box::new(alternate_block))
-                }
-                Stmt::Return(e) => match e {
-                    None => alternate_expr = Some(ReturnStatement::boxed_empty()),
-                    Some(e) => alternate_expr = Some(ReturnStatement::boxed(e.into())),
-                },
-                _ => panic!("Unsupported if statement consequent type"),
-            }
-        }
+        let alternate_expr = is.alternate.map(|e| e.into());
 
         IfStatement::boxed(test, consequent_expr, alternate_expr)
     }
@@ -158,17 +134,8 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
     fn from(for_stmt: ForStmt<'_>) -> Self {
         let test: Option<Box<dyn Expression>> = for_stmt.test.map(|t| t.into());
         let update: Option<Box<dyn Expression>> = for_stmt.update.map(|u| u.into());
-        let body: Box<dyn Statement>;
+        let body: Box<dyn Statement> = for_stmt.body.into();
 
-        match *for_stmt.body {
-            Stmt::Expr(e) => body = e.into(),
-            Stmt::Block(b) => {
-                let mut body_block = Scope::default();
-                parse_block(b.0, &mut body_block);
-                body = Box::new(body_block);
-            }
-            _ => unimplemented!(),
-        }
 
         match for_stmt.init {
             None => ForStatement::boxed(None, None, test, update, body),
@@ -181,9 +148,23 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
                 LoopInit::Variable(_, _) => {
                     unimplemented!("Only let expressions supported in for loops")
                 }
-                LoopInit::Expr(e) => ForStatement::boxed(Some(e.into()), None, test, update, body),
+                LoopInit::Expr(e) => ForStatement::boxed(
+                    Some(e.into()),
+                    None,
+                    test,
+                    update,
+                    body
+                ),
             },
         }
+    }
+}
+
+impl From<resast::stmt::BlockStmt<'_>> for Box<dyn Statement> {
+    fn from(block_statement: BlockStmt<'_>) -> Self {
+        let mut body_block = Scope::default();
+        parse_block(block_statement.0, &mut body_block);
+        Box::new(body_block)
     }
 }
 
@@ -197,6 +178,11 @@ impl From<resast::stmt::Stmt<'_>> for Box<dyn Statement> {
             },
             Stmt::If(if_stmt) => if_stmt.into(),
             Stmt::For(for_stmt) => for_stmt.into(),
+            Stmt::Break(break_stmt) => match break_stmt {
+                None => BreakStatement::boxed(),
+                Some(_) => { unimplemented!("Labeled break statements not supported") }
+            },
+            Stmt::Block(block_stmt) => block_stmt.into(),
             _ => {
                 dbg!(stmt);
                 unimplemented!()

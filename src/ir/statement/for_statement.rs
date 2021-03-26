@@ -67,6 +67,12 @@ impl IRNode for ForStatement {
         if let Some(test) = self.test.as_mut() {
             while test.evaluate(interpreter) == Value::Boolean(true) {
                 self.body.evaluate(interpreter);
+
+                if interpreter.broke() {
+                    interpreter.clear_break();
+                    break;
+                }
+
                 if self.update.is_some() {
                     self.update.as_mut().unwrap().evaluate(interpreter);
                 }
