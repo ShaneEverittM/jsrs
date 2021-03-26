@@ -1,10 +1,8 @@
 use javascript_rs::prelude::*;
 
-mod common;
-
 #[test]
 fn parse() {
-    let input = common::get_test_input("tests/input/parse_analysis.js");
+    let input = std::fs::read_to_string("tests/input/parse_analysis.js").unwrap();
 
     let program = parse_program(&input, "parse_analysis.js");
 
