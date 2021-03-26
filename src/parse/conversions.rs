@@ -153,7 +153,7 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
                     None,
                     test,
                     update,
-                    body
+                    body,
                 ),
             },
         }
@@ -162,7 +162,7 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
 
 impl From<resast::stmt::BlockStmt<'_>> for Box<dyn Statement> {
     fn from(block_statement: BlockStmt<'_>) -> Self {
-        let mut body_block = Scope::default();
+        let mut body_block = Scope::new(ScopeType::Local);
         parse_block(block_statement.0, &mut body_block);
         Box::new(body_block)
     }
@@ -206,7 +206,7 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
 
 impl From<resast::Func<'_>> for Box<dyn Statement> {
     fn from(f: Func<'_>) -> Self {
-        let mut block = Scope::default();
+        let mut block = Scope::named(&f.id.as_ref().unwrap().name, ScopeType::Function);
         super::parser::parse_block(f.body.0, &mut block);
         FunctionDeclaration::boxed(&f.id.unwrap().name, block)
     }

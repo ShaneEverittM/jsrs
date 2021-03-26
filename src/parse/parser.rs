@@ -37,7 +37,7 @@ pub fn parse_program(input: &str, file_name: &str) -> Scope {
     let ast = parser.parse().expect("Failed to parse");
 
     // programmatically construct IR from AST
-    let mut ir = Scope::named(&file_name);
+    let mut ir = Scope::named(&file_name, ScopeType::Global);
 
     if let Program::Script(ast_nodes) = ast {
         for node in ast_nodes {

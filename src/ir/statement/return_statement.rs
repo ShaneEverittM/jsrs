@@ -37,10 +37,13 @@ impl IRNode for ReturnStatement {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
-        match self.expression.take() {
-            None => Value::Undefined,
-            Some(mut expr) => expr.evaluate(interpreter),
+        if let Some(mut expr) = self.expression.take() {
+            interpreter.notify_return();
+            let ret_val = expr.evaluate(interpreter);
+            interpreter.set_return_val(ret_val);
         }
+        Value::Undefined
     }
 }
+
 impl Statement for ReturnStatement {}

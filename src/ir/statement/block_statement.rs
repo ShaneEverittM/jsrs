@@ -6,10 +6,18 @@ use crate::{
     runtime::{Interpreter, Value},
 };
 
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum ScopeType {
+    Function,
+    Local,
+    Global,
+}
+
 #[derive(Debug, Clone)]
 pub struct Scope {
     name: String,
     pub children: Vec<Box<dyn Statement>>,
+    scope_type: ScopeType,
 }
 
 impl Default for Scope {
@@ -17,17 +25,28 @@ impl Default for Scope {
         Self {
             name: String::from("Block"),
             children: Vec::new(),
+            scope_type: ScopeType::Local,
         }
     }
 }
 
 impl Scope {
-    pub fn named(name: &str) -> Self {
+    pub fn named(name: &str, scope_type: ScopeType) -> Self {
         Self {
             name: name.to_owned(),
             children: Vec::new(),
+            scope_type,
         }
     }
+
+    pub fn new(scope_type: ScopeType) -> Self {
+        Self {
+            name: "Scope".to_owned(),
+            children: Vec::new(),
+            scope_type,
+        }
+    }
+
     pub fn append(&mut self, statement: Box<dyn Statement>) {
         self.children.push(statement);
     }
@@ -36,6 +55,10 @@ impl Scope {
         for statement in statements {
             self.children.push(statement);
         }
+    }
+
+    pub fn get_type(&self) -> &ScopeType {
+        &self.scope_type
     }
 }
 

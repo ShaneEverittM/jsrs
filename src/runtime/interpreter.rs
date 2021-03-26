@@ -5,11 +5,14 @@ use crate::{
     ir::statement::Scope,
     runtime::{Object, ObjectType, Value},
 };
+use crate::ir::statement::ScopeType;
 
 pub struct Interpreter {
     pub global_object: Box<dyn Object>,
     pub scope_stack: Vec<HashMap<String, Value>>,
     should_break: bool,
+    should_return: bool,
+    return_register: Option<Value>,
 }
 
 #[derive(Debug, Clone)]
@@ -56,6 +59,8 @@ impl Default for Interpreter {
             // TODO: Put global object alias here, like "window" or "globalThis"
             scope_stack: Vec::new(),
             should_break: false,
+            should_return: false,
+            return_register: None,
         }
     }
 }
@@ -75,6 +80,14 @@ impl Interpreter {
             iterating
             */
             if self.should_break {
+                break;
+            }
+
+            if self.should_return {
+                if block.get_type() == &ScopeType::Function {
+                    self.clear_return();
+                    last_value = self.return_register.take().unwrap_or(Value::Undefined);
+                }
                 break;
             }
         }
@@ -104,6 +117,22 @@ impl Interpreter {
 
     pub fn broke(&self) -> bool {
         self.should_break
+    }
+
+    pub fn notify_return(&mut self) {
+        self.should_return = true;
+    }
+
+    pub fn clear_return(&mut self) {
+        self.should_return = false;
+    }
+
+    pub fn returned(&self) -> bool {
+        self.should_return
+    }
+
+    pub fn set_return_val(&mut self, val: Value) {
+        self.return_register = Some(val)
     }
 
     fn enter_scope(&mut self, scope: HashMap<String, Value>) {

@@ -33,7 +33,7 @@ fn add_vars() {
 
 #[test]
 fn if_test() {
-    validate_output("branches", Value::Number(420f64));
+    validate_output("branches", Value::Number(69f64));
 }
 
 #[test]

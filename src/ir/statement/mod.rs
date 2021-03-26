@@ -8,7 +8,7 @@ mod update_expression;
 mod for_statement;
 mod break_statement;
 
-pub use block_statement::Scope;
+pub use block_statement::{Scope, ScopeType};
 pub use expression_statement::ExpressionStatement;
 pub use function_declaration::FunctionDeclaration;
 pub use return_statement::ReturnStatement;

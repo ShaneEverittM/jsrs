@@ -73,6 +73,10 @@ impl IRNode for ForStatement {
                     break;
                 }
 
+                if interpreter.returned() {
+                    break;
+                }
+
                 if self.update.is_some() {
                     self.update.as_mut().unwrap().evaluate(interpreter);
                 }
