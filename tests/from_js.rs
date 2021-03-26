@@ -70,3 +70,8 @@ fn for_loop() {
 fn break_test() {
     validate_output("break", Value::Number(3f64));
 }
+
+#[test]
+fn return_test() {
+    validate_output("return", Value::Number(3f64));
+}
