@@ -1,7 +1,7 @@
 use crate::{
     ir::{
-        marker::{BlockStatement, Statement},
         IRNode,
+        marker::{BlockStatement, Statement},
     },
     runtime::{Interpreter, Value},
 };
@@ -9,39 +9,32 @@ use crate::{
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum ScopeType {
     Function,
-    Local,
+    Control,
     Global,
+}
+
+impl std::fmt::Display for ScopeType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let id = match self {
+            ScopeType::Function => { "FunctionBody" }
+            ScopeType::Control => { "ControlStatementBody" }
+            ScopeType::Global => { "GlobalScope" }
+        };
+
+        f.write_str(id)
+    }
 }
 
 #[derive(Debug, Clone)]
 pub struct Scope {
-    name: String,
     pub children: Vec<Box<dyn Statement>>,
     scope_type: ScopeType,
 }
 
-impl Default for Scope {
-    fn default() -> Self {
-        Self {
-            name: String::from("Block"),
-            children: Vec::new(),
-            scope_type: ScopeType::Local,
-        }
-    }
-}
 
 impl Scope {
-    pub fn named(name: &str, scope_type: ScopeType) -> Self {
-        Self {
-            name: name.to_owned(),
-            children: Vec::new(),
-            scope_type,
-        }
-    }
-
     pub fn new(scope_type: ScopeType) -> Self {
         Self {
-            name: "Scope".to_owned(),
             children: Vec::new(),
             scope_type,
         }
@@ -65,7 +58,7 @@ impl Scope {
 impl IRNode for Scope {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
-        let mut output = format!("{}{}\n", indent_str, self.name);
+        let mut output = format!("{}{}\n", indent_str, self.scope_type);
         for child in self.children.iter() {
             output += &child.dump(indent + 1);
         }

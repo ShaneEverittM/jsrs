@@ -1,9 +1,9 @@
 use javascript_rs::prelude::*;
 
 fn main() {
-    let (input, file_name) = javascript_rs::util::get_input();
+    let input = javascript_rs::util::get_input();
 
-    let program = parse_program(&input, &file_name);
+    let program = parse_program(&input);
 
     println!("{}", program.dump(0));
 

@@ -83,8 +83,13 @@ impl Interpreter {
                 break;
             }
 
+            /*
+            Keep breaking out of scopes, which will put us right after the call to evaluate
+            above, until we get to a function, meaning we found the function from which we
+            should return. Then clear return flag, and propagate value.
+            */
             if self.should_return {
-                if block.get_type() == &ScopeType::Function {
+                if *block.get_type() == ScopeType::Function {
                     self.clear_return();
                     last_value = self.return_register.take().unwrap_or(Value::Undefined);
                 }

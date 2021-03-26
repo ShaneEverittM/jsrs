@@ -9,7 +9,7 @@ pub fn make_indent(indent: u32) -> String {
 }
 
 
-pub fn get_input() -> (String, String) {
+pub fn get_input() -> String {
     let file_name = std::env::args().nth(1);
 
     match file_name {
@@ -19,11 +19,11 @@ pub fn get_input() -> (String, String) {
             let stdin = std::io::stdin();
             let mut lock = stdin.lock();
             lock.read_to_string(&mut buffer).unwrap();
-            (buffer, String::from("stdin"))
+            buffer
         }
         Some(file_name) => {
             // read from file
-            (std::fs::read_to_string(&file_name).unwrap(), file_name)
+            std::fs::read_to_string(&file_name).unwrap()
         }
     }
 }

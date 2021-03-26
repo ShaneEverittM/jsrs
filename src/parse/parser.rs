@@ -1,8 +1,8 @@
 use resast::prelude::*;
 use ressa::Parser;
 
-use crate::ir::statement::*;
 use crate::ir::marker::Statement;
+use crate::ir::statement::*;
 
 pub fn parse_var_decl(mut var_decl: Vec<VarDecl>) -> Vec<Box<dyn Statement>> {
     let mut statements = Vec::new();
@@ -31,13 +31,13 @@ pub fn parse_block(statements: Vec<ProgramPart>, block: &mut Scope) {
     }
 }
 
-pub fn parse_program(input: &str, file_name: &str) -> Scope {
+pub fn parse_program(input: &str) -> Scope {
     // parse
     let mut parser = Parser::new(input).unwrap();
     let ast = parser.parse().expect("Failed to parse");
 
     // programmatically construct IR from AST
-    let mut ir = Scope::named(&file_name, ScopeType::Global);
+    let mut ir = Scope::new(ScopeType::Global);
 
     if let Program::Script(ast_nodes) = ast {
         for node in ast_nodes {

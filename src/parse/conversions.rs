@@ -1,11 +1,11 @@
 use resast::prelude::*;
 
-use crate::ir::ops::UnaryOperator;
-use crate::parse::parser::parse_block;
 use crate::{
     ir::{expression::*, marker::*, statement::*},
     runtime::*,
 };
+use crate::ir::ops::UnaryOperator;
+use crate::parse::parser::parse_block;
 
 // Helps Rust figure out e.into() when e is in a Box..
 impl From<Box<resast::expr::Expr<'_>>> for Box<dyn Expression> {
@@ -162,7 +162,7 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
 
 impl From<resast::stmt::BlockStmt<'_>> for Box<dyn Statement> {
     fn from(block_statement: BlockStmt<'_>) -> Self {
-        let mut body_block = Scope::new(ScopeType::Local);
+        let mut body_block = Scope::new(ScopeType::Control);
         parse_block(block_statement.0, &mut body_block);
         Box::new(body_block)
     }
@@ -206,7 +206,7 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
 
 impl From<resast::Func<'_>> for Box<dyn Statement> {
     fn from(f: Func<'_>) -> Self {
-        let mut block = Scope::named(&f.id.as_ref().unwrap().name, ScopeType::Function);
+        let mut block = Scope::new(ScopeType::Function);
         super::parser::parse_block(f.body.0, &mut block);
         FunctionDeclaration::boxed(&f.id.unwrap().name, block)
     }

@@ -1,5 +1,6 @@
-use javascript_rs::prelude::*;
 use std::env;
+
+use javascript_rs::prelude::*;
 
 fn validate_output(file_name: &str, expected: Value) {
     let verbose = match env::var("VERBOSE") {
@@ -9,7 +10,7 @@ fn validate_output(file_name: &str, expected: Value) {
 
     let input = std::fs::read_to_string(&format!("tests/input/{}.js", file_name)).unwrap();
 
-    let program = parse_program(&input, "add_vars.js");
+    let program = parse_program(&input);
 
     if verbose {
         println!("{}", program.dump(0));
@@ -20,7 +21,7 @@ fn validate_output(file_name: &str, expected: Value) {
     let result = interpreter.run(program);
 
     if verbose {
-        println!("\nResult: {}", result);
+        println!("Result: {}\n", result);
     }
 
     assert_eq!(result, expected);
