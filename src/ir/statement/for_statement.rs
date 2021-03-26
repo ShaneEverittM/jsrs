@@ -4,6 +4,7 @@ use crate::prelude::{Interpreter, Value};
 
 #[derive(Clone, Debug)]
 pub struct ForStatement {
+    // ?: can a union be used here?
     initializer_expr: Option<Box<dyn Expression>>,
     initializer_decl: Option<Box<dyn Statement>>,
     test: Option<Box<dyn Expression>>,
