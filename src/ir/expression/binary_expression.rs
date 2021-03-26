@@ -33,22 +33,18 @@ impl IRNode for BinaryExpression {
         use Value::*;
         let lhs_val = self.lhs.evaluate(interpreter);
         let rhs_val = self.rhs.evaluate(interpreter);
-        let error_margin = 0.000000001;
 
+        // Should allow this here, since it's not our job as the interpreter to guess at
+        // best practices for the programmer
+        #[allow(clippy::float_cmp)]
         match (lhs_val.clone(), rhs_val.clone()) {
             (Number(lhs_num), Number(rhs_num)) => match self.op {
                 BinaryOperator::Plus => Value::Number(lhs_num + rhs_num),
                 BinaryOperator::Minus => Value::Number(lhs_num - rhs_num),
-                BinaryOperator::Equal => Value::Boolean((lhs_num - rhs_num).abs() < error_margin),
-                BinaryOperator::NotEqual => {
-                    Value::Boolean((lhs_num - rhs_num).abs() > error_margin)
-                }
-                BinaryOperator::StrictEqual => {
-                    Value::Boolean((lhs_num - rhs_num).abs() < error_margin)
-                }
-                BinaryOperator::StrictNotEqual => {
-                    Value::Boolean((lhs_num - rhs_num).abs() > error_margin)
-                }
+                BinaryOperator::Equal => Value::Boolean(lhs_num == rhs_num),
+                BinaryOperator::NotEqual => Value::Boolean(lhs_num != rhs_num),
+                BinaryOperator::StrictEqual =>  Value::Boolean(lhs_num == rhs_num),
+                BinaryOperator::StrictNotEqual => Value::Boolean(lhs_num != rhs_num),
                 BinaryOperator::LessThan => Value::Boolean(lhs_num < rhs_num),
                 BinaryOperator::GreaterThan => Value::Boolean(lhs_num > rhs_num),
                 BinaryOperator::LessThanEqual => Value::Boolean(lhs_num <= rhs_num),
