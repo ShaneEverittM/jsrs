@@ -12,7 +12,7 @@ function math() {
         }
         return y + 5 //45
     } else {
-        return 420
+        return 50
     }
 }
 
@@ -21,7 +21,7 @@ function runner() {
         for (let j = 0; j < 10; ++j) {
             if (i === 5) {
                 if (j === 5) {
-                    return math() + 24
+                    return math() + 5
                 }
             }
         }
@@ -29,4 +29,4 @@ function runner() {
     return 123
 }
 
-runner() //69
+runner() // 50

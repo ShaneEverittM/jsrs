@@ -1,8 +1,9 @@
+use itertools::{EitherOrBoth, Itertools};
+
 use crate::{
-    ir::{IrNode, marker::Expression},
+    ir::{marker::Expression, IrNode},
     runtime::{Interpreter, ObjectType, Value},
 };
-use crate::ir::expression::Literal;
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
@@ -16,7 +17,10 @@ impl CallExpression {
     }
 
     pub fn boxed(name: &str, arguments: Vec<Box<dyn Expression>>) -> Box<Self> {
-        Box::new(Self { name: name.to_owned(), arguments })
+        Box::new(Self {
+            name: name.to_owned(),
+            arguments,
+        })
     }
 }
 
@@ -38,18 +42,18 @@ impl IrNode for CallExpression {
             if obj.get_type() == ObjectType::Function {
                 let func = obj.as_function();
 
-                // Pad missing parameters as undefined
-                let missing = func.parameters.len() - self.arguments.len();
-                for _ in 0..missing {
-                    self.arguments.push(Literal::boxed(Value::Undefined));
-                }
-
                 // bind formal parameters to actual parameters (thanks Klefstad)
-                let context = func.parameters
+                let context = func
+                    .parameters
                     .iter()
-                    .zip(self.arguments.drain(..))
-                    .map(|(formal, mut actual)| {
-                        (formal.clone(), actual.evaluate(interpreter).unwrap_or_default())
+                    .zip_longest(self.arguments.drain(..))
+                    .map(|eob| match eob {
+                        EitherOrBoth::Both(formal, mut actual) => (
+                            formal.clone(),
+                            actual.evaluate(interpreter).unwrap_or_default(),
+                        ),
+                        EitherOrBoth::Left(formal) => (formal.clone(), Value::Undefined),
+                        EitherOrBoth::Right(_) => panic!("Too many arguments"),
                     })
                     .collect();
 
