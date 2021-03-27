@@ -22,11 +22,6 @@ impl ReturnStatement {
     }
 }
 
-impl Default for ReturnStatement {
-    fn default() -> Self {
-        Self { expression: None }
-    }
-}
 
 impl IRNode for ReturnStatement {
     fn dump(&self, indent: u32) -> String {
