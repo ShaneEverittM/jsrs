@@ -10,6 +10,8 @@ pub trait BlockStatement: IrNode + Debug + Statement {}
 
 pub trait Declaration: Statement {}
 
+impl<T> Statement for T where T: Declaration {}
+
 pub trait StatementClone {
     fn clone_box(&self) -> Box<dyn Statement>;
 }

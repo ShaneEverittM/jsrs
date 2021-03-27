@@ -1,7 +1,7 @@
 use crate::{
     ir::{
         IrNode,
-        marker::{Declaration, Statement},
+        marker::Declaration,
         statement::Scope,
     },
     runtime::{Function, Interpreter, Value},
@@ -44,7 +44,5 @@ impl IrNode for FunctionDeclaration {
         None
     }
 }
-
-impl Statement for FunctionDeclaration {}
 
 impl Declaration for FunctionDeclaration {}
