@@ -1,5 +1,5 @@
 use crate::ir::expression::Variable;
-use crate::ir::IRNode;
+use crate::ir::IrNode;
 use crate::ir::marker::Expression;
 use crate::prelude::{Interpreter, Value};
 
@@ -18,7 +18,7 @@ impl AssignmentExpression {
     }
 }
 
-impl IRNode for AssignmentExpression {
+impl IrNode for AssignmentExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!(

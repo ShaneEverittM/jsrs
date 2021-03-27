@@ -1,6 +1,6 @@
 use crate::{
     ir::{
-        IRNode,
+        IrNode,
         marker::{Declaration, Statement},
         statement::Scope,
     },
@@ -24,7 +24,7 @@ impl FunctionDeclaration {
     }
 }
 
-impl IRNode for FunctionDeclaration {
+impl IrNode for FunctionDeclaration {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}FunctionDeclaration: {} | {:?}\n", indent_str, self.name, self.parameters);

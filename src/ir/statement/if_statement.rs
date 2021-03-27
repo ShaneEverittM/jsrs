@@ -1,4 +1,4 @@
-use crate::ir::IRNode;
+use crate::ir::IrNode;
 use crate::ir::marker::{Expression, Statement};
 use crate::runtime::{Interpreter, Value};
 
@@ -34,7 +34,7 @@ impl IfStatement {
     }
 }
 
-impl IRNode for IfStatement {
+impl IrNode for IfStatement {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}IfStatement\n", indent_str);

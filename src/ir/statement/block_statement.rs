@@ -1,6 +1,6 @@
 use crate::{
     ir::{
-        IRNode,
+        IrNode,
         marker::{BlockStatement, Statement},
     },
     runtime::{Interpreter, Value},
@@ -55,7 +55,7 @@ impl Scope {
     }
 }
 
-impl IRNode for Scope {
+impl IrNode for Scope {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}{}\n", indent_str, self.scope_type);

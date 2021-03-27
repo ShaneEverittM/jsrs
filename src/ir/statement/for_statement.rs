@@ -1,4 +1,4 @@
-use crate::ir::IRNode;
+use crate::ir::IrNode;
 use crate::ir::marker::{Expression, Statement};
 use crate::prelude::{Interpreter, Value};
 
@@ -34,7 +34,7 @@ impl ForStatement {
     }
 }
 
-impl IRNode for ForStatement {
+impl IrNode for ForStatement {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}ForStatement\n", indent_str);

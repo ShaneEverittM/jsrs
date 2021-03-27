@@ -1,5 +1,5 @@
 use crate::{
-    ir::{IRNode, marker::Expression, marker::Statement},
+    ir::{IrNode, marker::Expression, marker::Statement},
     runtime::{Interpreter, Value},
 };
 
@@ -23,7 +23,7 @@ impl ReturnStatement {
 }
 
 
-impl IRNode for ReturnStatement {
+impl IrNode for ReturnStatement {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}ReturnStatement\n", indent_str);

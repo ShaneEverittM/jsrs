@@ -1,4 +1,4 @@
-use crate::ir::IRNode;
+use crate::ir::IrNode;
 use crate::ir::marker::{Expression, Statement};
 use crate::runtime::{Interpreter, Value};
 
@@ -24,7 +24,7 @@ impl VariableDeclaration {
     }
 }
 
-impl IRNode for VariableDeclaration {
+impl IrNode for VariableDeclaration {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}VariableDeclaration: {}\n", indent_str, self.name);

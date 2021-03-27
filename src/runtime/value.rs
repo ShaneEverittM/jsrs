@@ -11,6 +11,13 @@ pub enum Value {
     Object(Box<dyn Object>),
 }
 
+
+impl Default for Value {
+    fn default() -> Self {
+        Self::Undefined
+    }
+}
+
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

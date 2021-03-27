@@ -1,5 +1,5 @@
 use crate::ir::expression::Variable;
-use crate::ir::IRNode;
+use crate::ir::IrNode;
 use crate::ir::marker::Expression;
 use crate::ir::ops::UnaryOperator;
 use crate::prelude::{Interpreter, Value};
@@ -21,7 +21,7 @@ impl UpdateExpression {
     }
 }
 
-impl IRNode for UpdateExpression {
+impl IrNode for UpdateExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         format!(

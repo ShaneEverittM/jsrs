@@ -1,5 +1,5 @@
 use crate::{
-    ir::{IRNode, marker::Expression, ops::BinaryOperator},
+    ir::{IrNode, marker::Expression, ops::BinaryOperator},
     runtime::{Interpreter, Value},
 };
 
@@ -20,7 +20,7 @@ impl BinaryExpression {
     }
 }
 
-impl IRNode for BinaryExpression {
+impl IrNode for BinaryExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!("{}BinaryExpression: {}\n", indent_str, self.op);

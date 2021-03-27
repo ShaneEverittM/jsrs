@@ -1,11 +1,13 @@
 use std::fmt::Debug;
 
-use crate::ir::IRNode;
+use crate::ir::IrNode;
 
-pub trait Statement: IRNode + Debug + StatementClone {}
-pub trait Expression: IRNode + Debug + ExpressionClone {}
+pub trait Statement: IrNode + Debug + StatementClone {}
 
-pub trait BlockStatement: IRNode + Debug + Statement {}
+pub trait Expression: IrNode + Debug + ExpressionClone {}
+
+pub trait BlockStatement: IrNode + Debug + Statement {}
+
 pub trait Declaration: Statement {}
 
 pub trait StatementClone {

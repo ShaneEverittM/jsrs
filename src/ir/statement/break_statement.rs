@@ -1,4 +1,4 @@
-use crate::ir::IRNode;
+use crate::ir::IrNode;
 use crate::ir::marker::Statement;
 use crate::prelude::{Interpreter, Value};
 
@@ -13,7 +13,7 @@ impl BreakStatement {
 }
 
 
-impl IRNode for BreakStatement {
+impl IrNode for BreakStatement {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         format!("{}BreakStatement\n", indent_str)
