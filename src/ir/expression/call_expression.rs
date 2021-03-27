@@ -35,7 +35,7 @@ impl IRNode for CallExpression {
                 // bind formal parameters to actual parameters (thanks Klefstad)
                 let missing = func.parameters.len() - self.arguments.len();
                 for _ in 0..missing {
-                    self.arguments.push(Literal::boxed(Value::Undefined) as Box<dyn Expression>);
+                    self.arguments.push(Literal::boxed(Value::Undefined));
                 }
                 let context = func.parameters
                     .iter()
