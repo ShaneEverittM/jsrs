@@ -84,3 +84,8 @@ fn return_test() {
 fn complicated_v2() {
     validate_output("complicated2", Some(Value::Number(69f64)));
 }
+
+#[test]
+fn empty_decl() {
+    validate_output("empty_decl", Some(Value::Number(5f64)));
+}

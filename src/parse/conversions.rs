@@ -197,7 +197,11 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
     fn from(dec: VarDecl) -> Self {
         let VarDecl { id, mut init } = dec;
         if let Pat::Ident(id) = id {
-            VariableDeclaration::boxed(&id.name, init.take().unwrap().into())
+            VariableDeclaration::boxed(
+                &id.name,
+                init.take().map(|e| e.into())
+                    .unwrap_or_else(|| Literal::boxed(Value::Undefined) as Box<dyn Expression>),
+            )
         } else {
             unimplemented!()
         }
