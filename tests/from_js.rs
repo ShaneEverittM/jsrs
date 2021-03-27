@@ -94,3 +94,8 @@ fn empty_decl() {
 fn params() {
     validate_output("parameters", Some(Value::Number(3f64)));
 }
+
+#[test]
+fn missing_params() {
+    validate_output("missing_parameter", Some(Value::Number(5f64)));
+}
