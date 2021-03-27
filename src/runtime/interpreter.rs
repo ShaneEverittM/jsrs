@@ -109,13 +109,9 @@ impl Interpreter {
     }
 
     pub fn resolve_variable(&mut self, name: &str) -> Option<&mut Value> {
-        for scope in self.scope_stack.iter_mut().rev() {
-            match scope.get_mut(name) {
-                None => continue,
-                Some(v) => return Some(v),
-            }
-        }
-        None
+        self.scope_stack.iter_mut().rev().find_map(|scope| {
+            scope.get_mut(name)
+        })
     }
 
     pub fn notify_break(&mut self) {
