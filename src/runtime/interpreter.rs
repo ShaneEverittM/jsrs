@@ -100,7 +100,7 @@ impl Interpreter {
             }
         }
 
-        self.pop_scope();
+        self.leave_scope();
 
         last_value
     }
@@ -146,7 +146,7 @@ impl Interpreter {
         self.scope_stack.push(scope);
     }
 
-    fn pop_scope(&mut self) {
+    fn leave_scope(&mut self) {
         assert!(self.scope_stack.last().is_some());
         self.scope_stack.pop();
     }
