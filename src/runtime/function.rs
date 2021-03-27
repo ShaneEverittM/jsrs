@@ -3,9 +3,8 @@ use std::collections::HashMap;
 
 use crate::{
     ir::statement::Scope,
-    runtime::{Object, Value, ObjectType},
+    runtime::{Object, ObjectType, Value},
 };
-
 
 #[derive(Debug, Clone)]
 pub struct Function {
@@ -14,14 +13,16 @@ pub struct Function {
     //       https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions#the_arguments_object
     properties: HashMap<String, Value>,
     pub name: String,
+    pub parameters: Vec<String>,
     pub body: Scope,
 }
 
 impl Function {
-    pub fn new(name: String, body: Scope) -> Box<Self> {
+    pub fn new(name: String, parameters: Vec<String>, body: Scope) -> Box<Self> {
         Box::new(Self {
             properties: HashMap::new(),
             name,
+            parameters,
             body,
         })
     }

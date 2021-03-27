@@ -89,3 +89,8 @@ fn complicated_v2() {
 fn empty_decl() {
     validate_output("empty_decl", Some(Value::Number(5f64)));
 }
+
+#[test]
+fn params() {
+    validate_output("parameters", Some(Value::Number(3f64)));
+}

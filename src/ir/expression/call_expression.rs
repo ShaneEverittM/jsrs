@@ -2,19 +2,21 @@ use crate::{
     ir::{IRNode, marker::Expression},
     runtime::{Interpreter, ObjectType, Value},
 };
+use crate::ir::expression::Literal;
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
     name: String,
+    arguments: Vec<Box<dyn Expression>>,
 }
 
 impl CallExpression {
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: String, arguments: Vec<Box<dyn Expression>>) -> Self {
+        Self { name, arguments }
     }
 
-    pub fn boxed(name: &str) -> Box<Self> {
-        Box::new(Self { name: name.to_owned() })
+    pub fn boxed(name: &str, arguments: Vec<Box<dyn Expression>>) -> Box<Self> {
+        Box::new(Self { name: name.to_owned(), arguments })
     }
 }
 
@@ -30,14 +32,25 @@ impl IRNode for CallExpression {
         if let Value::Object(mut obj) = val.unwrap() {
             if obj.get_type() == ObjectType::Function {
                 let func = obj.as_function();
-                // TODO: update interpreter context to have param info here
-                func.body.evaluate(interpreter)
+                // bind formal parameters to actual parameters (thanks Klefstad)
+                let missing = func.parameters.len() - self.arguments.len();
+                for _ in 0..missing {
+                    self.arguments.push(Literal::boxed(Value::Undefined) as Box<dyn Expression>);
+                }
+                let context = func.parameters
+                    .iter()
+                    .zip(self.arguments.drain(..))
+                    .map(|(formal, mut actual)| {
+                        (formal.clone(), actual.evaluate(interpreter).unwrap_or(Value::Undefined))
+                    }).collect();
+                interpreter.run_with(func.body.clone(), context)
             } else {
-                unimplemented!()
+                unimplemented!("Only current callable type is a function")
             }
         } else {
-            unimplemented!()
+            unimplemented!("Cannot resolve callable name")
         }
     }
 }
+
 impl Expression for CallExpression {}

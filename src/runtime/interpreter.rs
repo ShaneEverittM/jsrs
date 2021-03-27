@@ -66,8 +66,8 @@ impl Default for Interpreter {
 }
 
 impl Interpreter {
-    pub fn run(&mut self, mut block: Scope) -> Option<Value> {
-        self.enter_scope(HashMap::new());
+    pub fn run_with(&mut self, mut block: Scope, context: HashMap<String, Value>) -> Option<Value> {
+        self.enter_scope(context);
 
         let mut last_value = None;
 
@@ -103,6 +103,9 @@ impl Interpreter {
         self.pop_scope();
 
         last_value
+    }
+    pub fn run(&mut self, block: Scope) -> Option<Value> {
+        self.run_with(block, HashMap::new())
     }
 
     pub fn resolve_variable(&mut self, name: &str) -> Option<&mut Value> {

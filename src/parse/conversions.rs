@@ -1,3 +1,5 @@
+use std::string::ToString;
+
 use resast::prelude::*;
 
 use crate::{
@@ -48,10 +50,11 @@ impl From<resast::expr::BinaryExpr<'_>> for Box<dyn Expression> {
 }
 
 impl From<resast::expr::CallExpr<'_>> for Box<dyn Expression> {
-    fn from(c: CallExpr<'_>) -> Self {
+    fn from(mut c: CallExpr<'_>) -> Self {
         let callee = c.callee;
+        let arguments = c.arguments.drain(..).map(|e| e.into()).collect();
         match *callee {
-            Expr::Ident(i) => CallExpression::boxed(&i.name),
+            Expr::Ident(i) => CallExpression::boxed(&i.name, arguments),
             _ => unimplemented!(),
         }
     }
@@ -212,7 +215,14 @@ impl From<resast::Func<'_>> for Box<dyn Statement> {
     fn from(f: Func<'_>) -> Self {
         let mut block = Scope::new(ScopeType::Function);
         super::parser::parse_block(f.body.0, &mut block);
-        FunctionDeclaration::boxed(&f.id.unwrap().name, block)
+        let params = f.params.iter().map(|param| {
+            match param {
+                FuncArg::Expr(Expr::Ident(id)) => { id.name.to_string() }
+                FuncArg::Pat(Pat::Ident(id)) => { id.name.to_string() }
+                _ => panic!("Unsupported parameter ident")
+            }
+        }).collect();
+        FunctionDeclaration::boxed(&f.id.unwrap().name, params, block)
     }
 }
 
