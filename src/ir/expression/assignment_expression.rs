@@ -1,6 +1,6 @@
 use crate::ir::expression::Variable;
-use crate::ir::marker::Expression;
 use crate::ir::IRNode;
+use crate::ir::marker::Expression;
 use crate::prelude::{Interpreter, Value};
 
 #[derive(Debug, Clone)]
@@ -29,12 +29,15 @@ impl IRNode for AssignmentExpression {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         let new_val = self.new_value.evaluate(interpreter);
         let current_val = interpreter
             .resolve_variable(&self.variable.name)
             .expect("Cannot find variable");
-        *current_val = new_val.clone();
+        *current_val = match new_val.clone() {
+            None => panic!("Cannot assign to expression which produces no value!"),
+            Some(v) => v,
+        };
         new_val
     }
 }

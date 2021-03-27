@@ -1,5 +1,5 @@
-use crate::ir::marker::Expression;
 use crate::ir::IRNode;
+use crate::ir::marker::Expression;
 use crate::runtime::{Interpreter, Value};
 
 #[derive(Clone, Debug)]
@@ -28,15 +28,15 @@ impl IRNode for Variable {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         let mut scope_stack = interpreter.scope_stack.clone();
         for scope in scope_stack.iter_mut().rev() {
             match scope.get(&self.name) {
                 None => continue,
-                Some(val) => return val.clone(),
+                Some(val) => return Some(val.clone()),
             }
         }
-        Value::Undefined
+        None
     }
 }
 impl Expression for Variable {}

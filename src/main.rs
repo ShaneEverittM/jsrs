@@ -11,5 +11,8 @@ fn main() {
 
     let result = interpreter.run(program);
 
-    println!("Output: {}", result);
+    match result {
+        None => {}
+        Some(result) => { println!("Output: {}", result); }
+    }
 }

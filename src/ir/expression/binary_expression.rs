@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Expression, ops::BinaryOperator, IRNode},
+    ir::{IRNode, marker::Expression, ops::BinaryOperator},
     runtime::{Interpreter, Value},
 };
 
@@ -29,21 +29,21 @@ impl IRNode for BinaryExpression {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         use Value::*;
-        let lhs_val = self.lhs.evaluate(interpreter);
-        let rhs_val = self.rhs.evaluate(interpreter);
+        let lhs_val = self.lhs.evaluate(interpreter).unwrap_or(Value::Undefined);
+        let rhs_val = self.rhs.evaluate(interpreter).unwrap_or(Value::Undefined);
 
         // Should allow this here, since it's not our job as the interpreter to guess at
         // best practices for the programmer
         #[allow(clippy::float_cmp)]
-        match (lhs_val.clone(), rhs_val.clone()) {
+            let val = match (lhs_val.clone(), rhs_val.clone()) {
             (Number(lhs_num), Number(rhs_num)) => match self.op {
                 BinaryOperator::Plus => Value::Number(lhs_num + rhs_num),
                 BinaryOperator::Minus => Value::Number(lhs_num - rhs_num),
                 BinaryOperator::Equal => Value::Boolean(lhs_num == rhs_num),
                 BinaryOperator::NotEqual => Value::Boolean(lhs_num != rhs_num),
-                BinaryOperator::StrictEqual =>  Value::Boolean(lhs_num == rhs_num),
+                BinaryOperator::StrictEqual => Value::Boolean(lhs_num == rhs_num),
                 BinaryOperator::StrictNotEqual => Value::Boolean(lhs_num != rhs_num),
                 BinaryOperator::LessThan => Value::Boolean(lhs_num < rhs_num),
                 BinaryOperator::GreaterThan => Value::Boolean(lhs_num > rhs_num),
@@ -65,7 +65,8 @@ impl IRNode for BinaryExpression {
             // TODO: Some sort of crash mechanism
             (Undefined, Number(val)) => panic!("Attempt to add Undefined with {}", val),
             _ => panic!("Unsupported binary operation: {:?} {:?} {:?}", lhs_val, self.op, rhs_val),
-        }
+        };
+        Some(val)
     }
 }
 

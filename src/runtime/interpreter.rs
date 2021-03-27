@@ -66,13 +66,23 @@ impl Default for Interpreter {
 }
 
 impl Interpreter {
-    pub fn run(&mut self, mut block: Scope) -> Value {
+    pub fn run(&mut self, mut block: Scope) -> Option<Value> {
         self.enter_scope(HashMap::new());
 
-        let mut last_value = Value::Undefined;
+        let mut last_value = None;
 
         for node in block.children.iter_mut() {
-            last_value = node.evaluate(self);
+            if let Some(val) = node.evaluate(self) {
+                last_value = Some(val)
+            }
+            match &last_value {
+                None => {}
+                Some(v) => { dbg!(&v); }
+            }
+            if let Some(return_value) = self.return_register.as_ref() {
+                dbg!(return_value);
+            }
+
             /*
             Break out of evaluating block, but don't clear, since we are probably
             running inside Loop::evaluate() and it needs to stop looping. Two rust breaks
@@ -91,7 +101,7 @@ impl Interpreter {
             if self.should_return {
                 if *block.get_type() == ScopeType::Function {
                     self.clear_return();
-                    last_value = self.return_register.take().unwrap_or(Value::Undefined);
+                    last_value = self.return_register.take();
                 }
                 break;
             }

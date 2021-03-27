@@ -1,7 +1,7 @@
 use crate::ir::expression::Variable;
+use crate::ir::IRNode;
 use crate::ir::marker::Expression;
 use crate::ir::ops::UnaryOperator;
-use crate::ir::IRNode;
 use crate::prelude::{Interpreter, Value};
 
 #[derive(Debug, Clone)]
@@ -30,7 +30,7 @@ impl IRNode for UpdateExpression {
         )
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         let current_value = interpreter
             .resolve_variable(&self.variable.name)
             .expect("Cannot resolve variable");
@@ -47,7 +47,7 @@ impl IRNode for UpdateExpression {
         if self.prefix {
             return_value = current_value.clone()
         }
-        return_value
+        Some(return_value)
     }
 }
 

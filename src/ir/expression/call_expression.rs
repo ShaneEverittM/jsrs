@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Expression, IRNode},
+    ir::{IRNode, marker::Expression},
     runtime::{Interpreter, ObjectType, Value},
 };
 
@@ -24,7 +24,7 @@ impl IRNode for CallExpression {
         format!("{}CallExpression: {}\n", indent_str, self.name)
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         let val = interpreter.global_object.get(&self.name);
         assert!(val.is_some());
         if let Value::Object(mut obj) = val.unwrap() {

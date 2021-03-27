@@ -1,5 +1,5 @@
-use crate::ir::marker::{Expression, Statement};
 use crate::ir::IRNode;
+use crate::ir::marker::{Expression, Statement};
 use crate::prelude::{Interpreter, Value};
 
 #[derive(Clone, Debug)]
@@ -54,8 +54,7 @@ impl IRNode for ForStatement {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
-
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         if self.initializer_expr.is_some() {
             self.initializer_expr.as_mut().unwrap().evaluate(interpreter);
         }
@@ -65,7 +64,7 @@ impl IRNode for ForStatement {
         }
 
         if let Some(test) = self.test.as_mut() {
-            while test.evaluate(interpreter) == Value::Boolean(true) {
+            while test.evaluate(interpreter) == Some(Value::Boolean(true)) {
                 self.body.evaluate(interpreter);
 
                 if interpreter.broke() {
@@ -85,7 +84,7 @@ impl IRNode for ForStatement {
             unimplemented!("For loops without tests not supported")
         }
 
-        Value::Undefined
+        None
     }
 }
 

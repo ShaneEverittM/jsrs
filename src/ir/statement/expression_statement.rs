@@ -1,7 +1,7 @@
 use crate::{
     ir::{
-        marker::{Expression, Statement},
         IRNode,
+        marker::{Expression, Statement},
     },
     runtime::{Interpreter, Value},
 };
@@ -29,7 +29,7 @@ impl IRNode for ExpressionStatement {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         self.expr.evaluate(interpreter)
     }
 }

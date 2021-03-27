@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Expression, IRNode},
+    ir::{IRNode, marker::Expression},
     runtime::{Interpreter, Value},
 };
 
@@ -17,6 +17,7 @@ impl Literal {
         Box::new(Self { val })
     }
 }
+
 impl IRNode for Literal {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
@@ -24,8 +25,8 @@ impl IRNode for Literal {
         output
     }
 
-    fn evaluate(&mut self, _interpreter: &mut Interpreter) -> Value {
-        self.val.clone()
+    fn evaluate(&mut self, _interpreter: &mut Interpreter) -> Option<Value> {
+        Some(self.val.clone())
     }
 }
 

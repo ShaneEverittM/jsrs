@@ -1,5 +1,5 @@
-use crate::ir::marker::Statement;
 use crate::ir::IRNode;
+use crate::ir::marker::Statement;
 use crate::prelude::{Interpreter, Value};
 
 // TODO: Support labeled breaks
@@ -19,9 +19,9 @@ impl IRNode for BreakStatement {
         format!("{}BreakStatement\n", indent_str)
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         interpreter.notify_break();
-        Value::Undefined
+        None
     }
 }
 

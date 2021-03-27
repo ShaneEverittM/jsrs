@@ -1,8 +1,8 @@
 use crate::{
     ir::{
+        IRNode,
         marker::{Declaration, Statement},
         statement::Scope,
-        IRNode,
     },
     runtime::{Function, Interpreter, Value},
 };
@@ -31,13 +31,15 @@ impl IRNode for FunctionDeclaration {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         let function = Function::new(self.name.clone(), self.body.clone());
         interpreter
             .global_object
             .put(self.name.clone(), Value::Object(function));
-        Value::Undefined
+        None
     }
 }
+
 impl Statement for FunctionDeclaration {}
+
 impl Declaration for FunctionDeclaration {}

@@ -1,5 +1,5 @@
-use crate::ir::marker::{Expression, Statement};
 use crate::ir::IRNode;
+use crate::ir::marker::{Expression, Statement};
 use crate::runtime::{Interpreter, Value};
 
 #[derive(Debug, Clone)]
@@ -46,19 +46,21 @@ impl IRNode for IfStatement {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Value {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         let val = self.test.evaluate(interpreter);
-        let b = match val {
-            Value::Boolean(b) => b,
-            _ => panic!("Value must be boolean"),
-        };
+        if let Some(val) = val {
+            let b = match val {
+                Value::Boolean(b) => b,
+                _ => panic!("Value must be boolean"),
+            };
 
-        if b {
-            self.consequent.evaluate(interpreter);
-        } else if self.alternate.is_some() {
-            self.alternate.as_mut().unwrap().evaluate(interpreter);
+            if b {
+                self.consequent.evaluate(interpreter);
+            } else if self.alternate.is_some() {
+                self.alternate.as_mut().unwrap().evaluate(interpreter);
+            }
         }
-        Value::Undefined
+        None
     }
 }
 
