@@ -75,13 +75,6 @@ impl Interpreter {
             if let Some(val) = node.evaluate(self) {
                 last_value = Some(val)
             }
-            match &last_value {
-                None => {}
-                Some(v) => { dbg!(&v); }
-            }
-            if let Some(return_value) = self.return_register.as_ref() {
-                dbg!(return_value);
-            }
 
             /*
             Break out of evaluating block, but don't clear, since we are probably

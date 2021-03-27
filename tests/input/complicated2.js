@@ -21,7 +21,7 @@ function runner() {
         for (let j = 0; j < 10; ++j) {
             if (i === 5) {
                 if (j === 5) {
-                    return math()
+                    return math() + 24
                 }
             }
         }

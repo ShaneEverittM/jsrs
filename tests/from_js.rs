@@ -82,5 +82,5 @@ fn return_test() {
 
 #[test]
 fn complicated_v2() {
-    validate_output("complicated2", Some(Value::Number(45f64)));
+    validate_output("complicated2", Some(Value::Number(69f64)));
 }
