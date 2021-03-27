@@ -62,6 +62,11 @@ impl IRNode for BinaryExpression {
                 BinaryOperator::StrictEqual => Value::Boolean(lhs_str == rhs_str),
                 _ => panic!("Unsupported string operation")
             }
+            (Undefined, Undefined) => match self.op {
+                BinaryOperator::Equal => Value::Boolean(true),
+                BinaryOperator::StrictEqual => Value::Boolean(true),
+                _ => unimplemented!("Undefined is weird")
+            }
             // TODO: Some sort of crash mechanism
             (Undefined, Number(val)) => panic!("Attempt to add Undefined with {}", val),
             _ => panic!("Unsupported binary operation: {:?} {:?} {:?}", lhs_val, self.op, rhs_val),
