@@ -38,15 +38,13 @@ impl IRNode for ReturnStatement {
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         if let Some(mut expr) = self.expression.take() {
-            interpreter.notify_return();
             let ret_val = expr.evaluate(interpreter);
             if let Some(val) = ret_val.as_ref() {
                 interpreter.set_return_val(val.clone());
             }
-            ret_val
-        } else {
-            None
+            interpreter.notify_return();
         }
+        None
     }
 }
 
