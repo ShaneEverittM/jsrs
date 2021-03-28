@@ -99,3 +99,8 @@ fn params() {
 fn missing_params() {
     validate_output("missing_parameter", Some(Value::Number(5f64)));
 }
+
+#[test]
+fn recursion() {
+    validate_output("recursion", Some(Value::Number(7f64)));
+}

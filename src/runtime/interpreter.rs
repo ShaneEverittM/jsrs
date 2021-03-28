@@ -1,14 +1,17 @@
 use std::any::Any;
 use std::collections::HashMap;
 
+use crate::ir::statement::ScopeType;
 use crate::{
     ir::statement::Scope,
     runtime::{Object, ObjectType, Value},
 };
-use crate::ir::statement::ScopeType;
+use std::cell::{RefCell, RefMut};
+use std::rc::Rc;
+use std::borrow::BorrowMut;
 
 pub struct Interpreter {
-    pub global_object: Box<dyn Object>,
+    pub global_object: Rc<RefCell<Box<dyn Object>>>,
     pub scope_stack: Vec<HashMap<String, Value>>,
     should_break: bool,
     should_return: bool,
@@ -43,6 +46,10 @@ impl Object for GlobalObject {
         self.properties.get(name).cloned()
     }
 
+    fn get_mut(&mut self, name: &str) -> Option<&mut Value> {
+        self.properties.get_mut(name)
+    }
+
     fn get_type(&self) -> ObjectType {
         ObjectType::Global
     }
@@ -54,10 +61,15 @@ impl Object for GlobalObject {
 
 impl Default for Interpreter {
     fn default() -> Self {
+        let go = Rc::new(RefCell::new(
+            Box::new(GlobalObject::new()) as Box<dyn Object>
+        ));
+        let mut global_scope = HashMap::new();
+        global_scope.insert("globalThis".to_owned(), Value::Object(go.clone()));
+
         Self {
-            global_object: Box::new(GlobalObject::new()),
-            // TODO: Put global object alias here, like "window" or "globalThis"
-            scope_stack: Vec::new(),
+            global_object: go,
+            scope_stack: vec![global_scope],
             should_break: false,
             should_return: false,
             return_register: None,
@@ -109,9 +121,15 @@ impl Interpreter {
     }
 
     pub fn resolve_variable(&mut self, name: &str) -> Option<&mut Value> {
-        self.scope_stack.iter_mut().rev().find_map(|scope| {
-            scope.get_mut(name)
-        })
+        self.scope_stack
+            .iter_mut()
+            .rev()
+            .find_map(|scope| scope.get_mut(name))
+    }
+
+    pub fn resolve_function(&mut self, name: &str) -> Option<&mut Value> {
+        let mut go: RefMut<_> = self.global_object.borrow_mut();
+
     }
 
     pub fn notify_break(&mut self) {

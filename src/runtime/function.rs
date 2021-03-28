@@ -37,7 +37,13 @@ impl Object for Function {
         self.properties.get(name).cloned()
     }
 
-    fn get_type(&self) -> ObjectType { ObjectType::Function }
+    fn get_mut(&mut self, name: &str) -> Option<&mut Value> {
+        self.properties.get_mut(name)
+    }
+
+    fn get_type(&self) -> ObjectType {
+        ObjectType::Function
+    }
 
     fn as_any(&mut self) -> &mut dyn Any {
         self

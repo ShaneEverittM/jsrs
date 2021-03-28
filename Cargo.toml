@@ -10,4 +10,5 @@ edition = "2018"
 
 ressa = "0.7.1"
 resast = "0.4.1"
+itertools = "0.10.0"
 #clap = "2.33.3"

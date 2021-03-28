@@ -33,11 +33,17 @@ impl IrNode for CallExpression {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
-        // TODO: Currently only top level function are supported
-        let val = interpreter.global_object.get(&self.name);
-
+        let val = interpreter.resolve_function(&self.name).unwrap();
         // Look for symbol in global object
-        if let Value::Object(mut obj) = val.expect("Could not find function") {
+        if let Value::Object(cell) = val {
+
+            // Clone cell since otherwise it would be a ref into the interpreter which
+            // would upset the borrow checker, it points to the same thing anyway
+            let cell_ref = cell.clone();
+
+            // Get a reference to the actual object
+            let mut obj = cell_ref.borrow_mut();
+
             // Verify it is in fact a function (or later at least callable)
             if obj.get_type() == ObjectType::Function {
                 let func = obj.as_function();
@@ -56,8 +62,15 @@ impl IrNode for CallExpression {
                         EitherOrBoth::Right(_) => panic!("Too many arguments"),
                     })
                     .collect();
+                let body = func.body.clone();
 
-                interpreter.run_with(func.body.clone(), context)
+                // Must drop here because it could be the case that while running the function body
+                // below, we encounter a call to the same function (recursion). When calling this
+                // function, we would look it up and find the same Cell! If we then called inner_mut
+                // on it the previous RefMut would still be alive! So we drop it here.
+                drop(obj);
+
+                interpreter.run_with(body, context)
             } else {
                 unimplemented!("Only current callable type is a function")
             }

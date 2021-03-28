@@ -1,11 +1,9 @@
 use crate::{
-    ir::{
-        IrNode,
-        marker::Declaration,
-        statement::Scope,
-    },
+    ir::{marker::Declaration, statement::Scope, IrNode},
     runtime::{Function, Interpreter, Value},
 };
+use std::cell::RefCell;
+use std::rc::Rc;
 
 #[derive(Debug, Clone)]
 pub struct FunctionDeclaration {
@@ -16,18 +14,29 @@ pub struct FunctionDeclaration {
 
 impl FunctionDeclaration {
     pub fn new(name: String, parameters: Vec<String>, body: Scope) -> Self {
-        Self { name, parameters, body }
+        Self {
+            name,
+            parameters,
+            body,
+        }
     }
 
     pub fn boxed(name: &str, parameters: Vec<String>, body: Scope) -> Box<Self> {
-        Box::new(Self { name: name.to_owned(), parameters, body })
+        Box::new(Self {
+            name: name.to_owned(),
+            parameters,
+            body,
+        })
     }
 }
 
 impl IrNode for FunctionDeclaration {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
-        let mut output = format!("{}FunctionDeclaration: {} | {:?}\n", indent_str, self.name, self.parameters);
+        let mut output = format!(
+            "{}FunctionDeclaration: {} | {:?}\n",
+            indent_str, self.name, self.parameters
+        );
         output += &self.body.dump(indent + 1);
         output
     }
@@ -38,9 +47,18 @@ impl IrNode for FunctionDeclaration {
             self.parameters.clone(),
             self.body.clone(),
         );
-        interpreter
-            .global_object
-            .put(self.name.clone(), Value::Object(function));
+
+        let go = interpreter.resolve_variable("globalThis").unwrap();
+        let go = match go {
+            Value::Object(go) => go,
+            _ => panic!("Global object should be of type Object"),
+        };
+
+        go.borrow_mut().put(
+            self.name.clone(),
+            Value::Object(Rc::new(RefCell::new(function))),
+        );
+
         None
     }
 }
