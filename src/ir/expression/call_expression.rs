@@ -33,7 +33,7 @@ impl IrNode for CallExpression {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
-        let val = interpreter.resolve_function(&self.name).unwrap();
+        let val = interpreter.resolve_function_object(&self.name).unwrap();
         // Look for symbol in global object
         if let Value::Object(cell) = val {
 

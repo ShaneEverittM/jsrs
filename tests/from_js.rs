@@ -104,3 +104,8 @@ fn missing_params() {
 fn recursion() {
     validate_output("recursion", Some(Value::Number(7f64)));
 }
+
+#[test]
+fn aliased_go() {
+    validate_output("aliased_go", Some(Value::Number(7f64)));
+}

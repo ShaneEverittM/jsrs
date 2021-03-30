@@ -6,9 +6,8 @@ use crate::{
     ir::statement::Scope,
     runtime::{Object, ObjectType, Value},
 };
-use std::cell::{RefCell, RefMut};
+use std::cell::RefCell;
 use std::rc::Rc;
-use std::borrow::BorrowMut;
 
 pub struct Interpreter {
     pub global_object: Rc<RefCell<Box<dyn Object>>>,
@@ -127,10 +126,11 @@ impl Interpreter {
             .find_map(|scope| scope.get_mut(name))
     }
 
-    pub fn resolve_function(&mut self, name: &str) -> Option<&mut Value> {
-        let mut go: RefMut<_> = self.global_object.borrow_mut();
 
+    pub fn resolve_function_object(&mut self, name: &str) -> Option<Value> {
+        self.global_object.borrow_mut().get(name).clone()
     }
+
 
     pub fn notify_break(&mut self) {
         self.should_break = true;
