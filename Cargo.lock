@@ -159,10 +159,10 @@ version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0017e8edc3f6afc24768d1f4071df5547fccdae4e2e08caf21cc724a919404c9"
 dependencies = [
- "backtrace",
- "hash-chain",
- "log",
- "res-regex",
+    "backtrace",
+    "hash-chain",
+    "log",
+    "res-regex",
     "resast",
     "ress",
 ]

@@ -1,15 +1,15 @@
+use std::any::Any;
 use std::collections::HashMap;
 
 use crate::runtime::{Object, ObjectType, Value};
-use std::any::Any;
 
 #[derive(Debug, Clone)]
-pub struct JSString {
+pub struct JsString {
     properties: HashMap<String, Value>,
     str: String,
 }
 
-impl JSString {
+impl JsString {
     pub fn new(str: &str) -> Self {
         Self {
             properties: HashMap::new(),
@@ -24,7 +24,7 @@ impl JSString {
     }
 }
 
-impl Object for JSString {
+impl Object for JsString {
     fn put(&mut self, name: String, value: Value) {
         self.properties.insert(name, value);
     }

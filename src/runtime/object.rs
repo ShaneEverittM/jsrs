@@ -1,4 +1,4 @@
-use crate::runtime::{interpreter::GlobalObject, JSString, Function, Value};
+use crate::runtime::{Function, interpreter::GlobalObject, JsString, Value};
 
 #[derive(Eq, PartialEq)]
 pub enum Type {
@@ -32,9 +32,9 @@ pub trait Object: std::fmt::Debug + ObjectClone {
         self.as_any().downcast_mut::<GlobalObject>().unwrap()
     }
 
-    fn as_string(&mut self) -> &mut JSString {
+    fn as_string(&mut self) -> &mut JsString {
         assert!(self.get_type() == Type::String);
-        self.as_any().downcast_mut::<JSString>().unwrap()
+        self.as_any().downcast_mut::<JsString>().unwrap()
     }
 }
 

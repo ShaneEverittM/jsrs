@@ -1,20 +1,14 @@
 use std::any::Any;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::process::exit;
 use std::rc::Rc;
-
-use thiserror::Error;
 
 use crate::{
     ir::statement::{Scope, ScopeType},
-    runtime::{Object, ObjectType, Value},
+    runtime::{Exception, Object, ObjectType, Value},
+    runtime::exception::*,
 };
-
-#[derive(Error, Clone, Debug, Eq, PartialEq)]
-pub enum Exception {
-    #[error("Unhandled exception: {0}")]
-    Exception(String),
-}
 
 pub struct Interpreter {
     global_object: Rc<RefCell<Box<dyn Object>>>,
@@ -90,9 +84,8 @@ impl Interpreter {
         let mut last_value = Value::Undefined;
 
         for node in block.children.iter_mut() {
-            if let Ok(val) = node.evaluate(self) {
-                last_value = val
-            }
+            last_value = node.evaluate(self)?;
+
 
             /*
             Break out of evaluating block, but don't clear, since we are probably
@@ -123,15 +116,23 @@ impl Interpreter {
         Ok(last_value)
     }
     pub fn run(&mut self, block: Scope) -> Result<Value, Exception> {
-        let exception = self.run_with(block, HashMap::new()).unwrap();
-        Ok(exception)
+        match self.run_with(block, HashMap::new()) {
+            Ok(value) => Ok(value),
+            Err(e) => self.handle_exception(e),
+        }
+    }
+
+    fn handle_exception(&mut self, exception: Exception) -> ! {
+        eprintln!("{:#?}", exception);
+        exit(1)
     }
 
     pub fn resolve_variable(&mut self, name: &str) -> Result<&mut Value, Exception> {
         self.scope_stack
             .iter_mut()
             .rev()
-            .find_map(|scope| scope.get_mut(name)).ok_or(Exception::Exception("Cannot find variable".to_owned()))
+            .find_map(|scope| scope.get_mut(name))
+            .ok_or_else(|| ReferenceError(name.to_owned()))
     }
 
     pub fn add_variable(&mut self, key: String, value: Value) {

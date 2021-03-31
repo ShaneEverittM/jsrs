@@ -1,8 +1,9 @@
+pub use exception::Exception;
 pub use function::Function;
-pub use interpreter::{Exception, Interpreter};
+pub use interpreter::Interpreter;
 pub use object::Object;
 pub use object::Type as ObjectType;
-pub use string::JSString;
+pub use string::JsString;
 pub use value::Value;
 
 mod function;
@@ -11,3 +12,4 @@ mod object;
 mod value;
 mod literal_object;
 mod string;
+pub mod exception;
