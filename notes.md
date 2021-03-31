@@ -10,16 +10,11 @@
 - Argument completion from command line.
 
 ## Problems
-- How to handle objects pointing to same memory? This is generally disallowed in Rust.
-    - Go fully unsafe and write a wrapper class around object that holds a raw pointer underneath?
-    - ~~Steal~~ Be inspired by `evmap::ShallowCopy?`
-    - and Rc<RefCell<Object>>> might do the trick!
     
 ## Questions
-- Am I using clone too much?
 
 ## Next Time
-
-- If I'm feeling ambitious, take a stab at putting an alias to the global object in the top level scope using Rc and
-  RefCell.
+- Exception system. Make an exception error type and have evaluate return a Result<Option<Value>, Exception> and use ?
+  to bubble up as needed. Can have a function that called Interpreter::run() to start and have it catch all unhandled
+  exceptions.
 - Organize imports.
