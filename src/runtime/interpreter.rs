@@ -159,8 +159,8 @@ impl Interpreter {
 
     /// Finds the a variable given `name`, and applies the closure `edit` to it.
     pub fn edit_variable<F>(&mut self, name: &str, edit: F) -> Result<Value, Exception>
-        where
-            F: FnOnce(&mut Value) -> Result<Value, Exception>,
+    where
+        F: FnOnce(&mut Value) -> Result<Value, Exception>,
     {
         match self.resolve_variable(name) {
             None => match self.global_object.borrow_mut().get_mut(name) {

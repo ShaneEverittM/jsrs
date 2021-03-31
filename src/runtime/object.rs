@@ -1,4 +1,4 @@
-use crate::runtime::{Function, interpreter::GlobalObject, JsString, Value};
+use crate::runtime::{interpreter::GlobalObject, Function, JsString, Value};
 
 #[derive(Eq, PartialEq)]
 pub enum Type {

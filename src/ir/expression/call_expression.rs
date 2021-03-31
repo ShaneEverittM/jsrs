@@ -3,7 +3,7 @@ use std::cell::RefMut;
 use itertools::{EitherOrBoth, Itertools};
 
 use crate::{
-    ir::{IrNode, marker::Expression},
+    ir::{marker::Expression, IrNode},
     runtime::{exception::*, Function, Interpreter, Value},
 };
 

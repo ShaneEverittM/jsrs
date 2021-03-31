@@ -1,5 +1,5 @@
 use crate::{
-    ir::{IrNode, marker::Expression},
+    ir::{marker::Expression, IrNode},
     runtime::{exception::*, Interpreter, Value},
 };
 

@@ -1,7 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{
-    ir::{IrNode, marker::Declaration, statement::Scope},
+    ir::{marker::Declaration, statement::Scope, IrNode},
     runtime::{exception::*, Function, Interpreter, Value},
 };
 

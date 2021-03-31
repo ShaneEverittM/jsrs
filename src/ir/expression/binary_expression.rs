@@ -1,5 +1,5 @@
 use crate::{
-    ir::{IrNode, marker::Expression, ops::BinaryOperator},
+    ir::{marker::Expression, ops::BinaryOperator, IrNode},
     runtime::{exception::*, Interpreter, Value},
 };
 
@@ -37,7 +37,7 @@ impl IrNode for BinaryExpression {
         // Should allow this here, since it's not our job as the interpreter to guess at
         // best practices for the programmer
         #[allow(clippy::float_cmp)]
-            let val = match (lhs_val.clone(), rhs_val.clone()) {
+        let val = match (lhs_val.clone(), rhs_val.clone()) {
             (Number(lhs_num), Number(rhs_num)) => match self.op {
                 BinaryOperator::Plus => Value::Number(lhs_num + rhs_num),
                 BinaryOperator::Minus => Value::Number(lhs_num - rhs_num),
