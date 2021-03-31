@@ -31,7 +31,14 @@ impl IrNode for UpdateExpression {
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         interpreter.edit_variable(&self.variable.name, |variable| {
-            let mut return_value = variable.clone();
+            // If postfix operator, then cache original
+            let original_value = if !self.prefix {
+                variable.clone()
+            } else {
+                Value::Undefined
+            };
+
+            // Apply operation
             match self.op {
                 UnaryOperator::Increment => match variable {
                     Value::Number(n) => *n += 1f64,
@@ -39,10 +46,13 @@ impl IrNode for UpdateExpression {
                 },
                 _ => unimplemented!(),
             }
+
+            // If prefix operator, return current value, otherwise the cached value
             if self.prefix {
-                return_value = variable.clone()
+                success!(variable.clone())
+            } else {
+                success!(original_value)
             }
-            Ok(return_value)
         })
     }
 }
