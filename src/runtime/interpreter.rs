@@ -10,8 +10,8 @@ use crate::{
 use crate::ir::statement::ScopeType;
 
 pub struct Interpreter {
-    pub global_object: Rc<RefCell<Box<dyn Object>>>,
-    pub scope_stack: Vec<HashMap<String, Value>>,
+    global_object: Rc<RefCell<Box<dyn Object>>>,
+    scope_stack: Vec<HashMap<String, Value>>,
     should_break: bool,
     should_return: bool,
     return_register: Option<Value>,
@@ -124,6 +124,10 @@ impl Interpreter {
             .iter_mut()
             .rev()
             .find_map(|scope| scope.get_mut(name))
+    }
+
+    pub fn add_variable(&mut self, key: String, value: Value) {
+        self.scope_stack.last_mut().unwrap().insert(key, value);
     }
 
     pub fn get_go_property(&mut self, name: &str) -> Option<Value> {

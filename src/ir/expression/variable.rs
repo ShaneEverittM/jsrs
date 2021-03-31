@@ -29,14 +29,8 @@ impl IrNode for Variable {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
-        let mut scope_stack = interpreter.scope_stack.clone();
-        for scope in scope_stack.iter_mut().rev() {
-            match scope.get(&self.name) {
-                None => continue,
-                Some(val) => return Some(val.clone()),
-            }
-        }
-        None
+        interpreter.resolve_variable(&self.name).map(|v| v.clone())
     }
 }
+
 impl Expression for Variable {}

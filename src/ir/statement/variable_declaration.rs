@@ -39,8 +39,7 @@ impl IrNode for VariableDeclaration {
             None => Value::Undefined,
             Some(value) => value.evaluate(interpreter).unwrap_or(Value::Undefined),
         };
-        let current_scope = interpreter.scope_stack.last_mut().unwrap();
-        current_scope.insert(self.name.clone(), value);
+        interpreter.add_variable(self.name.clone(), value);
         None
     }
 }
