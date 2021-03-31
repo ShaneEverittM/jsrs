@@ -14,7 +14,3 @@
 ## Question
 
 ## Next Time
-- Exception system. Make an exception error type and have evaluate return a Result<Option<Value>, Exception> and use ?
-  to bubble up as needed. Can have a function that called Interpreter::run() to start and have it catch all unhandled
-  exceptions.
-- Organize imports.
