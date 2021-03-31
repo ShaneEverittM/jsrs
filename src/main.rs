@@ -13,6 +13,8 @@ fn main() {
 
     match result {
         Err(_) => {}
-        Ok(result) => { println!("Output: {}", result); }
+        Ok(result) => {
+            println!("Output: {}", result);
+        }
     }
 }

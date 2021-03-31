@@ -19,11 +19,17 @@ pub enum Exception {
 
 #[macro_export]
 macro_rules! success {
-    ($value:expr) => { Ok($value)};
-    () => {Ok(crate::runtime::Value::Undefined)};
+    ($value:expr) => {
+        Ok($value)
+    };
+    () => {
+        Ok(crate::runtime::Value::Undefined)
+    };
 }
 
 #[macro_export]
 macro_rules! exception {
-    ($value:expr) => {std::result::Result::Err($value)};
+    ($value:expr) => {
+        std::result::Result::Err($value)
+    };
 }

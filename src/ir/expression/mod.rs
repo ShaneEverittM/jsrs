@@ -5,10 +5,9 @@ pub use literal::Literal;
 pub use member_expression::MemberExpression;
 pub use variable::Variable;
 
+mod assignment_expression;
 mod binary_expression;
 mod call_expression;
 mod literal;
-mod variable;
-mod assignment_expression;
 mod member_expression;
-
+mod variable;

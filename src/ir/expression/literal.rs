@@ -30,5 +30,4 @@ impl IrNode for Literal {
     }
 }
 
-
 impl Expression for Literal {}

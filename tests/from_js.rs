@@ -23,7 +23,9 @@ fn validate_output(file_name: &str, expected: Result<Value, Exception>) {
     if verbose {
         match result.as_ref() {
             Err(_) => {}
-            Ok(result) => { println!("Output: {}", result); }
+            Ok(result) => {
+                println!("Output: {}", result);
+            }
         }
     }
 

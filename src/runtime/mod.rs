@@ -6,10 +6,10 @@ pub use object::Type as ObjectType;
 pub use string::JsString;
 pub use value::Value;
 
+pub mod exception;
 mod function;
 mod interpreter;
-mod object;
-mod value;
 mod literal_object;
+mod object;
 mod string;
-pub mod exception;
+mod value;

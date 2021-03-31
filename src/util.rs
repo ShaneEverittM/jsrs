@@ -8,7 +8,6 @@ pub fn make_indent(indent: u32) -> String {
     indents
 }
 
-
 pub fn get_input() -> String {
     let file_name = std::env::args().nth(1);
 
@@ -27,4 +26,3 @@ pub fn get_input() -> String {
         }
     }
 }
-

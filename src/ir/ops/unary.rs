@@ -6,7 +6,6 @@ use resast::UnaryOp;
 pub enum UnaryOperator {
     Increment,
     Decrement,
-
 }
 
 impl fmt::Display for UnaryOperator {
