@@ -1,9 +1,11 @@
-use crate::{
-    ir::{marker::Declaration, statement::Scope, IrNode},
-    runtime::{Function, Interpreter, Value},
-};
 use std::cell::RefCell;
 use std::rc::Rc;
+
+use crate::{
+    ir::{IrNode, marker::Declaration, statement::Scope},
+    runtime::{Function, Interpreter, Value},
+};
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct FunctionDeclaration {
@@ -41,7 +43,7 @@ impl IrNode for FunctionDeclaration {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         let function = Function::new(
             self.name.clone(),
             self.parameters.clone(),
@@ -59,7 +61,7 @@ impl IrNode for FunctionDeclaration {
             Value::Object(Rc::new(RefCell::new(function))),
         );
 
-        None
+        Ok(Value::Undefined)
     }
 }
 

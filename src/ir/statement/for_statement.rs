@@ -1,6 +1,7 @@
 use crate::ir::IrNode;
 use crate::ir::marker::{Expression, Statement};
 use crate::prelude::{Interpreter, Value};
+use crate::runtime::Exception;
 
 #[derive(Clone, Debug)]
 pub struct ForStatement {
@@ -54,7 +55,7 @@ impl IrNode for ForStatement {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         if self.initializer_expr.is_some() {
             self.initializer_expr.as_mut().unwrap().evaluate(interpreter);
         }
@@ -64,7 +65,7 @@ impl IrNode for ForStatement {
         }
 
         if let Some(test) = self.test.as_mut() {
-            while test.evaluate(interpreter) == Some(Value::Boolean(true)) {
+            while test.evaluate(interpreter) == Ok(Value::Boolean(true)) {
                 self.body.evaluate(interpreter);
 
                 if interpreter.broke() {
@@ -84,7 +85,7 @@ impl IrNode for ForStatement {
             unimplemented!("For loops without tests not supported")
         }
 
-        None
+        Ok(Value::Undefined)
     }
 }
 

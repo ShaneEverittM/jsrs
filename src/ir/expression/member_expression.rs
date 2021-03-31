@@ -1,6 +1,6 @@
 use crate::ir::IrNode;
 use crate::ir::marker::Expression;
-use crate::runtime::{Interpreter, Value};
+use crate::runtime::{Exception, Interpreter, Value};
 
 #[derive(Debug, Clone)]
 pub struct MemberExpression {
@@ -20,7 +20,7 @@ impl IrNode for MemberExpression {
         format!("{}MemberCallExpression: {}\n", indent_str, self.property)
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         interpreter.resolve_variable(&self.object).map(|o| o.clone())
     }
 }

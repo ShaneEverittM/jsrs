@@ -6,7 +6,7 @@ use crate::{
     ir::{IrNode, marker::Expression},
     runtime::{Interpreter, Value},
 };
-use crate::runtime::Function;
+use crate::runtime::{Exception, Function};
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
@@ -37,7 +37,7 @@ impl CallExpression {
     }
 
 
-    fn call_internal(&mut self, function: RefMut<Function>, interpreter: &mut Interpreter) -> Option<Value> {
+    fn call_internal(&mut self, function: RefMut<Function>, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         let block = function.body.clone();
 
         // bind formal parameters to actual parameters (thanks Klefstad)
@@ -67,7 +67,7 @@ impl IrNode for CallExpression {
         format!("{}CallExpression: {}\n", indent_str, self.name)
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         let func = match self.member_of.as_ref() {
             // Free function
             None => {

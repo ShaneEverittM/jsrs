@@ -1,6 +1,6 @@
 use crate::ir::IrNode;
 use crate::ir::marker::{Expression, Statement};
-use crate::runtime::{Interpreter, Value};
+use crate::runtime::{Exception, Interpreter, Value};
 
 #[derive(Clone, Debug)]
 pub struct VariableDeclaration {
@@ -34,13 +34,13 @@ impl IrNode for VariableDeclaration {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         let value = match self.value.as_mut() {
             None => Value::Undefined,
             Some(expr) => expr.evaluate(interpreter).unwrap_or_default(),
         };
         interpreter.add_variable(self.name.clone(), value);
-        None
+        Ok(Value::Undefined)
     }
 }
 

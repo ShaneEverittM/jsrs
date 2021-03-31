@@ -2,7 +2,7 @@ use std::env;
 
 use javascript_rs::prelude::*;
 
-fn validate_output(file_name: &str, expected: Option<Value>) {
+fn validate_output(file_name: &str, expected: Result<Value, Exception>) {
     let verbose = match env::var("VERBOSE") {
         Ok(v) => v == "1",
         Err(_) => false,
@@ -22,8 +22,8 @@ fn validate_output(file_name: &str, expected: Option<Value>) {
 
     if verbose {
         match result.as_ref() {
-            None => {}
-            Some(result) => { println!("Output: {}", result); }
+            Err(_) => {}
+            Ok(result) => { println!("Output: {}", result); }
         }
     }
 
@@ -32,80 +32,80 @@ fn validate_output(file_name: &str, expected: Option<Value>) {
 
 #[test]
 fn add_vars() {
-    validate_output("add_vars", Some(Value::Number(5.5f64)));
+    validate_output("add_vars", Ok(Value::Number(5.5f64)));
 }
 
 #[test]
 fn if_test() {
-    validate_output("branches", Some(Value::Number(69f64)));
+    validate_output("branches", Ok(Value::Number(69f64)));
 }
 
 #[test]
 fn if_no_block_test() {
-    validate_output("statement_branches", Some(Value::Number(420f64)));
+    validate_output("statement_branches", Ok(Value::Number(420f64)));
 }
 
 #[test]
 fn string_test() {
-    validate_output("string", Some(Value::String("Strings!".to_owned())));
+    validate_output("string", Ok(Value::String("Strings!".to_owned())));
 }
 
 #[test]
 fn complicated() {
-    validate_output("complicated", Some(Value::Number(6f64)));
+    validate_output("complicated", Ok(Value::Number(6f64)));
 }
 
 #[test]
 fn assignment() {
-    validate_output("assignment", Some(Value::Number(7f64)));
+    validate_output("assignment", Ok(Value::Number(7f64)));
 }
 
 #[test]
 fn update() {
-    validate_output("update", Some(Value::Number(6f64)));
+    validate_output("update", Ok(Value::Number(6f64)));
 }
 
 #[test]
 fn for_loop() {
-    validate_output("for", Some(Value::Number(5f64)));
+    validate_output("for", Ok(Value::Number(5f64)));
 }
 
 #[test]
 fn break_test() {
-    validate_output("break", Some(Value::Number(3f64)));
+    validate_output("break", Ok(Value::Number(3f64)));
 }
 
 #[test]
 fn return_test() {
-    validate_output("return", Some(Value::Number(3f64)));
+    validate_output("return", Ok(Value::Number(3f64)));
 }
 
 #[test]
 fn complicated_v2() {
-    validate_output("complicated2", Some(Value::Number(50f64)));
+    validate_output("complicated2", Ok(Value::Number(50f64)));
 }
 
 #[test]
 fn empty_decl() {
-    validate_output("empty_decl", Some(Value::Number(5f64)));
+    validate_output("empty_decl", Ok(Value::Number(5f64)));
 }
 
 #[test]
 fn params() {
-    validate_output("parameters", Some(Value::Number(3f64)));
+    validate_output("parameters", Ok(Value::Number(3f64)));
 }
 
 #[test]
 fn missing_params() {
-    validate_output("missing_parameter", Some(Value::Number(5f64)));
+    validate_output("missing_parameter", Ok(Value::Number(5f64)));
 }
 
 #[test]
 fn recursion() {
-    validate_output("recursion", Some(Value::Number(7f64)));
+    validate_output("recursion", Ok(Value::Number(7f64)));
 }
 
 #[test]
 fn aliased_go() {
-    validate_output("aliased_go", Some(Value::Number(3f64)));
+    validate_output("aliased_go", Ok(Value::Number(3f64)));
 }

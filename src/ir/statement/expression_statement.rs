@@ -5,6 +5,7 @@ use crate::{
     },
     runtime::{Interpreter, Value},
 };
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct ExpressionStatement {
@@ -29,7 +30,7 @@ impl IrNode for ExpressionStatement {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         self.expr.evaluate(interpreter)
     }
 }

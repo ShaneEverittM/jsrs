@@ -5,6 +5,7 @@ use crate::{
     },
     runtime::{Interpreter, Value},
 };
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum ScopeType {
@@ -65,7 +66,7 @@ impl IrNode for Scope {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         interpreter.run(self.clone())
     }
 }

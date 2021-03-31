@@ -1,6 +1,6 @@
 use crate::ir::IrNode;
 use crate::ir::marker::{Expression, Statement};
-use crate::runtime::{Interpreter, Value};
+use crate::runtime::{Exception, Interpreter, Value};
 
 #[derive(Debug, Clone)]
 pub struct IfStatement {
@@ -46,9 +46,8 @@ impl IrNode for IfStatement {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
-        let val = self.test.evaluate(interpreter);
-        if let Some(val) = val {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
+        if let Ok(val) = self.test.evaluate(interpreter) {
             let b = match val {
                 Value::Boolean(b) => b,
                 _ => panic!("Value must be boolean"),
@@ -60,7 +59,7 @@ impl IrNode for IfStatement {
                 self.alternate.as_mut().unwrap().evaluate(interpreter);
             }
         }
-        None
+        Ok(Value::Undefined)
     }
 }
 

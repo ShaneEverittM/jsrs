@@ -2,6 +2,7 @@ use crate::{
     ir::{IrNode, marker::Expression, ops::BinaryOperator},
     runtime::{Interpreter, Value},
 };
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct BinaryExpression {
@@ -29,7 +30,7 @@ impl IrNode for BinaryExpression {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         use Value::*;
         let lhs_val = self.lhs.evaluate(interpreter).unwrap_or(Value::Undefined);
         let rhs_val = self.rhs.evaluate(interpreter).unwrap_or(Value::Undefined);
@@ -71,7 +72,7 @@ impl IrNode for BinaryExpression {
             (Undefined, Number(val)) => panic!("Attempt to add Undefined with {}", val),
             _ => panic!("Unsupported binary operation: {:?} {:?} {:?}", lhs_val, self.op, rhs_val),
         };
-        Some(val)
+        Ok(val)
     }
 }
 

@@ -3,6 +3,7 @@ use crate::ir::IrNode;
 use crate::ir::marker::Expression;
 use crate::ir::ops::UnaryOperator;
 use crate::prelude::{Interpreter, Value};
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct UpdateExpression {
@@ -30,7 +31,7 @@ impl IrNode for UpdateExpression {
         )
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         let current_value = interpreter
             .resolve_variable(&self.variable.name)
             .expect("Cannot resolve variable");
@@ -47,7 +48,7 @@ impl IrNode for UpdateExpression {
         if self.prefix {
             return_value = current_value.clone()
         }
-        Some(return_value)
+        Ok(return_value)
     }
 }
 

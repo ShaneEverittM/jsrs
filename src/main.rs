@@ -12,7 +12,7 @@ fn main() {
     let result = interpreter.run(program);
 
     match result {
-        None => {}
-        Some(result) => { println!("Output: {}", result); }
+        Err(_) => {}
+        Ok(result) => { println!("Output: {}", result); }
     }
 }

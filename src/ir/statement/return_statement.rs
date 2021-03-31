@@ -2,6 +2,7 @@ use crate::{
     ir::{IrNode, marker::Expression, marker::Statement},
     runtime::{Interpreter, Value},
 };
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct ReturnStatement {
@@ -31,15 +32,14 @@ impl IrNode for ReturnStatement {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         if let Some(mut expr) = self.expression.take() {
-            let ret_val = expr.evaluate(interpreter);
-            if let Some(val) = ret_val.as_ref() {
+            if let Ok(val) = expr.evaluate(interpreter).as_ref() {
                 interpreter.set_return_val(val.clone());
             }
             interpreter.notify_return();
         }
-        None
+        Ok(Value::Undefined)
     }
 }
 

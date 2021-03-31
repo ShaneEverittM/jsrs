@@ -3,11 +3,18 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use thiserror::Error;
+
 use crate::{
-    ir::statement::Scope,
+    ir::statement::{Scope, ScopeType},
     runtime::{Object, ObjectType, Value},
 };
-use crate::ir::statement::ScopeType;
+
+#[derive(Error, Clone, Debug, Eq, PartialEq)]
+pub enum Exception {
+    #[error("Unhandled exception: {0}")]
+    Exception(String),
+}
 
 pub struct Interpreter {
     global_object: Rc<RefCell<Box<dyn Object>>>,
@@ -77,14 +84,14 @@ impl Default for Interpreter {
 }
 
 impl Interpreter {
-    pub fn run_with(&mut self, mut block: Scope, context: HashMap<String, Value>) -> Option<Value> {
+    pub fn run_with(&mut self, mut block: Scope, context: HashMap<String, Value>) -> Result<Value, Exception> {
         self.enter_scope(context);
 
-        let mut last_value = None;
+        let mut last_value = Value::Undefined;
 
         for node in block.children.iter_mut() {
-            if let Some(val) = node.evaluate(self) {
-                last_value = Some(val)
+            if let Ok(val) = node.evaluate(self) {
+                last_value = val
             }
 
             /*
@@ -105,7 +112,7 @@ impl Interpreter {
             if self.should_return {
                 if *block.get_type() == ScopeType::Function {
                     self.clear_return();
-                    last_value = self.return_register.take();
+                    last_value = self.return_register.take().unwrap_or_default();
                 }
                 break;
             }
@@ -113,17 +120,18 @@ impl Interpreter {
 
         self.leave_scope();
 
-        last_value
+        Ok(last_value)
     }
-    pub fn run(&mut self, block: Scope) -> Option<Value> {
-        self.run_with(block, HashMap::new())
+    pub fn run(&mut self, block: Scope) -> Result<Value, Exception> {
+        let exception = self.run_with(block, HashMap::new()).unwrap();
+        Ok(exception)
     }
 
-    pub fn resolve_variable(&mut self, name: &str) -> Option<&mut Value> {
+    pub fn resolve_variable(&mut self, name: &str) -> Result<&mut Value, Exception> {
         self.scope_stack
             .iter_mut()
             .rev()
-            .find_map(|scope| scope.get_mut(name))
+            .find_map(|scope| scope.get_mut(name)).ok_or(Exception::Exception("Cannot find variable".to_owned()))
     }
 
     pub fn add_variable(&mut self, key: String, value: Value) {

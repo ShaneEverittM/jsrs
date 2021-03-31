@@ -2,6 +2,7 @@ use crate::ir::expression::Variable;
 use crate::ir::IrNode;
 use crate::ir::marker::Expression;
 use crate::prelude::{Interpreter, Value};
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct AssignmentExpression {
@@ -29,14 +30,14 @@ impl IrNode for AssignmentExpression {
         output
     }
 
-    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
+    fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         let new_val = self.new_value.evaluate(interpreter);
         let current_val = interpreter
             .resolve_variable(&self.variable.name)
             .expect("Cannot find variable");
         *current_val = match new_val.clone() {
-            None => panic!("Cannot assign to expression which produces no value!"),
-            Some(v) => v,
+            Err(_) => panic!("Cannot assign to expression which produces no value!"),
+            Ok(v) => v,
         };
         new_val
     }

@@ -27,3 +27,10 @@ pub fn get_input() -> String {
         }
     }
 }
+
+
+#[macro_export]
+macro_rules! success {
+    ($value:ident) => { Ok($value)};
+    () => {Ok(crate::runtime::Value::Undefined)}
+}

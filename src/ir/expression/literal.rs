@@ -2,6 +2,7 @@ use crate::{
     ir::{IrNode, marker::Expression},
     runtime::{Interpreter, Value},
 };
+use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct Literal {
@@ -25,8 +26,8 @@ impl IrNode for Literal {
         output
     }
 
-    fn evaluate(&mut self, _interpreter: &mut Interpreter) -> Option<Value> {
-        Some(self.val.clone())
+    fn evaluate(&mut self, _interpreter: &mut Interpreter) -> Result<Value, Exception> {
+        Ok(self.val.clone())
     }
 }
 
