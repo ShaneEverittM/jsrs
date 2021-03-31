@@ -1,7 +1,10 @@
-use crate::ir::IrNode;
-use crate::ir::marker::{Expression, Statement};
-use crate::prelude::{Interpreter, Value};
-use crate::runtime::exception::*;
+use crate::{
+    ir::{
+        IrNode,
+        marker::{Expression, Statement},
+    },
+    runtime::{exception::*, Interpreter, Value},
+};
 
 #[derive(Clone, Debug)]
 pub struct ForStatement {
@@ -57,11 +60,17 @@ impl IrNode for ForStatement {
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         if self.initializer_expr.is_some() {
-            self.initializer_expr.as_mut().unwrap().evaluate(interpreter)?;
+            self.initializer_expr
+                .as_mut()
+                .unwrap()
+                .evaluate(interpreter)?;
         }
 
         if self.initializer_decl.is_some() {
-            self.initializer_decl.as_mut().unwrap().evaluate(interpreter)?;
+            self.initializer_decl
+                .as_mut()
+                .unwrap()
+                .evaluate(interpreter)?;
         }
 
         if let Some(test) = self.test.as_mut() {

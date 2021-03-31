@@ -1,7 +1,7 @@
-use crate::ir::IrNode;
-use crate::ir::marker::Statement;
-use crate::prelude::{Interpreter, Value};
-use crate::runtime::Exception;
+use crate::{
+    ir::{IrNode, marker::Statement},
+    runtime::{exception::*, Interpreter, Value},
+};
 
 // TODO: Support labeled breaks
 #[derive(Clone, Debug)]
@@ -12,7 +12,6 @@ impl BreakStatement {
         Box::new(Self)
     }
 }
-
 
 impl IrNode for BreakStatement {
     fn dump(&self, indent: u32) -> String {
@@ -25,6 +24,5 @@ impl IrNode for BreakStatement {
         Ok(Value::Undefined)
     }
 }
-
 
 impl Statement for BreakStatement {}

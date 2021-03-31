@@ -1,6 +1,7 @@
-use crate::ir::IrNode;
-use crate::ir::marker::Expression;
-use crate::runtime::{Exception, Interpreter, Value};
+use crate::{
+    ir::{IrNode, marker::Expression},
+    runtime::{Exception, Interpreter, Value},
+};
 
 #[derive(Clone, Debug)]
 pub struct Variable {

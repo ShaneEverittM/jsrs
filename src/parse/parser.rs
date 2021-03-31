@@ -1,8 +1,7 @@
 use resast::prelude::*;
 use ressa::Parser;
 
-use crate::ir::marker::Statement;
-use crate::ir::statement::*;
+use crate::ir::{marker::Statement, statement::*};
 
 pub fn parse_var_decl(mut var_decl: Vec<VarDecl>) -> Vec<Box<dyn Statement>> {
     let mut statements = Vec::new();
@@ -16,9 +15,7 @@ pub fn parse_block(statements: Vec<ProgramPart>, block: &mut Scope) {
     for part in statements {
         match part {
             ProgramPart::Decl(d) => match d {
-                Decl::Var(VarKind::Let, dec) => {
-                    block.append_all(parse_var_decl(dec))
-                }
+                Decl::Var(VarKind::Let, dec) => block.append_all(parse_var_decl(dec)),
                 Decl::Func(_) => unimplemented!("Nested functions not supported"),
                 _ => unimplemented!("{:?} not allowed in this context", d),
             },

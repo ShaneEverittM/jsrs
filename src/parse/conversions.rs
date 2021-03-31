@@ -3,11 +3,10 @@ use std::string::ToString;
 use resast::prelude::*;
 
 use crate::{
-    ir::{expression::*, marker::*, statement::*},
+    ir::{expression::*, marker::*, ops::*, statement::*},
+    parse::parser::*,
     runtime::*,
 };
-use crate::ir::ops::UnaryOperator;
-use crate::parse::parser::parse_block;
 
 // Helps Rust figure out e.into() when e is in a Box..
 impl From<Box<resast::expr::Expr<'_>>> for Box<dyn Expression> {
@@ -21,7 +20,6 @@ impl From<Box<resast::stmt::Stmt<'_>>> for Box<dyn Statement> {
         (*expr).into()
     }
 }
-
 
 /* # Expressions # */
 
@@ -124,7 +122,6 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
     }
 }
 
-
 /* # Expression to Statement# */
 
 impl From<resast::expr::Expr<'_>> for Box<dyn Statement> {
@@ -132,7 +129,6 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Statement> {
         ExpressionStatement::boxed(expr.into())
     }
 }
-
 
 /* # Statements # */
 
@@ -153,7 +149,6 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
         let update: Option<Box<dyn Expression>> = for_stmt.update.map(|u| u.into());
         let body: Box<dyn Statement> = for_stmt.body.into();
 
-
         match for_stmt.init {
             None => ForStatement::boxed(None, None, test, update, body),
             Some(init) => match init {
@@ -165,13 +160,7 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
                 LoopInit::Variable(_, _) => {
                     unimplemented!("Only let expressions supported in for loops")
                 }
-                LoopInit::Expr(e) => ForStatement::boxed(
-                    Some(e.into()),
-                    None,
-                    test,
-                    update,
-                    body,
-                ),
+                LoopInit::Expr(e) => ForStatement::boxed(Some(e.into()), None, test, update, body),
             },
         }
     }
@@ -197,7 +186,9 @@ impl From<resast::stmt::Stmt<'_>> for Box<dyn Statement> {
             Stmt::For(for_stmt) => for_stmt.into(),
             Stmt::Break(break_stmt) => match break_stmt {
                 None => BreakStatement::boxed(),
-                Some(_) => { unimplemented!("Labeled break statements not supported") }
+                Some(_) => {
+                    unimplemented!("Labeled break statements not supported")
+                }
             },
             Stmt::Block(block_stmt) => block_stmt.into(),
             _ => {
@@ -216,7 +207,8 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
         if let Pat::Ident(id) = id {
             VariableDeclaration::boxed(
                 &id.name,
-                init.take().map(|e| e.into())
+                init.take()
+                    .map(|e| e.into())
                     .unwrap_or_else(|| Literal::boxed(Value::Undefined) as Box<dyn Expression>),
             )
         } else {
@@ -229,13 +221,15 @@ impl From<resast::Func<'_>> for Box<dyn Statement> {
     fn from(f: Func<'_>) -> Self {
         let mut block = Scope::new(ScopeType::Function);
         super::parser::parse_block(f.body.0, &mut block);
-        let params = f.params.iter().map(|param| {
-            match param {
-                FuncArg::Expr(Expr::Ident(id)) => { id.name.to_string() }
-                FuncArg::Pat(Pat::Ident(id)) => { id.name.to_string() }
-                _ => panic!("Unsupported parameter ident")
-            }
-        }).collect();
+        let params = f
+            .params
+            .iter()
+            .map(|param| match param {
+                FuncArg::Expr(Expr::Ident(id)) => id.name.to_string(),
+                FuncArg::Pat(Pat::Ident(id)) => id.name.to_string(),
+                _ => panic!("Unsupported parameter ident"),
+            })
+            .collect();
         FunctionDeclaration::boxed(&f.id.unwrap().name, params, block)
     }
 }

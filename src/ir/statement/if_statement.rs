@@ -1,6 +1,10 @@
-use crate::ir::IrNode;
-use crate::ir::marker::{Expression, Statement};
-use crate::runtime::{exception::*, Interpreter, Value};
+use crate::{
+    ir::{
+        IrNode,
+        marker::{Expression, Statement},
+    },
+    runtime::{exception::*, Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct IfStatement {
@@ -50,7 +54,11 @@ impl IrNode for IfStatement {
         if let Ok(val) = self.test.evaluate(interpreter) {
             let test = match val {
                 Value::Boolean(b) => b,
-                _ => return Err(TypeError("If statement test must evaluate to boolean".to_string()))
+                _ => {
+                    return Err(TypeError(
+                        "If statement test must evaluate to boolean".to_string(),
+                    ))
+                }
             };
 
             if test {

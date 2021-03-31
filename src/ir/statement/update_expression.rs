@@ -1,10 +1,7 @@
-use crate::ir::expression::Variable;
-use crate::ir::IrNode;
-use crate::ir::marker::Expression;
-use crate::ir::ops::UnaryOperator;
-use crate::prelude::{Interpreter, Value};
-use crate::runtime::Exception;
-use crate::runtime::exception::*;
+use crate::{
+    ir::{expression::Variable, IrNode, marker::Expression, ops::UnaryOperator},
+    runtime::{exception::*, Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct UpdateExpression {

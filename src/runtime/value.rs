@@ -1,8 +1,6 @@
-use std::fmt;
+use std::{cell::RefCell, fmt, rc::Rc};
 
-use crate::runtime::{ Object};
-use std::cell::RefCell;
-use std::rc::Rc;
+use crate::runtime::Object;
 
 #[derive(Debug, Clone)]
 pub enum Value {

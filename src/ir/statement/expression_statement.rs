@@ -3,9 +3,8 @@ use crate::{
         IrNode,
         marker::{Expression, Statement},
     },
-    runtime::{Interpreter, Value},
+    runtime::{exception::*, Interpreter, Value},
 };
-use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct ExpressionStatement {
@@ -16,7 +15,7 @@ impl ExpressionStatement {
     pub fn new(expr: Box<dyn Expression>) -> Self {
         Self { expr }
     }
-    
+
     pub fn boxed(expr: Box<dyn Expression>) -> Box<Self> {
         Box::new(Self { expr })
     }

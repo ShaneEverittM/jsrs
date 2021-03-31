@@ -1,8 +1,7 @@
 use crate::{
     ir::{IrNode, marker::Expression, ops::BinaryOperator},
-    runtime::{Interpreter, Value},
+    runtime::{exception::*, Interpreter, Value},
 };
-use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct BinaryExpression {

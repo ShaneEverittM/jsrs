@@ -28,14 +28,3 @@ pub fn get_input() -> String {
     }
 }
 
-
-#[macro_export]
-macro_rules! success {
-    ($value:expr) => { Ok($value)};
-    () => {Ok(crate::runtime::Value::Undefined)};
-}
-
-#[macro_export]
-macro_rules! exception {
-    ($value:expr) => {std::result::Result::Err($value)};
-}

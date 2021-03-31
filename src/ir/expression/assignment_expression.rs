@@ -1,9 +1,7 @@
-use crate::ir::expression::Variable;
-use crate::ir::IrNode;
-use crate::ir::marker::Expression;
-use crate::prelude::{Interpreter, Value};
-use crate::runtime::exception::*;
-use crate::runtime::Exception;
+use crate::{
+    ir::{expression::Variable, IrNode, marker::Expression},
+    runtime::{exception::*, Interpreter, Value},
+};
 
 #[derive(Debug, Clone)]
 pub struct AssignmentExpression {

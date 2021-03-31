@@ -3,9 +3,8 @@ use crate::{
         IrNode,
         marker::{BlockStatement, Statement},
     },
-    runtime::{Interpreter, Value},
+    runtime::{exception::*, Interpreter, Value},
 };
-use crate::runtime::Exception;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum ScopeType {
@@ -17,9 +16,9 @@ pub enum ScopeType {
 impl std::fmt::Display for ScopeType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let id = match self {
-            ScopeType::Function => { "FunctionBody" }
-            ScopeType::Control => { "ControlStatementBody" }
-            ScopeType::Global => { "GlobalScope" }
+            ScopeType::Function => "FunctionBody",
+            ScopeType::Control => "ControlStatementBody",
+            ScopeType::Global => "GlobalScope",
         };
 
         f.write_str(id)
@@ -31,7 +30,6 @@ pub struct Scope {
     pub children: Vec<Box<dyn Statement>>,
     scope_type: ScopeType,
 }
-
 
 impl Scope {
     pub fn new(scope_type: ScopeType) -> Self {

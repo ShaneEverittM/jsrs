@@ -1,8 +1,10 @@
 use crate::{
-    ir::{IrNode, marker::Expression, marker::Statement},
-    runtime::{Interpreter, Value},
+    ir::{
+        IrNode,
+        marker::{Expression, Statement},
+    },
+    runtime::{exception::*, Interpreter, Value},
 };
-use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct ReturnStatement {
@@ -17,12 +19,9 @@ impl ReturnStatement {
     }
 
     pub fn boxed_empty() -> Box<Self> {
-        Box::new(Self {
-            expression: None,
-        })
+        Box::new(Self { expression: None })
     }
 }
-
 
 impl IrNode for ReturnStatement {
     fn dump(&self, indent: u32) -> String {

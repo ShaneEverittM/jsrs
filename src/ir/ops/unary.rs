@@ -1,5 +1,6 @@
-use resast::UnaryOp;
 use std::fmt;
+
+use resast::UnaryOp;
 
 #[derive(Debug, Clone)]
 pub enum UnaryOperator {

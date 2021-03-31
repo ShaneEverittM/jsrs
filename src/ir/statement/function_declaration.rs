@@ -1,9 +1,8 @@
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 use crate::{
     ir::{IrNode, marker::Declaration, statement::Scope},
-    runtime::{Exception, exception::*, Function, Interpreter, Value},
+    runtime::{exception::*, Function, Interpreter, Value},
 };
 
 #[derive(Debug, Clone)]

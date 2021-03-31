@@ -4,9 +4,8 @@ use itertools::{EitherOrBoth, Itertools};
 
 use crate::{
     ir::{IrNode, marker::Expression},
-    runtime::{Interpreter, Value},
+    runtime::{exception::*, Function, Interpreter, Value},
 };
-use crate::runtime::{Exception, Function};
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
@@ -17,7 +16,11 @@ pub struct CallExpression {
 
 impl CallExpression {
     pub fn new(name: String, arguments: Vec<Box<dyn Expression>>) -> Self {
-        Self { member_of: None, name, arguments }
+        Self {
+            member_of: None,
+            name,
+            arguments,
+        }
     }
 
     pub fn boxed(name: &str, arguments: Vec<Box<dyn Expression>>) -> Box<Self> {
@@ -28,7 +31,11 @@ impl CallExpression {
         })
     }
 
-    pub fn boxed_member(member_of: &str, name: &str, arguments: Vec<Box<dyn Expression>>) -> Box<Self> {
+    pub fn boxed_member(
+        member_of: &str,
+        name: &str,
+        arguments: Vec<Box<dyn Expression>>,
+    ) -> Box<Self> {
         Box::new(Self {
             member_of: Some(member_of.to_owned()),
             name: name.to_owned(),
@@ -36,8 +43,11 @@ impl CallExpression {
         })
     }
 
-
-    fn call_internal(&mut self, function: RefMut<Function>, interpreter: &mut Interpreter) -> Result<Value, Exception> {
+    fn call_internal(
+        &mut self,
+        function: RefMut<Function>,
+        interpreter: &mut Interpreter,
+    ) -> Result<Value, Exception> {
         let block = function.body.clone();
 
         // bind formal parameters to actual parameters (thanks Klefstad)
@@ -78,12 +88,16 @@ impl IrNode for CallExpression {
             // Member function
             Some(object_name) => {
                 // Find variable using scope resolution rules
-                let val = interpreter.get_variable(object_name).expect("Cannot find function");
+                let val = interpreter
+                    .get_variable(object_name)
+                    .expect("Cannot find function");
 
                 // Check that ident resolves to an object
                 if let Value::Object(obj) = val {
                     // Borrow the object we are calling a property of
-                    obj.borrow_mut().get(&self.name).expect("Object has no function with given name")
+                    obj.borrow_mut()
+                        .get(&self.name)
+                        .expect("Object has no function with given name")
                 } else {
                     panic!("Identifier is not an object")
                 }

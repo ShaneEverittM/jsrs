@@ -1,13 +1,8 @@
-use std::any::Any;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::process::exit;
-use std::rc::Rc;
+use std::{any::Any, cell::RefCell, collections::HashMap, process::exit, rc::Rc};
 
 use crate::{
     ir::statement::{Scope, ScopeType},
-    runtime::{Exception, Object, ObjectType, Value},
-    runtime::exception::*,
+    runtime::{exception::*, Object, ObjectType, Value},
 };
 
 pub struct Interpreter {
@@ -151,6 +146,7 @@ impl Interpreter {
             .find_map(|scope| scope.get_mut(name))
     }
 
+    /// Get the value of a variable with name `name`, using scope resolution.
     pub fn get_variable(&mut self, name: &str) -> Result<Value, Exception> {
         match self.resolve_variable(name) {
             None => match self.global_object.borrow_mut().get_mut(name) {
@@ -161,26 +157,18 @@ impl Interpreter {
         }
     }
 
+    /// Finds the a variable given `name`, and applies the closure `edit` to it.
     pub fn edit_variable<F>(&mut self, name: &str, edit: F) -> Result<Value, Exception>
         where
             F: FnOnce(&mut Value) -> Result<Value, Exception>,
     {
-        let mut go_borrow = self.global_object.borrow_mut();
-
-        let variable = match self
-            .scope_stack
-            .iter_mut()
-            .rev()
-            .find_map(|scope| scope.get_mut(name))
-        {
-            None => match go_borrow.get_mut(name) {
-                None => return Err(ReferenceError(name.to_owned())),
-                Some(v) => v,
+        match self.resolve_variable(name) {
+            None => match self.global_object.borrow_mut().get_mut(name) {
+                None => Err(ReferenceError(name.to_owned())),
+                Some(v) => edit(v),
             },
-            Some(v) => v,
-        };
-
-        edit(variable)
+            Some(v) => edit(v),
+        }
     }
 
     pub fn notify_break(&mut self) {

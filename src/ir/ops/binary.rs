@@ -1,5 +1,6 @@
-use resast::BinaryOp;
 use std::fmt;
+
+use resast::BinaryOp;
 
 #[derive(Debug, Clone)]
 pub enum BinaryOperator {
