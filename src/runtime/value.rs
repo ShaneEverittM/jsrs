@@ -1,6 +1,8 @@
 use std::fmt;
 
-use crate::runtime::Object;
+use crate::runtime::{ Object};
+use std::cell::RefCell;
+use std::rc::Rc;
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -8,9 +10,8 @@ pub enum Value {
     Undefined,
     Boolean(bool),
     String(String),
-    Object(Box<dyn Object>),
+    Object(Rc<RefCell<Box<dyn Object>>>),
 }
-
 
 impl Default for Value {
     fn default() -> Self {

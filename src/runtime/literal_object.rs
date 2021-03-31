@@ -19,6 +19,10 @@ impl Object for LiteralObject {
         self.properties.get(name).cloned()
     }
 
+    fn get_mut(&mut self, name: &str) -> Option<&mut Value> {
+        self.properties.get_mut(name)
+    }
+
     fn get_type(&self) -> ObjectType {
         ObjectType::Object
     }

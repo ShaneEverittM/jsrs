@@ -82,7 +82,7 @@ fn return_test() {
 
 #[test]
 fn complicated_v2() {
-    validate_output("complicated2", Some(Value::Number(69f64)));
+    validate_output("complicated2", Some(Value::Number(50f64)));
 }
 
 #[test]
@@ -98,4 +98,14 @@ fn params() {
 #[test]
 fn missing_params() {
     validate_output("missing_parameter", Some(Value::Number(5f64)));
+}
+
+#[test]
+fn recursion() {
+    validate_output("recursion", Some(Value::Number(7f64)));
+}
+
+#[test]
+fn aliased_go() {
+    validate_output("aliased_go", Some(Value::Number(3f64)));
 }

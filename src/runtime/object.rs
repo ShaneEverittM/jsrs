@@ -16,6 +16,8 @@ pub trait Object: std::fmt::Debug + ObjectClone {
 
     fn get(&mut self, name: &str) -> Option<Value>;
 
+    fn get_mut(&mut self, name: &str) -> Option<&mut Value>;
+
     fn get_type(&self) -> Type;
 
     fn as_any(&mut self) -> &mut dyn std::any::Any;

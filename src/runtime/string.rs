@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::runtime::{Value, Object, ObjectType};
+use crate::runtime::{Object, ObjectType, Value};
 use std::any::Any;
 
 #[derive(Debug, Clone)]
@@ -11,10 +11,16 @@ pub struct JSString {
 
 impl JSString {
     pub fn new(str: &str) -> Self {
-        Self { properties: HashMap::new(), str: str.to_owned() }
+        Self {
+            properties: HashMap::new(),
+            str: str.to_owned(),
+        }
     }
     pub fn boxed(str: &str) -> Box<Self> {
-        Box::new(Self { properties: HashMap::new(), str: str.to_owned() })
+        Box::new(Self {
+            properties: HashMap::new(),
+            str: str.to_owned(),
+        })
     }
 }
 
@@ -27,6 +33,10 @@ impl Object for JSString {
         self.properties.get(name).cloned()
     }
 
+    fn get_mut(&mut self, name: &str) -> Option<&mut Value> {
+        self.properties.get_mut(name)
+    }
+
     fn get_type(&self) -> ObjectType {
         ObjectType::String
     }
@@ -35,4 +45,3 @@ impl Object for JSString {
         self
     }
 }
-
