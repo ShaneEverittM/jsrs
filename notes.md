@@ -9,9 +9,9 @@
   able to just use standard `Interpreter::run` and `IRNode::evaluate` on each incoming line.
 - Argument completion from command line.
 
-## Problems
-    
-## Questions
+## Problem
+
+## Question
 
 ## Next Time
 - Exception system. Make an exception error type and have evaluate return a Result<Option<Value>, Exception> and use ?

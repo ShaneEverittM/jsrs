@@ -37,7 +37,7 @@ impl IrNode for VariableDeclaration {
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Option<Value> {
         let value = match self.value.as_mut() {
             None => Value::Undefined,
-            Some(value) => value.evaluate(interpreter).unwrap_or(Value::Undefined),
+            Some(expr) => expr.evaluate(interpreter).unwrap_or_default(),
         };
         interpreter.add_variable(self.name.clone(), value);
         None
