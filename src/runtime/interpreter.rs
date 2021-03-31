@@ -1,13 +1,13 @@
 use std::any::Any;
+use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 
-use crate::ir::statement::ScopeType;
 use crate::{
     ir::statement::Scope,
     runtime::{Object, ObjectType, Value},
 };
-use std::cell::RefCell;
-use std::rc::Rc;
+use crate::ir::statement::ScopeType;
 
 pub struct Interpreter {
     pub global_object: Rc<RefCell<Box<dyn Object>>>,
@@ -126,11 +126,9 @@ impl Interpreter {
             .find_map(|scope| scope.get_mut(name))
     }
 
-
-    pub fn resolve_function_object(&mut self, name: &str) -> Option<Value> {
-        self.global_object.borrow_mut().get(name).clone()
+    pub fn get_go_property(&mut self, name: &str) -> Option<Value> {
+        self.global_object.borrow_mut().get(name)
     }
-
 
     pub fn notify_break(&mut self) {
         self.should_break = true;

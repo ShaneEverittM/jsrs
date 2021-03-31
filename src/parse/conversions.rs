@@ -55,7 +55,21 @@ impl From<resast::expr::CallExpr<'_>> for Box<dyn Expression> {
         let arguments = c.arguments.drain(..).map(|e| e.into()).collect();
         match *callee {
             Expr::Ident(i) => CallExpression::boxed(&i.name, arguments),
-            _ => unimplemented!(),
+            Expr::Member(m) => {
+                let id: String = match *m.object {
+                    Expr::Ident(i) => i.name.into(),
+                    _ => panic!("expected ident"),
+                };
+                let property: String = match *m.property {
+                    Expr::Ident(i) => i.name.into(),
+                    _ => panic!("expected ident"),
+                };
+                CallExpression::boxed_member(&id, &property, arguments)
+            }
+            _ => {
+                dbg!(callee);
+                unimplemented!()
+            }
         }
     }
 }

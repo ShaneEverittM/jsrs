@@ -107,5 +107,5 @@ fn recursion() {
 
 #[test]
 fn aliased_go() {
-    validate_output("aliased_go", Some(Value::Number(7f64)));
+    validate_output("aliased_go", Some(Value::Number(3f64)));
 }
