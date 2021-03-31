@@ -30,10 +30,10 @@ impl IrNode for AssignmentExpression {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        let new_val = self.new_value.evaluate(interpreter);
+        let new_val = self.new_value.evaluate(interpreter)?;
 
         interpreter.edit_variable(&self.variable.name, |variable| {
-            *variable = new_val?;
+            *variable = new_val;
             success!()
         })
     }
