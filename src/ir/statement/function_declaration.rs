@@ -3,9 +3,8 @@ use std::rc::Rc;
 
 use crate::{
     ir::{IrNode, marker::Declaration, statement::Scope},
-    runtime::{Function, Interpreter, Value},
+    runtime::{Exception, exception::*, Function, Interpreter, Value},
 };
-use crate::runtime::Exception;
 
 #[derive(Debug, Clone)]
 pub struct FunctionDeclaration {
@@ -49,19 +48,9 @@ impl IrNode for FunctionDeclaration {
             self.parameters.clone(),
             self.body.clone(),
         );
+        interpreter.put_go_property(&self.name, Value::Object(Rc::new(RefCell::new(function))));
 
-        let go = interpreter.resolve_variable("globalThis").unwrap();
-        let go = match go {
-            Value::Object(go) => go,
-            _ => panic!("Global object should be of type Object"),
-        };
-
-        go.borrow_mut().put(
-            self.name.clone(),
-            Value::Object(Rc::new(RefCell::new(function))),
-        );
-
-        Ok(Value::Undefined)
+        success!()
     }
 }
 

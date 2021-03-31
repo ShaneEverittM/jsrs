@@ -78,7 +78,7 @@ impl IrNode for CallExpression {
             // Member function
             Some(object_name) => {
                 // Find variable using scope resolution rules
-                let val = interpreter.resolve_variable(object_name).expect("Cannot find function");
+                let val = interpreter.get_variable(object_name).expect("Cannot find function");
 
                 // Check that ident resolves to an object
                 if let Value::Object(obj) = val {

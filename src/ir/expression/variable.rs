@@ -29,7 +29,7 @@ impl IrNode for Variable {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        interpreter.resolve_variable(&self.name).map(|v| v.clone())
+        interpreter.get_variable(&self.name)
     }
 }
 

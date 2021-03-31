@@ -78,14 +78,17 @@ impl Default for Interpreter {
 }
 
 impl Interpreter {
-    pub fn run_with(&mut self, mut block: Scope, context: HashMap<String, Value>) -> Result<Value, Exception> {
+    pub fn run_with(
+        &mut self,
+        mut block: Scope,
+        context: HashMap<String, Value>,
+    ) -> Result<Value, Exception> {
         self.enter_scope(context);
 
         let mut last_value = Value::Undefined;
 
         for node in block.children.iter_mut() {
             last_value = node.evaluate(self)?;
-
 
             /*
             Break out of evaluating block, but don't clear, since we are probably
@@ -127,20 +130,57 @@ impl Interpreter {
         exit(1)
     }
 
-    pub fn resolve_variable(&mut self, name: &str) -> Result<&mut Value, Exception> {
-        self.scope_stack
-            .iter_mut()
-            .rev()
-            .find_map(|scope| scope.get_mut(name))
-            .ok_or_else(|| ReferenceError(name.to_owned()))
-    }
-
     pub fn add_variable(&mut self, key: String, value: Value) {
         self.scope_stack.last_mut().unwrap().insert(key, value);
     }
 
     pub fn get_go_property(&mut self, name: &str) -> Option<Value> {
         self.global_object.borrow_mut().get(name)
+    }
+
+    pub fn put_go_property(&mut self, name: &str, property: Value) {
+        self.global_object
+            .borrow_mut()
+            .put(name.to_owned(), property)
+    }
+
+    fn resolve_variable(&mut self, name: &str) -> Option<&mut Value> {
+        self.scope_stack
+            .iter_mut()
+            .rev()
+            .find_map(|scope| scope.get_mut(name))
+    }
+
+    pub fn get_variable(&mut self, name: &str) -> Result<Value, Exception> {
+        match self.resolve_variable(name) {
+            None => match self.global_object.borrow_mut().get_mut(name) {
+                None => Err(ReferenceError(name.to_owned())),
+                Some(v) => Ok(v.clone()),
+            },
+            Some(v) => Ok(v.clone()),
+        }
+    }
+
+    pub fn edit_variable<F>(&mut self, name: &str, edit: F) -> Result<Value, Exception>
+        where
+            F: FnOnce(&mut Value) -> Result<Value, Exception>,
+    {
+        let mut go_borrow = self.global_object.borrow_mut();
+
+        let variable = match self
+            .scope_stack
+            .iter_mut()
+            .rev()
+            .find_map(|scope| scope.get_mut(name))
+        {
+            None => match go_borrow.get_mut(name) {
+                None => return Err(ReferenceError(name.to_owned())),
+                Some(v) => v,
+            },
+            Some(v) => v,
+        };
+
+        edit(variable)
     }
 
     pub fn notify_break(&mut self) {

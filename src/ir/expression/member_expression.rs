@@ -21,7 +21,7 @@ impl IrNode for MemberExpression {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        interpreter.resolve_variable(&self.object).map(|o| o.clone())
+        interpreter.get_variable(&self.object)
     }
 }
 
