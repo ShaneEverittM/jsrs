@@ -56,3 +56,45 @@ impl Clone for Box<dyn Object> {
         self.clone_box()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::prelude::*;
+    use js_object_derive::Object;
+    use std::collections::HashMap;
+
+    #[derive(Object, Clone, Debug)]
+    #[object_type(Object)]
+    struct SomeObject {
+        properties: HashMap<String, Value>,
+    }
+
+    #[derive(Object, Clone, Debug)]
+    #[object_type(Object)]
+    struct SomeOtherObject {
+        #[properties]
+        other_name: HashMap<String, Value>,
+    }
+
+    #[test]
+    fn infer_properties() {
+        let mut o = SomeObject {
+            properties: HashMap::new(),
+        };
+
+        o.put("Prop".to_owned(), Value::Boolean(true));
+
+        assert_eq!(o.get("Prop"), Some(Value::Boolean(true)));
+    }
+
+    #[test]
+    fn annotate_properties() {
+        let mut o = SomeObject {
+            properties: HashMap::new(),
+        };
+
+        o.put("Prop".to_owned(), Value::Boolean(true));
+
+        assert_eq!(o.get("Prop"), Some(Value::Boolean(true)));
+    }
+}
