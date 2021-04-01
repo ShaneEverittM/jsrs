@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use js_object_derive::JsObject;
+use js_object_derive::Object;
 
 use crate::{
     runtime::{Function, Value},
     util::*,
 };
 
-#[derive(JsObject, Clone, Debug)]
+#[derive(Object, Clone, Debug)]
 #[object_type(Object)]
 pub struct Console {
     properties: HashMap<String, Value>,
