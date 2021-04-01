@@ -9,7 +9,7 @@
   able to just use standard `Interpreter::run` and `IRNode::evaluate` on each incoming line.
 - Argument completion from command line.
 
-## Problem
+## Problems
 
 ## Question
 
