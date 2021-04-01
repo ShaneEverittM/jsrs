@@ -1,4 +1,4 @@
-use std::{any::Any, cell::RefCell, collections::HashMap, process::exit, rc::Rc};
+use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::{
     ir::statement::{Scope, ScopeType},
@@ -159,13 +159,15 @@ impl Interpreter {
     pub fn run(&mut self, block: Scope) -> Result<Value, Exception> {
         match self.run_with(block, HashMap::new()) {
             Ok(value) => Ok(value),
-            Err(e) => self.handle_exception(e),
+            Err(e) => {
+                self.handle_exception(e.clone());
+                Err(e)
+            }
         }
     }
 
-    fn handle_exception(&mut self, exception: Exception) -> ! {
+    fn handle_exception(&mut self, exception: Exception) {
         eprintln!("{:#?}", exception);
-        exit(1)
     }
 
     pub fn add_variable(&mut self, key: String, value: Value) {

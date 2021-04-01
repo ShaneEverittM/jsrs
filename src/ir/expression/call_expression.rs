@@ -6,6 +6,7 @@ use crate::{
     ir::{marker::Expression, IrNode},
     runtime::{exception::*, Function, Interpreter, Value},
 };
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct CallExpression {
@@ -51,19 +52,22 @@ impl CallExpression {
         let block = function.body.clone();
 
         // bind formal parameters to actual parameters (thanks Klefstad)
-        let context = function
+        let mut context = HashMap::new();
+        for eob in function
             .parameters
             .iter()
             .zip_longest(self.arguments.drain(..))
-            .map(|eob| match eob {
-                EitherOrBoth::Both(formal, mut actual) => (
-                    formal.clone(),
-                    actual.evaluate(interpreter).unwrap_or_default(),
-                ),
-                EitherOrBoth::Left(formal) => (formal.clone(), Value::Undefined),
+        {
+            match eob {
+                EitherOrBoth::Both(formal, mut actual) => {
+                    context.insert(formal.clone(), actual.evaluate(interpreter)?);
+                }
+                EitherOrBoth::Left(formal) => {
+                    context.insert(formal.clone(), Value::Undefined);
+                }
                 EitherOrBoth::Right(_) => panic!("Too many arguments"),
-            })
-            .collect();
+            }
+        }
 
         if function.is_built_in() {
             interpreter.handle_built_in(&function.name, context)

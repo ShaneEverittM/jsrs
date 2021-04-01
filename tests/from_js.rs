@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, string::ToString};
 
 use javascript_rs::prelude::*;
 
@@ -16,13 +16,15 @@ fn validate_output(file_name: &str, expected: Result<Value, Exception>) {
         println!("{}", program.dump(0));
     }
 
-    let mut interpreter = Interpreter::default();
+    let mut interpreter = Interpreter::new();
 
     let result = interpreter.run(program);
 
     if verbose {
         match result.as_ref() {
-            Err(_) => {}
+            Err(e) => {
+                println!("Threw Exception: {}", e.to_string());
+            }
             Ok(result) => {
                 println!("Output: {}", result);
             }
@@ -115,4 +117,9 @@ fn aliased_go() {
 #[test]
 fn built_in() {
     validate_output("built_in", Ok(Value::Undefined));
+}
+
+#[test]
+fn exception() {
+    validate_output("exception", Err(Exception::ReferenceError("x".to_owned())));
 }

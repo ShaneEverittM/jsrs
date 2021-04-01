@@ -1,3 +1,5 @@
+use std::string::ToString;
+
 use javascript_rs::prelude::*;
 
 fn main() {
@@ -12,7 +14,9 @@ fn main() {
     let result = interpreter.run(program);
 
     match result {
-        Err(_) => {}
+        Err(e) => {
+            println!("Threw Exception: {}", e.to_string());
+        }
         Ok(result) => {
             println!("Output: {}", result);
         }
