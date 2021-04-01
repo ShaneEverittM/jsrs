@@ -1,8 +1,10 @@
-use std::{any::Any, cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
+
+use js_object_derive::Object;
 
 use crate::{
     ir::statement::{Scope, ScopeType},
-    runtime::{exception::*, Console, Object, ObjectType, Value},
+    runtime::{exception::*, Console, Object, Value},
     util::*,
 };
 
@@ -14,7 +16,8 @@ pub struct Interpreter {
     return_register: Option<Value>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Object, Debug, Clone)]
+#[object_type(Global)]
 pub struct GlobalObject {
     properties: HashMap<String, Value>,
 }
@@ -30,28 +33,6 @@ impl GlobalObject {
         Self {
             properties: HashMap::new(),
         }
-    }
-}
-
-impl Object for GlobalObject {
-    fn put(&mut self, name: String, value: Value) {
-        self.properties.insert(name, value);
-    }
-
-    fn get(&self, name: &str) -> Option<Value> {
-        self.properties.get(name).cloned()
-    }
-
-    fn get_mut(&mut self, name: &str) -> Option<&mut Value> {
-        self.properties.get_mut(name)
-    }
-
-    fn get_type(&self) -> ObjectType {
-        ObjectType::Global
-    }
-
-    fn as_any(&mut self) -> &mut dyn Any {
-        self
     }
 }
 

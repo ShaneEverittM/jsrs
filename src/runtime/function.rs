@@ -1,12 +1,12 @@
-use std::{any::Any, collections::HashMap};
+use std::collections::HashMap;
+
+use js_object_derive::Object;
 
 use crate::ir::statement::ScopeType;
-use crate::{
-    ir::statement::Scope,
-    runtime::{Object, ObjectType, Value},
-};
+use crate::{ir::statement::Scope, runtime::Value};
 
-#[derive(Debug, Clone)]
+#[derive(Object, Debug, Clone)]
+#[object_type(Function)]
 pub struct Function {
     // TODO: Properties should contain the arguments, caller, callee
     //       and number of args while the function is executing as per
@@ -41,27 +41,5 @@ impl Function {
 
     pub fn is_built_in(&self) -> bool {
         self.is_built_in
-    }
-}
-
-impl Object for Function {
-    fn put(&mut self, name: String, value: Value) {
-        self.properties.insert(name, value);
-    }
-
-    fn get(&self, name: &str) -> Option<Value> {
-        self.properties.get(name).cloned()
-    }
-
-    fn get_mut(&mut self, name: &str) -> Option<&mut Value> {
-        self.properties.get_mut(name)
-    }
-
-    fn get_type(&self) -> ObjectType {
-        ObjectType::Function
-    }
-
-    fn as_any(&mut self) -> &mut dyn Any {
-        self
     }
 }
