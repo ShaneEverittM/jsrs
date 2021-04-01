@@ -28,7 +28,7 @@ impl Object for JsString {
         self.properties.insert(name, value);
     }
 
-    fn get(&mut self, name: &str) -> Option<Value> {
+    fn get(&self, name: &str) -> Option<Value> {
         self.properties.get(name).cloned()
     }
 

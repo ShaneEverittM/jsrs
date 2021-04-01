@@ -38,7 +38,7 @@ impl Object for GlobalObject {
         self.properties.insert(name, value);
     }
 
-    fn get(&mut self, name: &str) -> Option<Value> {
+    fn get(&self, name: &str) -> Option<Value> {
         self.properties.get(name).cloned()
     }
 
@@ -185,21 +185,27 @@ impl Interpreter {
             .put(name.to_owned(), property)
     }
 
-    fn resolve_variable(&mut self, name: &str) -> Option<&mut Value> {
+    fn resolve_variable_mut(&mut self, name: &str) -> Option<&mut Value> {
         self.scope_stack
             .iter_mut()
             .rev()
             .find_map(|scope| scope.get_mut(name))
     }
+    fn resolve_variable(&self, name: &str) -> Option<Value> {
+        self.scope_stack
+            .iter()
+            .rev()
+            .find_map(|scope| scope.get(name).cloned())
+    }
 
     /// Get the value of a variable with name `name`, using scope resolution.
     pub fn get_variable(&mut self, name: &str) -> Result<Value, Exception> {
         match self.resolve_variable(name) {
-            None => match self.global_object.borrow_mut().get_mut(name) {
+            None => match self.global_object.borrow().get(name) {
                 None => Err(ReferenceError(name.to_owned())),
-                Some(v) => Ok(v.clone()),
+                Some(v) => Ok(v),
             },
-            Some(v) => Ok(v.clone()),
+            Some(v) => Ok(v),
         }
     }
 
@@ -208,7 +214,9 @@ impl Interpreter {
     where
         F: FnOnce(&mut Value) -> Result<Value, Exception>,
     {
-        match self.resolve_variable(name) {
+        // Look up in normal scope stack
+        match self.resolve_variable_mut(name) {
+            // If not found, check if it is a property of the global object
             None => match self.global_object.borrow_mut().get_mut(name) {
                 None => Err(ReferenceError(name.to_owned())),
                 Some(v) => edit(v),
