@@ -111,3 +111,8 @@ fn recursion() {
 fn aliased_go() {
     validate_output("aliased_go", Ok(Value::Number(3f64)));
 }
+
+#[test]
+fn built_in() {
+    validate_output("built_in", Ok(Value::Undefined));
+}

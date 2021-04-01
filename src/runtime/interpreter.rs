@@ -2,7 +2,8 @@ use std::{any::Any, cell::RefCell, collections::HashMap, process::exit, rc::Rc};
 
 use crate::{
     ir::statement::{Scope, ScopeType},
-    runtime::{exception::*, Object, ObjectType, Value},
+    runtime::{exception::*, Console, Object, ObjectType, Value},
+    util::*,
 };
 
 pub struct Interpreter {
@@ -69,10 +70,17 @@ impl Interpreter {
 
         // Create the root scope
         let mut global_scope = HashMap::new();
-        global_scope.insert("globalThis".to_owned(), Value::Object(Rc::clone(&global_object)));
-        global_scope.insert("window".to_owned(), Value::Object(Rc::clone(&global_object)));
+        global_scope.insert(
+            "globalThis".to_owned(),
+            Value::Object(Rc::clone(&global_object)),
+        );
+        global_scope.insert(
+            "window".to_owned(),
+            Value::Object(Rc::clone(&global_object)),
+        );
 
         // Add base functions to the global object
+        Self::populate_built_ins(Rc::clone(&global_object));
 
         Self {
             global_object,
@@ -83,17 +91,30 @@ impl Interpreter {
         }
     }
 
+    fn populate_built_ins(global_object: Rc<RefCell<Box<dyn Object>>>) {
+        let mut borrow = global_object.borrow_mut();
 
-    // fn create_console() -> Box<dyn Object> {
-    //
-    // }
+        let shared_object = wrap_object(Console::boxed());
+        borrow.put("console".to_owned(), Value::Object(shared_object));
+    }
 
-
-    // fn populate_built_ins(global_object: Rc<RefCell<Box<dyn Object>>>) {
-    //     let mut borrow = global_object.borrow_mut();
-    //
-    //     borrow.put("console", )
-    // }
+    pub fn handle_built_in(
+        &mut self,
+        name: &str,
+        context: HashMap<String, Value>,
+    ) -> Result<Value, Exception> {
+        match name {
+            "console_log" => {
+                let expr = context
+                    .get("expr")
+                    .ok_or_else(|| ReferenceError("expression".to_owned()))?;
+                println!("{}", expr);
+                success!()
+            }
+            "other" => success!(),
+            _ => success!(),
+        }
+    }
 
     pub fn run_with(
         &mut self,
@@ -181,8 +202,8 @@ impl Interpreter {
 
     /// Finds the a variable given `name`, and applies the closure `edit` to it.
     pub fn edit_variable<F>(&mut self, name: &str, edit: F) -> Result<Value, Exception>
-        where
-            F: FnOnce(&mut Value) -> Result<Value, Exception>,
+    where
+        F: FnOnce(&mut Value) -> Result<Value, Exception>,
     {
         match self.resolve_variable(name) {
             None => match self.global_object.borrow_mut().get_mut(name) {

@@ -65,9 +65,12 @@ impl CallExpression {
             })
             .collect();
 
-        drop(function);
-
-        interpreter.run_with(block, context)
+        if function.is_built_in() {
+            interpreter.handle_built_in(&function.name, context)
+        } else {
+            drop(function);
+            interpreter.run_with(block, context)
+        }
     }
 }
 

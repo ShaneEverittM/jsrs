@@ -7,6 +7,7 @@ pub use object::Type as ObjectType;
 pub use string::JsString;
 pub use value::Value;
 
+mod console;
 pub mod exception;
 mod function;
 mod interpreter;
@@ -14,4 +15,3 @@ mod literal_object;
 mod object;
 mod string;
 mod value;
-mod console;

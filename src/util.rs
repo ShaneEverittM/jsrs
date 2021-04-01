@@ -1,4 +1,8 @@
+use std::cell::RefCell;
 use std::io::Read;
+use std::rc::Rc;
+
+use crate::runtime::Object;
 
 pub fn make_indent(indent: u32) -> String {
     let mut indents = String::new();
@@ -25,4 +29,8 @@ pub fn get_input() -> String {
             std::fs::read_to_string(&file_name).unwrap()
         }
     }
+}
+
+pub fn wrap_object(obj: Box<dyn Object>) -> Rc<RefCell<Box<dyn Object>>> {
+    Rc::new(RefCell::new(obj))
 }

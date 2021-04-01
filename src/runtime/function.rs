@@ -1,5 +1,6 @@
 use std::{any::Any, collections::HashMap};
 
+use crate::ir::statement::ScopeType;
 use crate::{
     ir::statement::Scope,
     runtime::{Object, ObjectType, Value},
@@ -14,6 +15,7 @@ pub struct Function {
     pub name: String,
     pub parameters: Vec<String>,
     pub body: Scope,
+    is_built_in: bool,
 }
 
 impl Function {
@@ -23,7 +25,22 @@ impl Function {
             name,
             parameters,
             body,
+            is_built_in: false,
         })
+    }
+
+    pub fn built_in(name: String, parameters: Vec<String>) -> Box<Self> {
+        Box::new(Self {
+            properties: HashMap::new(),
+            name,
+            parameters,
+            body: Scope::new(ScopeType::Function),
+            is_built_in: true,
+        })
+    }
+
+    pub fn is_built_in(&self) -> bool {
+        self.is_built_in
     }
 }
 
