@@ -166,8 +166,9 @@ impl Interpreter {
         }
     }
 
-    fn handle_exception(&mut self, exception: Exception) {
-        eprintln!("{:#?}", exception);
+    fn handle_exception(&mut self, _exception: Exception) {
+        #[cfg(not(feature = "suppress_exceptions"))]
+        eprintln!("{}", _exception.to_string());
     }
 
     pub fn add_variable(&mut self, key: String, value: Value) {

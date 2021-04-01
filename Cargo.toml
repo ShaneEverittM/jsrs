@@ -7,9 +7,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
 ressa = "0.7.1"
 resast = "0.4.1"
 itertools = "0.10.0"
 thiserror = "1.0.24"
-js_object_derive = {path = "../js-object-derive"}
+js_object_derive = { path = "../js-object-derive" }
+
+[features]
+suppress_exceptions = []
