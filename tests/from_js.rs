@@ -123,3 +123,13 @@ fn built_in() {
 fn exception() {
     validate_output("exception", Err(Exception::ReferenceError("x".to_owned())));
 }
+
+#[test]
+fn member() {
+    validate_output("member", Err(Exception::ReferenceError("x".to_owned())));
+}
+
+#[test]
+fn objects() {
+    validate_output("object", Err(Exception::ReferenceError("x".to_owned())));
+}

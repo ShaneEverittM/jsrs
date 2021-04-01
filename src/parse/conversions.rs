@@ -86,7 +86,14 @@ impl From<resast::expr::AssignExpr<'_>> for Box<dyn Expression> {
             },
             AssignLeft::Expr(e) => match *e {
                 Expr::Ident(i) => i,
-                _ => unimplemented!(),
+                Expr::Member(m) => {
+                    dbg!(m);
+                    unimplemented!()
+                },
+                _ => {
+                    dbg!(e);
+                    unimplemented!()
+                },
             },
         };
 
@@ -108,6 +115,12 @@ impl From<resast::expr::UpdateExpr<'_>> for Box<dyn Expression> {
     }
 }
 
+impl From<resast::expr::MemberExpr<'_>> for Box<dyn Expression> {
+    fn from(mem_expr: MemberExpr<'_>) -> Self {
+        MemberExpression::boxed(mem_expr.)
+    }
+}
+
 impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
     fn from(expr: Expr<'_>) -> Self {
         match expr {
@@ -117,6 +130,7 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
             Expr::Call(call_expr) => call_expr.into(),
             Expr::Assign(assn_expr) => assn_expr.into(),
             Expr::Update(up_expr) => up_expr.into(),
+            Expr::Member(mem_expr) => mem_expr.into(),
             _ => unimplemented!(),
         }
     }
