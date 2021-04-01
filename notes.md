@@ -14,3 +14,4 @@
 ## Question
 
 ## Next Time
+- Make Interpreter generic over its output. This can allow it to integrate into both testing and a repl.
