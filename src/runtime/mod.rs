@@ -1,3 +1,4 @@
+pub use console::Console;
 pub use exception::Exception;
 pub use function::Function;
 pub use interpreter::Interpreter;
@@ -13,3 +14,4 @@ mod literal_object;
 mod object;
 mod string;
 mod value;
+mod console;

@@ -1,6 +1,6 @@
-use crate::runtime::{interpreter::GlobalObject, Function, JsString, Value};
+use crate::runtime::{Function, interpreter::GlobalObject, JsString, Value};
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Debug)]
 pub enum Type {
     Object,
     Global,
@@ -23,17 +23,17 @@ pub trait Object: std::fmt::Debug + ObjectClone {
     fn as_any(&mut self) -> &mut dyn std::any::Any;
 
     fn as_function(&mut self) -> &mut Function {
-        assert!(self.get_type() == Type::Function);
+        assert_eq!(self.get_type(), Type::Function);
         self.as_any().downcast_mut::<Function>().unwrap()
     }
 
     fn as_global(&mut self) -> &mut GlobalObject {
-        assert!(self.get_type() == Type::Global);
+        assert_eq!(self.get_type(), Type::Global);
         self.as_any().downcast_mut::<GlobalObject>().unwrap()
     }
 
     fn as_string(&mut self) -> &mut JsString {
-        assert!(self.get_type() == Type::String);
+        assert_eq!(self.get_type(), Type::String);
         self.as_any().downcast_mut::<JsString>().unwrap()
     }
 }

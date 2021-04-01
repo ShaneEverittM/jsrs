@@ -56,23 +56,45 @@ impl Object for GlobalObject {
 
 impl Default for Interpreter {
     fn default() -> Self {
-        let go = Rc::new(RefCell::new(
+        Self::new()
+    }
+}
+
+impl Interpreter {
+    pub fn new() -> Self {
+        // Create the global object
+        let global_object = Rc::new(RefCell::new(
             Box::new(GlobalObject::new()) as Box<dyn Object>
         ));
+
+        // Create the root scope
         let mut global_scope = HashMap::new();
-        global_scope.insert("globalThis".to_owned(), Value::Object(go.clone()));
+        global_scope.insert("globalThis".to_owned(), Value::Object(Rc::clone(&global_object)));
+        global_scope.insert("window".to_owned(), Value::Object(Rc::clone(&global_object)));
+
+        // Add base functions to the global object
 
         Self {
-            global_object: go,
+            global_object,
             scope_stack: vec![global_scope],
             should_break: false,
             should_return: false,
             return_register: None,
         }
     }
-}
 
-impl Interpreter {
+
+    // fn create_console() -> Box<dyn Object> {
+    //
+    // }
+
+
+    // fn populate_built_ins(global_object: Rc<RefCell<Box<dyn Object>>>) {
+    //     let mut borrow = global_object.borrow_mut();
+    //
+    //     borrow.put("console", )
+    // }
+
     pub fn run_with(
         &mut self,
         mut block: Scope,
@@ -159,8 +181,8 @@ impl Interpreter {
 
     /// Finds the a variable given `name`, and applies the closure `edit` to it.
     pub fn edit_variable<F>(&mut self, name: &str, edit: F) -> Result<Value, Exception>
-    where
-        F: FnOnce(&mut Value) -> Result<Value, Exception>,
+        where
+            F: FnOnce(&mut Value) -> Result<Value, Exception>,
     {
         match self.resolve_variable(name) {
             None => match self.global_object.borrow_mut().get_mut(name) {
