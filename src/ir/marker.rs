@@ -8,7 +8,7 @@ use std::fmt::Debug;
 
 use crate::ir::IrNode;
 
-pub use js_derive::{Expression, Statement, Declaration};
+pub use jsrs_derive::{Expression, Statement, Declaration};
 
 pub trait Statement: IrNode + Debug + StatementClone {}
 

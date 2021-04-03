@@ -1,9 +1,9 @@
 use std::string::ToString;
 
-use javascript_rs::prelude::*;
+use jsrs::prelude::*;
 
 fn main() {
-    let input = javascript_rs::util::get_input();
+    let input = get_input();
 
     let program = parse_program(&input);
 

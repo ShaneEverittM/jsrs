@@ -1,5 +1,5 @@
 [package]
-name = "javascript-rs"
+name = "jsrs"
 version = "0.1.0"
 authors = ["Shane Murphy <shaneeverittmurphy@gmail.com>"]
 edition = "2018"
@@ -11,7 +11,7 @@ ressa = "0.7.1"
 resast = "0.4.1"
 itertools = "0.10.0"
 thiserror = "1.0.24"
-js_derive = { path = "../js-object-derive" }
+jsrs_derive = { path = "../jsrs_derive" }
 
 [features]
 suppress_exceptions = []

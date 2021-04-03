@@ -1,6 +1,6 @@
 use std::{env, string::ToString};
 
-use javascript_rs::prelude::*;
+use jsrs::prelude::*;
 
 fn validate_output(file_name: &str, expected: Result<Value, Exception>) {
     let verbose = match env::var("VERBOSE") {

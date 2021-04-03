@@ -1,6 +1,6 @@
 use crate::runtime::{interpreter::GlobalObject, Function, JsString, Value};
 
-pub use js_derive::Object;
+pub use jsrs_derive::Object;
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Eq, PartialEq)]
@@ -66,7 +66,7 @@ impl Clone for Box<dyn Object> {
 #[cfg(test)]
 mod tests {
     use crate::prelude::*;
-    use js_derive::Object;
+    use jsrs_derive::Object;
     use std::collections::HashMap;
 
     #[derive(Object, Clone, Debug)]
