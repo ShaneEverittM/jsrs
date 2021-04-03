@@ -2,7 +2,7 @@ use std::{collections::HashMap, fmt};
 
 use js_object_derive::Object;
 
-use crate::runtime::{Value, Object};
+use crate::runtime::{Object, Value};
 
 // TODO: make a derive macro that can implement object for a type by annotating the
 //  field with a map interface

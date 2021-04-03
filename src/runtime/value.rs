@@ -27,7 +27,7 @@ impl fmt::Display for Value {
             Value::Object(o) => {
                 let s = format!("{}", o.borrow());
                 f.write_str(&s)
-            },
+            }
         }
     }
 }

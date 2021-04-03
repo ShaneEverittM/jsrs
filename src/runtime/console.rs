@@ -3,7 +3,7 @@ use std::{collections::HashMap, fmt};
 use js_object_derive::Object;
 
 use crate::{
-    runtime::{Function, Value, Object},
+    runtime::{Function, Object, Value},
     util::*,
 };
 

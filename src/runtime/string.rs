@@ -1,8 +1,8 @@
-use std::{fmt, collections::HashMap};
+use std::{collections::HashMap, fmt};
 
 use js_object_derive::Object;
 
-use crate::runtime::{Value, Object};
+use crate::runtime::{Object, Value};
 
 #[derive(Object, Debug, Clone)]
 #[object_type(String)]
@@ -25,7 +25,6 @@ impl JsString {
         })
     }
 }
-
 
 impl fmt::Display for JsString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

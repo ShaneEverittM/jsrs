@@ -39,7 +39,6 @@ pub trait Object: std::fmt::Debug + ObjectClone + std::fmt::Display {
     }
 
     fn format_properties(&self) -> String;
-
 }
 
 // Helper trait to allow object-safety
