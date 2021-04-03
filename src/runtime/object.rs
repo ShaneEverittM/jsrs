@@ -14,6 +14,7 @@ pub enum Type {
 pub trait Object: std::fmt::Debug + ObjectClone {
     fn put(&mut self, name: String, value: Value);
 
+    // TODO: These two should return exceptions instead of None
     fn get(&self, name: &str) -> Option<Value>;
 
     fn get_mut(&mut self, name: &str) -> Option<&mut Value>;
