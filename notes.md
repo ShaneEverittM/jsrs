@@ -14,4 +14,5 @@
 ## Question
 
 ## Next Time
+- Replace *lots* of panics, expects, unwraps, etc. with exceptions. Not all though, some are missing features.
 - Make Interpreter generic over its output. This can allow it to integrate into both testing and a repl.
