@@ -8,11 +8,12 @@ pub mod statement;
 pub trait IrNode {
     fn dump(&self, indent: u32) -> String;
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception>;
+    #[allow(unused_variables)]
     fn edit_lvalue(
         &mut self,
-        _interpreter: &mut Interpreter,
-        _edit: Box<dyn FnOnce(&mut Value) -> Result<Value, Exception>>,
+        interpreter: &mut Interpreter,
+        edit: Box<dyn FnOnce(&mut Value) -> Result<Value, Exception>>,
     ) -> Result<Value, Exception> {
-        unimplemented!("Not a valid lvalue")
+        Err(Exception::TypeError("Not an lvalue".to_owned()))
     }
 }

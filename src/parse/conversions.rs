@@ -111,7 +111,7 @@ impl From<resast::expr::MemberExpr<'_>> for Box<dyn Expression> {
             _ => {
                 dbg!(mem_expr.object);
                 unimplemented!()
-            },
+            }
         };
 
         let property = match *mem_expr.property {
@@ -119,7 +119,7 @@ impl From<resast::expr::MemberExpr<'_>> for Box<dyn Expression> {
             _ => {
                 dbg!(mem_expr.property);
                 unimplemented!()
-            },
+            }
         };
         MemberExpression::boxed(object, property)
     }

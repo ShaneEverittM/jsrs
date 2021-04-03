@@ -36,6 +36,11 @@ impl IrNode for MemberExpression {
         })
     }
 
+    /// Applies the given closure to the value that is yielded by this expression.
+    ///
+    /// Essentially this is one step more than Interpreter::edit_variable(). First we use said
+    /// function to enter a context with mutable access to the object we want to edit, then we
+    /// apply the given closure to its property.
     fn edit_lvalue(
         &mut self,
         interpreter: &mut Interpreter,
@@ -44,10 +49,12 @@ impl IrNode for MemberExpression {
         interpreter.edit_variable(&self.object, |obj| match obj {
             Value::Object(o) => {
                 let mut obj_borrow = o.borrow_mut();
-                let prop = obj_borrow.get_mut(&self.property).unwrap();
+                let prop = obj_borrow
+                    .get_mut(&self.property)
+                    .ok_or_else(|| Exception::ReferenceError(self.property.clone()))?;
                 edit(prop)
             }
-            _ => panic!(),
+            _ => Err(Exception::TypeError("Variable is not an object".to_owned())),
         })
     }
 }
