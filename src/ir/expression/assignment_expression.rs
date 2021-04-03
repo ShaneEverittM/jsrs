@@ -1,41 +1,38 @@
 use crate::{
-    ir::{expression::Variable, marker::Expression, IrNode},
+    ir::{marker::Expression, IrNode},
     runtime::{exception::*, Interpreter, Value},
 };
 
 #[derive(Debug, Clone)]
 pub struct AssignmentExpression {
-    variable: Variable,
-    new_value: Box<dyn Expression>,
+    lhs: Box<dyn Expression>,
+    rhs: Box<dyn Expression>,
 }
 
 impl AssignmentExpression {
-    pub fn boxed(variable: Variable, new_value: Box<dyn Expression>) -> Box<Self> {
-        Box::new(Self {
-            variable,
-            new_value,
-        })
+    pub fn boxed(lhs: Box<dyn Expression>, rhs: Box<dyn Expression>) -> Box<Self> {
+        Box::new(Self { lhs, rhs })
     }
 }
 
 impl IrNode for AssignmentExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
-        let mut output = format!(
-            "{}AssignmentExpression: {}\n",
-            indent_str, self.variable.name
-        );
-        output += &self.new_value.dump(indent + 1);
+        let mut output = format!("{}AssignmentExpression: \n", indent_str);
+        output += &self.lhs.dump(indent + 1);
+        output += &self.rhs.dump(indent + 1);
         output
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        let new_val = self.new_value.evaluate(interpreter)?;
+        let new_val = self.rhs.evaluate(interpreter)?;
 
-        interpreter.edit_variable(&self.variable.name, |variable| {
-            *variable = new_val;
-            success!()
-        })
+        let edit_fn = |lvalue: &mut Value| -> Result<Value, Exception> {
+            *lvalue = new_val.clone();
+            Ok(new_val)
+        };
+
+        self.lhs.edit_lvalue(interpreter, Box::new(edit_fn))
     }
 }
 

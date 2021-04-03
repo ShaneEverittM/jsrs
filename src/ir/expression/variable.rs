@@ -32,6 +32,14 @@ impl IrNode for Variable {
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         interpreter.get_variable(&self.name)
     }
+
+    fn edit_lvalue(
+        &mut self,
+        interpreter: &mut Interpreter,
+        edit: Box<dyn FnOnce(&mut Value) -> Result<Value, Exception>>,
+    ) -> Result<Value, Exception> {
+        interpreter.edit_variable(&self.name, edit)
+    }
 }
 
 impl Expression for Variable {}

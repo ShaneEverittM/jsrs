@@ -8,10 +8,3 @@ function Person(first, last, age, eye) {
 let x = new Person("Shane", "Murphy", 1, "Blue")
 
 console.log(x)
-
-
-
-
-let x = 6
-
-object.property = 8

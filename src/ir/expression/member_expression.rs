@@ -35,6 +35,21 @@ impl IrNode for MemberExpression {
             Ok(property)
         })
     }
+
+    fn edit_lvalue(
+        &mut self,
+        interpreter: &mut Interpreter,
+        edit: Box<dyn FnOnce(&mut Value) -> Result<Value, Exception>>,
+    ) -> Result<Value, Exception> {
+        interpreter.edit_variable(&self.object, |obj| match obj {
+            Value::Object(o) => {
+                let mut obj_borrow = o.borrow_mut();
+                let prop = obj_borrow.get_mut(&self.property).unwrap();
+                edit(prop)
+            }
+            _ => panic!(),
+        })
+    }
 }
 
 impl Expression for MemberExpression {}

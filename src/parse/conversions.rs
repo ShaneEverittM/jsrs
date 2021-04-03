@@ -79,25 +79,13 @@ impl From<resast::expr::AssignExpr<'_>> for Box<dyn Expression> {
             _ => unimplemented!(),
         }
 
-        let id = match assn_expr.left {
-            AssignLeft::Pat(p) => match p {
-                Pat::Ident(i) => i,
-                _ => unimplemented!(),
-            },
-            AssignLeft::Expr(e) => match *e {
-                Expr::Ident(i) => i,
-                Expr::Member(m) => {
-                    dbg!(m);
-                    unimplemented!()
-                },
-                _ => {
-                    dbg!(e);
-                    unimplemented!()
-                },
-            },
+        // TODO: Support patterns
+        let e = match assn_expr.left {
+            AssignLeft::Pat(_) => unimplemented!(),
+            AssignLeft::Expr(e) => e,
         };
 
-        AssignmentExpression::boxed(Variable::new(&id.name), assn_expr.right.into())
+        AssignmentExpression::boxed(e.into(), assn_expr.right.into())
     }
 }
 
@@ -117,7 +105,23 @@ impl From<resast::expr::UpdateExpr<'_>> for Box<dyn Expression> {
 
 impl From<resast::expr::MemberExpr<'_>> for Box<dyn Expression> {
     fn from(mem_expr: MemberExpr<'_>) -> Self {
-        MemberExpression::boxed(mem_expr.)
+        // FIXME: Currently only support plain ident member expressions of depth 1
+        let object = match *mem_expr.object {
+            Expr::Ident(i) => i.name.to_string(),
+            _ => {
+                dbg!(mem_expr.object);
+                unimplemented!()
+            },
+        };
+
+        let property = match *mem_expr.property {
+            Expr::Ident(i) => i.name.to_string(),
+            _ => {
+                dbg!(mem_expr.property);
+                unimplemented!()
+            },
+        };
+        MemberExpression::boxed(object, property)
     }
 }
 
