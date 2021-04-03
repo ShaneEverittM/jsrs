@@ -8,11 +8,11 @@ use std::fmt::Debug;
 
 use crate::ir::IrNode;
 
+pub use js_derive::{Expression, Statement, Declaration};
+
 pub trait Statement: IrNode + Debug + StatementClone {}
 
 pub trait Expression: IrNode + Debug + ExpressionClone {}
-
-pub trait BlockStatement: IrNode + Debug + Statement {}
 
 // Anything that is a Declaration is automatically a statement
 pub trait Declaration: Statement {}

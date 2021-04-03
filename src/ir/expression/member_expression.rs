@@ -3,7 +3,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Expression, Clone)]
 pub struct MemberExpression {
     object: String,
     property: String,
@@ -58,5 +59,3 @@ impl IrNode for MemberExpression {
         })
     }
 }
-
-impl Expression for MemberExpression {}

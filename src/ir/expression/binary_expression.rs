@@ -3,7 +3,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Expression, Clone)]
 pub struct BinaryExpression {
     op: BinaryOperator,
     lhs: Box<dyn Expression>,
@@ -77,5 +78,3 @@ impl IrNode for BinaryExpression {
         Ok(val)
     }
 }
-
-impl Expression for BinaryExpression {}

@@ -1,10 +1,9 @@
 use std::{collections::HashMap, fmt};
 
-use js_object_derive::Object;
-
 use crate::runtime::{Object, Value};
 
-#[derive(Object, Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Object, Clone)]
 #[object_type(String)]
 pub struct JsString {
     properties: HashMap<String, Value>,

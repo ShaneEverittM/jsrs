@@ -3,7 +3,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Expression, Clone)]
 pub struct Literal {
     pub val: Value,
 }
@@ -29,5 +30,3 @@ impl IrNode for Literal {
         Ok(self.val.clone())
     }
 }
-
-impl Expression for Literal {}

@@ -6,7 +6,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Statement, Clone)]
 pub struct ExpressionStatement {
     expr: Box<dyn Expression>,
 }
@@ -33,4 +34,3 @@ impl IrNode for ExpressionStatement {
         self.expr.evaluate(interpreter)
     }
 }
-impl Statement for ExpressionStatement {}

@@ -1,7 +1,5 @@
 use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 
-use js_object_derive::Object;
-
 use crate::{
     ir::statement::{Scope, ScopeType},
     runtime::{exception::*, Console, Object, Value},
@@ -16,7 +14,8 @@ pub struct Interpreter {
     return_register: Option<Value>,
 }
 
-#[derive(Object, Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Object, Clone)]
 #[object_type(Global)]
 pub struct GlobalObject {
     properties: HashMap<String, Value>,
@@ -162,8 +161,11 @@ impl Interpreter {
         self.scope_stack.last_mut().unwrap().insert(key, value);
     }
 
-    pub fn get_go_property(&mut self, name: &str) -> Option<Value> {
-        self.global_object.borrow_mut().get(name)
+    pub fn get_go_property(&mut self, name: &str) -> Result<Value, Exception> {
+        self.global_object
+            .borrow_mut()
+            .get(name)
+            .ok_or_else(|| Exception::ReferenceError(name.to_owned()))
     }
 
     pub fn put_go_property(&mut self, name: &str, property: Value) {

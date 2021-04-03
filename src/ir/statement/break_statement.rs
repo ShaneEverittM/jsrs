@@ -4,7 +4,8 @@ use crate::{
 };
 
 // TODO: Support labeled breaks
-#[derive(Clone, Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Statement, Clone)]
 pub struct BreakStatement;
 
 impl BreakStatement {
@@ -24,5 +25,3 @@ impl IrNode for BreakStatement {
         Ok(Value::Undefined)
     }
 }
-
-impl Statement for BreakStatement {}

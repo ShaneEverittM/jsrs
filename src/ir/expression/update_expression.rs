@@ -3,7 +3,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Expression, Clone)]
 pub struct UpdateExpression {
     variable: Variable,
     op: UnaryOperator,
@@ -56,5 +57,3 @@ impl IrNode for UpdateExpression {
         })
     }
 }
-
-impl Expression for UpdateExpression {}

@@ -1,12 +1,10 @@
 use crate::{
-    ir::{
-        marker::{BlockStatement, Statement},
-        IrNode,
-    },
+    ir::{marker::Statement, IrNode},
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Clone, Eq, PartialEq)]
 pub enum ScopeType {
     Function,
     Control,
@@ -15,17 +13,12 @@ pub enum ScopeType {
 
 impl std::fmt::Display for ScopeType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let id = match self {
-            ScopeType::Function => "FunctionBody",
-            ScopeType::Control => "ControlStatementBody",
-            ScopeType::Global => "GlobalScope",
-        };
-
-        f.write_str(id)
+        write!(f, "{:?}", self)
     }
 }
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Statement, Clone)]
 pub struct Scope {
     pub children: Vec<Box<dyn Statement>>,
     scope_type: ScopeType,
@@ -68,7 +61,3 @@ impl IrNode for Scope {
         interpreter.run(self.clone())
     }
 }
-
-impl Statement for Scope {}
-
-impl BlockStatement for Scope {}

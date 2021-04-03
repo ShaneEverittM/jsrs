@@ -2,7 +2,8 @@ use std::{cell::RefCell, fmt, rc::Rc};
 
 use crate::runtime::Object;
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Clone)]
 pub enum Value {
     Number(f64),
     Undefined,

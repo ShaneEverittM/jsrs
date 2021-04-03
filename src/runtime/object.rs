@@ -1,6 +1,9 @@
 use crate::runtime::{interpreter::GlobalObject, Function, JsString, Value};
 
-#[derive(Eq, PartialEq, Debug)]
+pub use js_derive::Object;
+
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Eq, PartialEq)]
 pub enum Type {
     Object,
     Global,
@@ -63,7 +66,7 @@ impl Clone for Box<dyn Object> {
 #[cfg(test)]
 mod tests {
     use crate::prelude::*;
-    use js_object_derive::Object;
+    use js_derive::Object;
     use std::collections::HashMap;
 
     #[derive(Object, Clone, Debug)]

@@ -6,7 +6,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Statement, Clone)]
 pub struct IfStatement {
     test: Box<dyn Expression>,
     consequent: Box<dyn Statement>,
@@ -70,5 +71,3 @@ impl IrNode for IfStatement {
         Ok(Value::Undefined)
     }
 }
-
-impl Statement for IfStatement {}

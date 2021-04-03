@@ -6,7 +6,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Clone, Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Statement, Clone)]
 pub struct ForStatement {
     // ?: can a union be used here?
     initializer_expr: Option<Box<dyn Expression>>,
@@ -96,5 +97,3 @@ impl IrNode for ForStatement {
         success!(Value::Undefined)
     }
 }
-
-impl Statement for ForStatement {}

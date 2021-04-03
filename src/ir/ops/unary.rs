@@ -2,7 +2,8 @@ use std::fmt;
 
 use resast::UnaryOp;
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Clone)]
 pub enum UnaryOperator {
     Increment,
     Decrement,

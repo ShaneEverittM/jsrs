@@ -3,7 +3,8 @@ use crate::{
     runtime::{Exception, Interpreter, Value},
 };
 
-#[derive(Clone, Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Expression, Clone)]
 pub struct Variable {
     pub name: String,
 }
@@ -41,5 +42,3 @@ impl IrNode for Variable {
         interpreter.edit_variable(&self.name, edit)
     }
 }
-
-impl Expression for Variable {}

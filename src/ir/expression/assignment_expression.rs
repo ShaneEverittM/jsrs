@@ -3,7 +3,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Expression, Clone)]
 pub struct AssignmentExpression {
     lhs: Box<dyn Expression>,
     rhs: Box<dyn Expression>,
@@ -35,5 +36,3 @@ impl IrNode for AssignmentExpression {
         self.lhs.edit_lvalue(interpreter, Box::new(edit_fn))
     }
 }
-
-impl Expression for AssignmentExpression {}

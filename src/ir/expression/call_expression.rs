@@ -1,4 +1,4 @@
-use std::cell::RefMut;
+use std::{collections::HashMap, cell::RefMut};
 
 use itertools::{EitherOrBoth, Itertools};
 
@@ -6,9 +6,9 @@ use crate::{
     ir::{marker::Expression, IrNode},
     runtime::{exception::*, Function, Interpreter, Value},
 };
-use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Expression, Clone)]
 pub struct CallExpression {
     member_of: Option<String>,
     name: String,
@@ -91,24 +91,22 @@ impl IrNode for CallExpression {
             // Free function
             None => {
                 // Get function as a property of the global object
-                interpreter.get_go_property(&self.name).unwrap()
+                interpreter.get_go_property(&self.name)?
             }
 
             // Member function
             Some(object_name) => {
                 // Find variable using scope resolution rules
-                let val = interpreter
-                    .get_variable(object_name)
-                    .expect("Cannot find function");
+                let val = interpreter.get_variable(object_name)?;
 
                 // Check that ident resolves to an object
                 if let Value::Object(obj) = val {
                     // Borrow the object we are calling a property of
                     obj.borrow_mut()
                         .get(&self.name)
-                        .expect("Object has no function with given name")
+                        .ok_or_else(|| ReferenceError(self.name.clone()))?
                 } else {
-                    panic!("Identifier is not an object")
+                    return Err(TypeError("Value is not an object".to_owned()));
                 }
             }
         };
@@ -119,9 +117,7 @@ impl IrNode for CallExpression {
             let rm = RefMut::map(func.borrow_mut(), |o| o.as_function());
             self.call_internal(rm, interpreter)
         } else {
-            unimplemented!("Only current callable type is a function")
+            Err(TypeError("Type is not callable".to_owned()))
         }
     }
 }
-
-impl Expression for CallExpression {}

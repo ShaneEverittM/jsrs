@@ -73,14 +73,14 @@ name = "javascript-rs"
 version = "0.1.0"
 dependencies = [
  "itertools",
- "js_object_derive",
+ "js_derive",
  "resast",
  "ressa",
  "thiserror",
 ]
 
 [[package]]
-name = "js_object_derive"
+name = "js_derive"
 version = "0.0.0"
 dependencies = [
  "proc-macro2",

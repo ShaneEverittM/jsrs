@@ -6,7 +6,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Statement, Clone)]
 pub struct ReturnStatement {
     expression: Option<Box<dyn Expression>>,
 }
@@ -41,5 +42,3 @@ impl IrNode for ReturnStatement {
         Ok(Value::Undefined)
     }
 }
-
-impl Statement for ReturnStatement {}

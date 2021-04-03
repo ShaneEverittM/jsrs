@@ -126,7 +126,7 @@ fn exception() {
 
 #[test]
 fn member() {
-    validate_output("member", Ok(Value::Number(5f64)));
+    validate_output("member", Err(Exception::TypeError("Value is not an object".to_owned())));
 }
 
 // #[test]

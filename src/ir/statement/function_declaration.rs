@@ -5,7 +5,8 @@ use crate::{
     runtime::{exception::*, Function, Interpreter, Value},
 };
 
-#[derive(Debug, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Declaration, Clone)]
 pub struct FunctionDeclaration {
     name: String,
     parameters: Vec<String>,
@@ -52,5 +53,3 @@ impl IrNode for FunctionDeclaration {
         success!()
     }
 }
-
-impl Declaration for FunctionDeclaration {}

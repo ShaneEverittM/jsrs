@@ -6,7 +6,8 @@ use crate::{
     runtime::{exception::*, Interpreter, Value},
 };
 
-#[derive(Clone, Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Statement, Clone)]
 pub struct VariableDeclaration {
     pub name: String,
     pub value: Option<Box<dyn Expression>>,
@@ -47,5 +48,3 @@ impl IrNode for VariableDeclaration {
         Ok(Value::Undefined)
     }
 }
-
-impl Statement for VariableDeclaration {}
