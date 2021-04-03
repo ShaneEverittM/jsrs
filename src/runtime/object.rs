@@ -11,7 +11,7 @@ pub enum Type {
 }
 
 // TODO: properties can be much more complicated that always a key:value
-pub trait Object: std::fmt::Debug + ObjectClone {
+pub trait Object: std::fmt::Debug + ObjectClone + std::fmt::Display {
     fn put(&mut self, name: String, value: Value);
 
     // TODO: These two should return exceptions instead of None
@@ -37,6 +37,9 @@ pub trait Object: std::fmt::Debug + ObjectClone {
         assert_eq!(self.get_type(), Type::String);
         self.as_any().downcast_mut::<JsString>().unwrap()
     }
+
+    fn format_properties(&self) -> String;
+
 }
 
 // Helper trait to allow object-safety
@@ -70,11 +73,23 @@ mod tests {
         properties: HashMap<String, Value>,
     }
 
+    impl std::fmt::Display for SomeObject {
+        fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            todo!()
+        }
+    }
+
     #[derive(Object, Clone, Debug)]
     #[object_type(Object)]
     struct SomeOtherObject {
         #[properties]
         other_name: HashMap<String, Value>,
+    }
+
+    impl std::fmt::Display for SomeOtherObject {
+        fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            todo!()
+        }
     }
 
     #[test]

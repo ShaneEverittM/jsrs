@@ -1,9 +1,11 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
 use js_object_derive::Object;
 
-use crate::ir::statement::ScopeType;
-use crate::{ir::statement::Scope, runtime::Value};
+use crate::{
+    ir::statement::{Scope, ScopeType},
+    runtime::{Object, Value},
+};
 
 #[derive(Object, Debug, Clone)]
 #[object_type(Function)]
@@ -41,5 +43,12 @@ impl Function {
 
     pub fn is_built_in(&self) -> bool {
         self.is_built_in
+    }
+}
+
+impl fmt::Display for Function {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Function Object: {}", self.name)?;
+        f.write_str(&self.format_properties())
     }
 }

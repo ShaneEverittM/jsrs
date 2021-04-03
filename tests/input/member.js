@@ -1,3 +1,3 @@
-console.log(5)
+console.log(console)
 globalThis.console = 5;
 console // 5

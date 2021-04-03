@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
 use js_object_derive::Object;
 
 use crate::{
-    runtime::{Function, Value},
+    runtime::{Function, Value, Object},
     util::*,
 };
 
@@ -25,5 +25,11 @@ impl Console {
         properties.insert("log".to_owned(), Value::Object(log_function_object));
 
         Box::new(Self { properties })
+    }
+}
+
+impl fmt::Display for Console {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.format_properties())
     }
 }

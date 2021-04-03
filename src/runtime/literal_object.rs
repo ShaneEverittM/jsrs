@@ -1,8 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 
 use js_object_derive::Object;
 
-use crate::runtime::Value;
+use crate::runtime::{Value, Object};
 
 // TODO: make a derive macro that can implement object for a type by annotating the
 //  field with a map interface
@@ -10,4 +10,10 @@ use crate::runtime::Value;
 #[object_type(Object)]
 pub struct LiteralObject {
     properties: HashMap<String, Value>,
+}
+
+impl fmt::Display for LiteralObject {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.format_properties())
+    }
 }

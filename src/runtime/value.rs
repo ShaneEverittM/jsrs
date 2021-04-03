@@ -24,9 +24,10 @@ impl fmt::Display for Value {
             Value::Undefined => f.write_str("Undefined"),
             Value::Boolean(b) => f.write_str(&b.to_string()),
             Value::String(s) => f.write_str(&s),
-            Value::Object(_) => {
-                unimplemented!()
-            }
+            Value::Object(o) => {
+                let s = format!("{}", o.borrow());
+                f.write_str(&s)
+            },
         }
     }
 }

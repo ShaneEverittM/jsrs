@@ -1,4 +1,4 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 
 use js_object_derive::Object;
 
@@ -25,6 +25,12 @@ pub struct GlobalObject {
 impl Default for GlobalObject {
     fn default() -> Self {
         GlobalObject::new()
+    }
+}
+
+impl fmt::Display for GlobalObject {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.format_properties())
     }
 }
 

@@ -70,7 +70,9 @@ impl CallExpression {
         }
 
         if function.is_built_in() {
-            interpreter.handle_built_in(&function.name, context)
+            let name = function.name.clone();
+            drop(function);
+            interpreter.handle_built_in(&name, context)
         } else {
             drop(function);
             interpreter.run_with(block, context)
