@@ -58,6 +58,6 @@ impl IrNode for Scope {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        interpreter.run(self.clone())
+        interpreter.evaluate_scope(self.clone())
     }
 }

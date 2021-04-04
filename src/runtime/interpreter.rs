@@ -6,31 +6,11 @@ use crate::{
     util::*,
 };
 
-pub struct Interpreter {
-    global_object: Rc<RefCell<Box<dyn Object>>>,
-    scope_stack: Vec<HashMap<String, Value>>,
-    should_break: bool,
-    should_return: bool,
-    return_register: Option<Value>,
-}
-
 #[cfg_attr(debug_assertions, derive(Debug))]
-#[derive(Object, Clone)]
+#[derive(Object, Clone, Default)]
 #[object_type(Global)]
 pub struct GlobalObject {
     properties: HashMap<String, Value>,
-}
-
-impl Default for GlobalObject {
-    fn default() -> Self {
-        GlobalObject::new()
-    }
-}
-
-impl fmt::Display for GlobalObject {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.format_properties())
-    }
 }
 
 impl GlobalObject {
@@ -41,10 +21,18 @@ impl GlobalObject {
     }
 }
 
-impl Default for Interpreter {
-    fn default() -> Self {
-        Self::new()
+impl fmt::Display for GlobalObject {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.format_properties())
     }
+}
+
+pub struct Interpreter {
+    global_object: Rc<RefCell<Box<dyn Object>>>,
+    scope_stack: Vec<HashMap<String, Value>>,
+    should_break: bool,
+    should_return: bool,
+    return_register: Option<Value>,
 }
 
 impl Interpreter {
@@ -56,6 +44,8 @@ impl Interpreter {
 
         // Create the root scope
         let mut global_scope = HashMap::new();
+
+        // Alias global object under these names
         global_scope.insert(
             "globalThis".to_owned(),
             Value::Object(Rc::clone(&global_object)),
@@ -77,29 +67,18 @@ impl Interpreter {
         }
     }
 
-    fn populate_built_ins(global_object: Rc<RefCell<Box<dyn Object>>>) {
-        let mut borrow = global_object.borrow_mut();
-
-        let shared_object = wrap_object(Console::boxed());
-        borrow.put("console".to_owned(), Value::Object(shared_object));
+    pub fn run(&mut self, block: Scope) -> Result<Value, Exception> {
+        match self.evaluate_scope(block) {
+            Ok(value) => Ok(value),
+            Err(e) => {
+                self.handle_exception(e.clone());
+                Err(e)
+            }
+        }
     }
 
-    pub fn handle_built_in(
-        &mut self,
-        name: &str,
-        context: HashMap<String, Value>,
-    ) -> Result<Value, Exception> {
-        match name {
-            "console_log" => {
-                let expr = context
-                    .get("expr")
-                    .ok_or_else(|| ReferenceError("expression".to_owned()))?;
-                println!("{}", expr);
-                success!()
-            }
-            "other" => success!(),
-            _ => success!(),
-        }
+    pub fn evaluate_scope(&mut self, block: Scope) -> Result<Value, Exception> {
+        self.run_with(block, HashMap::new())
     }
 
     pub fn run_with(
@@ -142,19 +121,23 @@ impl Interpreter {
 
         Ok(last_value)
     }
-    pub fn run(&mut self, block: Scope) -> Result<Value, Exception> {
-        match self.run_with(block, HashMap::new()) {
-            Ok(value) => Ok(value),
-            Err(e) => {
-                self.handle_exception(e.clone());
-                Err(e)
-            }
-        }
-    }
 
-    fn handle_exception(&mut self, _exception: Exception) {
-        #[cfg(not(feature = "suppress_exceptions"))]
-        eprintln!("{}", _exception.to_string());
+    pub fn handle_built_in(
+        &mut self,
+        name: &str,
+        context: HashMap<String, Value>,
+    ) -> Result<Value, Exception> {
+        match name {
+            "console_log" => {
+                let expr = context
+                    .get("expr")
+                    .ok_or_else(|| ReferenceError("expression".to_owned()))?;
+                println!("{}", expr);
+                success!()
+            }
+            "other" => success!(),
+            _ => success!(),
+        }
     }
 
     pub fn add_variable(&mut self, key: String, value: Value) {
@@ -172,19 +155,6 @@ impl Interpreter {
         self.global_object
             .borrow_mut()
             .put(name.to_owned(), property)
-    }
-
-    fn resolve_variable_mut(&mut self, name: &str) -> Option<&mut Value> {
-        self.scope_stack
-            .iter_mut()
-            .rev()
-            .find_map(|scope| scope.get_mut(name))
-    }
-    fn resolve_variable(&self, name: &str) -> Option<Value> {
-        self.scope_stack
-            .iter()
-            .rev()
-            .find_map(|scope| scope.get(name).cloned())
     }
 
     /// Get the value of a variable with name `name`, using scope resolution.
@@ -217,11 +187,9 @@ impl Interpreter {
     pub fn notify_break(&mut self) {
         self.should_break = true;
     }
-
     pub fn clear_break(&mut self) {
         self.should_break = false;
     }
-
     pub fn broke(&self) -> bool {
         self.should_break
     }
@@ -229,11 +197,9 @@ impl Interpreter {
     pub fn notify_return(&mut self) {
         self.should_return = true;
     }
-
     pub fn clear_return(&mut self) {
         self.should_return = false;
     }
-
     pub fn returned(&self) -> bool {
         self.should_return
     }
@@ -249,5 +215,36 @@ impl Interpreter {
     fn leave_scope(&mut self) {
         assert!(self.scope_stack.last().is_some());
         self.scope_stack.pop();
+    }
+
+    fn resolve_variable_mut(&mut self, name: &str) -> Option<&mut Value> {
+        self.scope_stack
+            .iter_mut()
+            .rev()
+            .find_map(|scope| scope.get_mut(name))
+    }
+    fn resolve_variable(&self, name: &str) -> Option<Value> {
+        self.scope_stack
+            .iter()
+            .rev()
+            .find_map(|scope| scope.get(name).cloned())
+    }
+
+    fn populate_built_ins(global_object: Rc<RefCell<Box<dyn Object>>>) {
+        let mut borrow = global_object.borrow_mut();
+
+        let shared_object = wrap_object(Console::boxed());
+        borrow.put("console".to_owned(), Value::Object(shared_object));
+    }
+
+    fn handle_exception(&mut self, _exception: Exception) {
+        #[cfg(not(feature = "suppress_exceptions"))]
+        eprintln!("{}", _exception.to_string());
+    }
+}
+
+impl Default for Interpreter {
+    fn default() -> Self {
+        Self::new()
     }
 }
