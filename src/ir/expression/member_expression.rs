@@ -26,12 +26,12 @@ impl IrNode for MemberExpression {
         interpreter.edit_variable(&self.object, |obj| {
             let object = match obj {
                 Value::Object(o) => o,
-                _ => return Err(Exception::TypeError("Expected object".to_owned())),
+                _ => return Err(TypeError("Expected object".to_owned())),
             };
             let property = object
                 .borrow()
                 .get(&self.property)
-                .ok_or_else(|| Exception::ReferenceError(self.property.clone()))?;
+                .ok_or_else(|| ReferenceError(self.property.clone()))?;
 
             Ok(property)
         })
@@ -52,10 +52,10 @@ impl IrNode for MemberExpression {
                 let mut obj_borrow = o.borrow_mut();
                 let prop = obj_borrow
                     .get_mut(&self.property)
-                    .ok_or_else(|| Exception::ReferenceError(self.property.clone()))?;
+                    .ok_or_else(|| ReferenceError(self.property.clone()))?;
                 edit(prop)
             }
-            _ => Err(Exception::TypeError("Variable is not an object".to_owned())),
+            _ => Err(TypeError("Variable is not an object".to_owned())),
         })
     }
 }
