@@ -22,6 +22,6 @@ impl IrNode for BreakStatement {
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         interpreter.notify_break();
-        Ok(Value::Undefined)
+        success!()
     }
 }

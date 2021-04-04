@@ -4,6 +4,7 @@ use crate::{
     ir::{marker::Declaration, statement::Scope, IrNode},
     runtime::{exception::*, Function, Interpreter, Value},
 };
+use crate::util::wrap_object;
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Declaration, Clone)]
@@ -48,7 +49,8 @@ impl IrNode for FunctionDeclaration {
             self.parameters.clone(),
             self.body.clone(),
         );
-        interpreter.put_go_property(&self.name, Value::Object(Rc::new(RefCell::new(function))));
+        
+        interpreter.put_go_property(&self.name, Value::Object(wrap_object(function)));
 
         success!()
     }

@@ -34,11 +34,11 @@ impl IrNode for ReturnStatement {
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         if let Some(mut expr) = self.expression.take() {
-            if let Ok(val) = expr.evaluate(interpreter).as_ref() {
-                interpreter.set_return_val(val.clone());
+            if let Ok(val) = expr.evaluate(interpreter) {
+                interpreter.set_return_val(val);
             }
             interpreter.notify_return();
         }
-        Ok(Value::Undefined)
+        success!()
     }
 }

@@ -40,11 +40,14 @@ impl IrNode for VariableDeclaration {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        let value = match self.value.as_mut() {
-            None => Value::Undefined,
-            Some(expr) => expr.evaluate(interpreter).unwrap_or_default(),
-        };
+        let value = self
+            .value
+            .as_mut()
+            .map(|v| v.evaluate(interpreter).unwrap_or_default())
+            .unwrap_or(Value::Undefined);
+
         interpreter.add_variable(self.name.clone(), value);
-        Ok(Value::Undefined)
+
+        success!()
     }
 }

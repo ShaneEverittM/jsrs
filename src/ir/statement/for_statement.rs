@@ -94,6 +94,6 @@ impl IrNode for ForStatement {
         } else {
             unimplemented!("For loops without tests not supported")
         }
-        success!(Value::Undefined)
+        success!()
     }
 }

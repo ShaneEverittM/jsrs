@@ -64,10 +64,10 @@ impl IrNode for IfStatement {
 
             if test {
                 self.consequent.evaluate(interpreter)?;
-            } else if self.alternate.is_some() {
-                self.alternate.as_mut().unwrap().evaluate(interpreter)?;
+            } else if let Some(alternate) = self.alternate.as_mut() {
+                alternate.evaluate(interpreter)?;
             }
         }
-        Ok(Value::Undefined)
+        success!()
     }
 }
