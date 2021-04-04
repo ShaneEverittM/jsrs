@@ -44,7 +44,7 @@ impl CallExpression {
         })
     }
 
-    fn call_internal(
+    fn call(
         &mut self,
         function: RefMut<Function>,
         interpreter: &mut Interpreter,
@@ -115,7 +115,7 @@ impl IrNode for CallExpression {
         if let Value::Object(func) = func {
             // Borrow just long enough to evaluate
             let rm = RefMut::map(func.borrow_mut(), |o| o.as_function());
-            self.call_internal(rm, interpreter)
+            self.call(rm, interpreter)
         } else {
             Err(TypeError("Type is not callable".to_owned()))
         }
