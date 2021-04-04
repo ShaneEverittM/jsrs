@@ -1,4 +1,4 @@
-use std::{collections::HashMap, cell::RefMut};
+use std::{cell::RefMut, collections::HashMap};
 
 use itertools::{EitherOrBoth, Itertools};
 
