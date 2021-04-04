@@ -13,7 +13,7 @@ repository = "https://github.com/ShaneEverittM/jsrs"
 keywords = ["interpreter", "javascript", "REPL"]
 categories = ["compilers"]
 
-exclude = ["/scripts/", "notes.md"]
+exclude = ["/scripts/", "notes.md", ".idea/"]
 
 
 [dependencies]
