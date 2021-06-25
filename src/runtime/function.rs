@@ -13,14 +13,14 @@ pub struct Function {
     //       and number of args while the function is executing as per
     //       https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions#the_arguments_object
     properties: HashMap<String, Value>,
-    pub name: String,
+    pub name: Option<String>,
     pub parameters: Vec<String>,
     pub body: Scope,
     is_built_in: bool,
 }
 
 impl Function {
-    pub fn new(name: String, parameters: Vec<String>, body: Scope) -> Box<Self> {
+    pub fn new(name: Option<String>, parameters: Vec<String>, body: Scope) -> Box<Self> {
         Box::new(Self {
             properties: HashMap::new(),
             name,
@@ -30,7 +30,7 @@ impl Function {
         })
     }
 
-    pub fn built_in(name: String, parameters: Vec<String>) -> Box<Self> {
+    pub fn built_in(name: Option<String>, parameters: Vec<String>) -> Box<Self> {
         Box::new(Self {
             properties: HashMap::new(),
             name,
@@ -47,7 +47,7 @@ impl Function {
 
 impl fmt::Display for Function {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Function Object: {}", self.name)?;
+        write!(f, "Function Object: {}", self.name.as_ref().unwrap_or(&"Anonymous".into()))?;
         f.write_str(&self.format_properties())
     }
 }

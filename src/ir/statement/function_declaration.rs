@@ -7,13 +7,13 @@ use crate::{
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Expression, Clone)]
 pub struct FunctionExpression {
-    name: String,
+    name: Option<String>,
     parameters: Vec<String>,
     body: Scope,
 }
 
 impl FunctionExpression {
-    pub fn new(name: String, parameters: Vec<String>, body: Scope) -> Self {
+    pub fn new(name: Option<String>, parameters: Vec<String>, body: Scope) -> Self {
         Self {
             name,
             parameters,
@@ -21,9 +21,9 @@ impl FunctionExpression {
         }
     }
 
-    pub fn boxed(name: &str, parameters: Vec<String>, body: Scope) -> Box<Self> {
+    pub fn boxed(name: Option<String>, parameters: Vec<String>, body: Scope) -> Box<Self> {
         Box::new(Self {
-            name: name.to_owned(),
+            name,
             parameters,
             body,
         })
@@ -35,7 +35,7 @@ impl IrNode for FunctionExpression {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!(
             "{}FunctionDeclaration: {} | {:?}\n",
-            indent_str, self.name, self.parameters
+            indent_str, self.name.as_ref().unwrap_or(&"Anonymous".into()), self.parameters
         );
         output += &self.body.dump(indent + 1);
         output
@@ -51,7 +51,7 @@ impl IrNode for FunctionExpression {
         let function_wrapped = wrap_object(function);
 
         if !interpreter.should_suppress_declarations() {
-            interpreter.put_go_property(&self.name, Value::Object(function_wrapped.clone()));
+            interpreter.put_go_property(&self.name.as_ref().unwrap(), Value::Object(function_wrapped.clone()));
         }
 
         Ok(Value::Object(function_wrapped))

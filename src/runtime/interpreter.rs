@@ -33,7 +33,7 @@ pub struct Interpreter {
     should_break: bool,
     should_return: bool,
     return_register: Option<Value>,
-    suppress_declarations: bool,
+    suppression_depth: usize,
 }
 
 impl Interpreter {
@@ -64,7 +64,7 @@ impl Interpreter {
             scope_stack: vec![global_scope],
             should_break: false,
             should_return: false,
-            suppress_declarations: false,
+            suppression_depth: 0,
             return_register: None,
         }
     }
@@ -228,13 +228,13 @@ impl Interpreter {
     }
 
     pub fn suppress_declarations(&mut self) {
-        self.suppress_declarations = true;
+        self.suppression_depth += 1
     }
     pub fn clear_suppress_declarations(&mut self) {
-        self.suppress_declarations = false;
+        self.suppression_depth -= 1;
     }
     pub fn should_suppress_declarations(&self) -> bool {
-        self.suppress_declarations
+        self.suppression_depth > 0
     }
 
     pub fn set_return_val(&mut self, val: Value) {

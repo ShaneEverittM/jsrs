@@ -182,7 +182,7 @@ impl From<resast::Func<'_>> for Box<dyn Expression> {
                 _ => panic!("Unsupported parameter ident"),
             })
             .collect();
-        FunctionExpression::boxed(&f.id.unwrap().name, params, block)
+        FunctionExpression::boxed(f.id.map(|i| i.name.to_string()), params, block)
     }
 }
 

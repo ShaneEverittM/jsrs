@@ -1,6 +1,7 @@
 let x = {
     name: "Shane",
-    age: function fun() {
+    nested: {height: "5:11"},
+    age: function () {
         console.log("In age")
     }
 }

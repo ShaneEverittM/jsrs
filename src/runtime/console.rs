@@ -17,7 +17,7 @@ impl Console {
         let mut properties = HashMap::new();
 
         let log_function_built_in =
-            Function::built_in("console_log".to_owned(), vec!["expr".to_owned()]);
+            Function::built_in(Some("console_log".to_owned()), vec!["expr".to_owned()]);
 
         let log_function_object = wrap_object(log_function_built_in);
 
