@@ -1,7 +1,7 @@
 use crate::{
     ir::{
-        marker::{Expression, Statement},
         IrNode,
+        marker::{Expression, Statement},
     },
     runtime::{exception::*, Interpreter, Value},
 };

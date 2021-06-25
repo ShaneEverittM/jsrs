@@ -1,4 +1,4 @@
-pub use block_statement::{Scope, ScopeType};
+pub use block_statement::{Block, BlockType};
 pub use break_statement::BreakStatement;
 pub use expression_statement::ExpressionStatement;
 pub use for_statement::ForStatement;

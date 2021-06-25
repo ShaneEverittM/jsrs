@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fmt};
 
 use crate::{
-    ir::statement::{Scope, ScopeType},
+    ir::statement::{Block, BlockType},
     runtime::{Object, Value},
 };
 
@@ -15,12 +15,12 @@ pub struct Function {
     properties: HashMap<String, Value>,
     pub name: Option<String>,
     pub parameters: Vec<String>,
-    pub body: Scope,
+    pub body: Block,
     is_built_in: bool,
 }
 
 impl Function {
-    pub fn new(name: Option<String>, parameters: Vec<String>, body: Scope) -> Box<Self> {
+    pub fn new(name: Option<String>, parameters: Vec<String>, body: Block) -> Box<Self> {
         Box::new(Self {
             properties: HashMap::new(),
             name,
@@ -35,7 +35,7 @@ impl Function {
             properties: HashMap::new(),
             name,
             parameters,
-            body: Scope::new(ScopeType::Function),
+            body: Block::new(BlockType::Function),
             is_built_in: true,
         })
     }

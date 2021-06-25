@@ -171,7 +171,7 @@ impl From<resast::expr::ObjExpr<'_>> for Box<dyn Expression> {
 
 impl From<resast::Func<'_>> for Box<dyn Expression> {
     fn from(f: Func<'_>) -> Self {
-        let mut block = Scope::new(ScopeType::Function);
+        let mut block = Block::new(BlockType::Function);
         super::parser::parse_block(f.body.0, &mut block);
         let params = f
             .params
@@ -249,7 +249,7 @@ impl From<resast::stmt::ForStmt<'_>> for Box<dyn Statement> {
 
 impl From<resast::stmt::BlockStmt<'_>> for Box<dyn Statement> {
     fn from(block_statement: BlockStmt<'_>) -> Self {
-        let mut body_block = Scope::new(ScopeType::Control);
+        let mut body_block = Block::new(BlockType::Control);
         parse_block(block_statement.0, &mut body_block);
         Box::new(body_block)
     }

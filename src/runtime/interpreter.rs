@@ -1,11 +1,12 @@
 use std::{cell::RefCell, collections::HashMap, fmt, rc::Rc};
 
 use crate::{
-    ir::statement::{Scope, ScopeType},
-    runtime::{exception::*, Console, Object, Value},
+    ir::statement::{Block, BlockType},
+    runtime::{Console, exception::*, Object, Value},
     util::*,
 };
 
+/// The global object containing top level definitions of built-in functions
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Object, Clone, Default)]
 #[object_type(Global)]
@@ -13,34 +14,51 @@ pub struct GlobalObject {
     properties: HashMap<String, Value>,
 }
 
-impl GlobalObject {
-    pub fn new() -> Self {
-        Self {
-            properties: HashMap::new(),
-        }
-    }
-}
-
 impl fmt::Display for GlobalObject {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.format_properties())
+        f.write_str(&Object::format_properties(self))
     }
 }
 
+/// The Interpreter in charge of everything, handles all evaluation, printing, built-in functions,
+/// exceptions and (eventually) memory management.
 pub struct Interpreter {
+    // The global object, also known as "window" or "globalThis", contains some top level defs
     global_object: Rc<RefCell<Box<dyn Object>>>,
+
+    // The stack of scope for variable resolution
     scope_stack: Vec<HashMap<String, Value>>,
+
+    // Flag indicating if the interpreter should break out of its current context
     should_break: bool,
+
+    // Flag indicating if the interpreter should return from the current function
     should_return: bool,
+
+    // Register to hold return values so that expression values can "skip" up arbitrary levels
     return_register: Option<Value>,
-    suppression_depth: usize,
+
+    // A counter indicating how many times it was requested of the interpreter to not treat
+    // function declarations as global declarations, useful for functions as properties or variables
+    declaration_suppression_counter: usize,
+
+    // Just a buffer to hold the initial scope with its useful things from construction
+    // until first call to interpret, at which point it gets moved to the scope stack
+    // as the bottom
+    _gs_slot: Option<HashMap<String, Value>>,
+}
+
+impl Default for Interpreter {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Interpreter {
     pub fn new() -> Self {
         // Create the global object
         let global_object = Rc::new(RefCell::new(
-            Box::new(GlobalObject::new()) as Box<dyn Object>
+            Box::new(GlobalObject::default()) as Box<dyn Object>
         ));
 
         // Create the root scope
@@ -61,11 +79,12 @@ impl Interpreter {
 
         Self {
             global_object,
-            scope_stack: vec![global_scope],
+            scope_stack: Vec::new(),
             should_break: false,
             should_return: false,
-            suppression_depth: 0,
             return_register: None,
+            declaration_suppression_counter: 0,
+            _gs_slot: Some(global_scope),
         }
     }
 
@@ -79,8 +98,9 @@ impl Interpreter {
         println!("End Global Object State")
     }
 
-    pub fn run(&mut self, block: Scope) -> Result<Value, Exception> {
-        match self.evaluate_scope(block) {
+    pub fn run(&mut self, block: Block) -> Result<Value, Exception> {
+        let global_scope = self._gs_slot.take().unwrap();
+        match self.run_with(block, global_scope) {
             Ok(value) => Ok(value),
             Err(e) => {
                 self.handle_exception(e.clone());
@@ -89,21 +109,16 @@ impl Interpreter {
         }
     }
 
-    pub fn evaluate_scope(&mut self, block: Scope) -> Result<Value, Exception> {
+    pub fn evaluate_scope(&mut self, block: Block) -> Result<Value, Exception> {
         self.run_with(block, HashMap::new())
     }
 
     pub fn run_with(
         &mut self,
-        mut block: Scope,
+        mut block: Block,
         context: HashMap<String, Value>,
     ) -> Result<Value, Exception> {
-        let mut top = false;
-        if *block.get_type() == ScopeType::Global {
-            top = true;
-        } else {
-            self.enter_scope(context);
-        }
+        self.enter_scope(context);
 
         let mut last_value = Value::Undefined;
 
@@ -126,7 +141,7 @@ impl Interpreter {
             should return. Then clear return flag, and propagate value.
             */
             if self.should_return {
-                if *block.get_type() == ScopeType::Function {
+                if block.get_type() == BlockType::Function {
                     self.clear_return();
                     last_value = self.return_register.take().unwrap_or_default();
                 }
@@ -134,9 +149,7 @@ impl Interpreter {
             }
         }
 
-        if !top {
-            self.leave_scope();
-        }
+        self.leave_scope();
 
         Ok(last_value)
     }
@@ -228,13 +241,13 @@ impl Interpreter {
     }
 
     pub fn suppress_declarations(&mut self) {
-        self.suppression_depth += 1
+        self.declaration_suppression_counter += 1
     }
     pub fn clear_suppress_declarations(&mut self) {
-        self.suppression_depth -= 1;
+        self.declaration_suppression_counter -= 1;
     }
     pub fn should_suppress_declarations(&self) -> bool {
-        self.suppression_depth > 0
+        self.declaration_suppression_counter > 0
     }
 
     pub fn set_return_val(&mut self, val: Value) {
@@ -264,20 +277,14 @@ impl Interpreter {
     }
 
     fn populate_built_ins(global_object: Rc<RefCell<Box<dyn Object>>>) {
-        let mut borrow = global_object.borrow_mut();
-
-        let shared_object = wrap_object(Console::boxed());
-        borrow.put("console".to_owned(), Value::Object(shared_object));
+        global_object.borrow_mut().put(
+            "console".to_owned(),
+            Value::Object(wrap_object(Console::boxed())),
+        );
     }
 
     fn handle_exception(&mut self, _exception: Exception) {
         #[cfg(not(feature = "suppress_exceptions"))]
         eprintln!("{}", _exception.to_string());
-    }
-}
-
-impl Default for Interpreter {
-    fn default() -> Self {
-        Self::new()
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Expression, statement::Scope, IrNode},
+    ir::{IrNode, marker::Expression, statement::Block},
     runtime::{exception::*, Function, Interpreter, Value},
     util::*,
 };
@@ -9,11 +9,11 @@ use crate::{
 pub struct FunctionExpression {
     name: Option<String>,
     parameters: Vec<String>,
-    body: Scope,
+    body: Block,
 }
 
 impl FunctionExpression {
-    pub fn new(name: Option<String>, parameters: Vec<String>, body: Scope) -> Self {
+    pub fn new(name: Option<String>, parameters: Vec<String>, body: Block) -> Self {
         Self {
             name,
             parameters,
@@ -21,7 +21,7 @@ impl FunctionExpression {
         }
     }
 
-    pub fn boxed(name: Option<String>, parameters: Vec<String>, body: Scope) -> Box<Self> {
+    pub fn boxed(name: Option<String>, parameters: Vec<String>, body: Block) -> Box<Self> {
         Box::new(Self {
             name,
             parameters,
