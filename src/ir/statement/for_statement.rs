@@ -1,7 +1,7 @@
 use crate::{
     ir::{
-        marker::{Expression, Statement},
         IrNode,
+        marker::{Expression, Statement},
     },
     runtime::{exception::*, Interpreter, Value},
 };
@@ -9,7 +9,7 @@ use crate::{
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Statement, Clone)]
 pub struct ForStatement {
-    // ?: can a union be used here?
+    // ?: can a enum be used here? ExprOrDecl?
     initializer_expr: Option<Box<dyn Expression>>,
     initializer_decl: Option<Box<dyn Statement>>,
     test: Option<Box<dyn Expression>>,
