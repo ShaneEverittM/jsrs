@@ -1,6 +1,6 @@
-use crate::runtime::{interpreter::GlobalObject, Function, JsString, Value};
-
 pub use jsrs_derive::Object;
+
+use crate::runtime::{Function, interpreter::GlobalObject, JsString, Value};
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Eq, PartialEq)]
@@ -13,7 +13,9 @@ pub enum Type {
     String,
 }
 
-// TODO: properties can be much more complicated that always a key:value
+// TODO: properties can be much more complicated that always a key:value, or can they?
+//  We can handle nested objects, functions (named or anonymous). Other oddities are just in
+//  shorthand, which may under the hood just be <name, value>.
 pub trait Object: std::fmt::Debug + ObjectClone + std::fmt::Display {
     fn put(&mut self, name: String, value: Value);
 
@@ -67,9 +69,11 @@ impl Clone for Box<dyn Object> {
 
 #[cfg(test)]
 mod tests {
-    use crate::prelude::*;
-    use jsrs_derive::Object;
     use std::collections::HashMap;
+
+    use jsrs_derive::Object;
+
+    use crate::prelude::*;
 
     #[derive(Object, Clone, Debug)]
     #[object_type(Object)]
