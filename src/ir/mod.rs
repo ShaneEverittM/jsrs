@@ -8,6 +8,9 @@ pub mod statement;
 pub trait IrNode {
     fn dump(&self, indent: u32) -> String;
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception>;
+
+    /// When you need to assign to the result of an expression, this first evaluates the expression,
+    /// then the interpreter finds the actual variable before applying the closure to it.
     #[allow(unused_variables)]
     fn edit_lvalue(
         &mut self,
