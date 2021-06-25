@@ -26,6 +26,8 @@ pub trait Object: std::fmt::Debug + ObjectClone + std::fmt::Display {
 
     fn as_any(&mut self) -> &mut dyn std::any::Any;
 
+    fn into_object(self: Box<Self>) -> Box<dyn Object>;
+
     fn as_function(&mut self) -> &mut Function {
         assert_eq!(self.get_type(), Type::Function);
         self.as_any().downcast_mut::<Function>().unwrap()

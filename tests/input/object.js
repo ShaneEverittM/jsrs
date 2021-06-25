@@ -1,10 +1,5 @@
-function Person(first, last, age, eye) {
-    this.firstName = first;
-    this.lastName = last;
-    this.age = age;
-    this.eyeColor = eye;
+let x = {
+    name: "Shane"
 }
-
-let x = new Person("Shane", "Murphy", 1, "Blue")
 
 console.log(x)

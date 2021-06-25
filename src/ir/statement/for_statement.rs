@@ -63,7 +63,9 @@ impl IrNode for ForStatement {
         if self.initializer_expr.is_some() {
             self.initializer_expr
                 .as_mut()
-                .unwrap()
+                .unwrap_or(
+                    &mut (crate::ir::expression::EmptyExpression::boxed() as Box<dyn Expression>),
+                )
                 .evaluate(interpreter)?;
         }
 

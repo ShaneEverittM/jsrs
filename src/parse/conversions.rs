@@ -125,6 +125,50 @@ impl From<resast::expr::MemberExpr<'_>> for Box<dyn Expression> {
     }
 }
 
+impl From<resast::expr::ObjExpr<'_>> for Box<dyn Expression> {
+    fn from(obj_expr: ObjExpr<'_>) -> Self {
+        let mut keys = Vec::new();
+        let mut values = Vec::new();
+        for prop in obj_expr {
+            let value: Box<dyn Expression>;
+            let key: String;
+            match prop {
+                ObjProp::Prop(prop) => {
+                    if prop.computed || prop.method || prop.short_hand || prop.is_static {
+                        unimplemented!()
+                    }
+
+                    match prop.kind {
+                        PropKind::Init => {
+                            value = match prop.value {
+                                PropValue::Expr(expr) => expr.into(),
+                                PropValue::Pat(_) => unimplemented!(),
+                                PropValue::None => unimplemented!(),
+                            };
+                            key = match prop.key {
+                                PropKey::Expr(e) => match e {
+                                    Expr::Ident(ident) => ident.name.to_string(),
+                                    _ => unimplemented!(),
+                                },
+                                PropKey::Lit(_) => unimplemented!(),
+                                PropKey::Pat(_) => unimplemented!(),
+                            };
+                        }
+                        PropKind::Get => unimplemented!(),
+                        PropKind::Set => unimplemented!(),
+                        PropKind::Ctor => unimplemented!(),
+                        PropKind::Method => unimplemented!(),
+                    }
+                }
+                ObjProp::Spread(_) => unimplemented!(),
+            }
+            keys.push(key);
+            values.push(value);
+        }
+        ObjectExpression::boxed(keys, values)
+    }
+}
+
 impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
     fn from(expr: Expr<'_>) -> Self {
         match expr {
@@ -135,6 +179,7 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
             Expr::Assign(assn_expr) => assn_expr.into(),
             Expr::Update(up_expr) => up_expr.into(),
             Expr::Member(mem_expr) => mem_expr.into(),
+            Expr::Obj(obj_expr) => obj_expr.into(),
             _ => unimplemented!(),
         }
     }

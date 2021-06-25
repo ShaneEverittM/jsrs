@@ -67,6 +67,16 @@ impl Interpreter {
         }
     }
 
+    pub fn dump_state(&self) {
+        let mut go_ref = self.global_object.borrow_mut();
+        let go = go_ref.as_global();
+        println!("Global Object State");
+        for (key, value) in go.properties.iter() {
+            println!("{}: {}", key, value);
+        }
+        println!("End Global Object State")
+    }
+
     pub fn run(&mut self, block: Scope) -> Result<Value, Exception> {
         match self.evaluate_scope(block) {
             Ok(value) => Ok(value),
@@ -138,6 +148,10 @@ impl Interpreter {
             "other" => success!(),
             _ => success!(),
         }
+    }
+
+    pub fn at_global(&self) -> bool {
+        self.scope_stack.is_empty()
     }
 
     pub fn add_variable(&mut self, key: String, value: Value) {

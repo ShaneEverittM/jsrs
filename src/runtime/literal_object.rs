@@ -11,6 +11,12 @@ pub struct LiteralObject {
     properties: HashMap<String, Value>,
 }
 
+impl LiteralObject {
+    pub fn boxed(properties: HashMap<String, Value>) -> Box<Self> {
+        Box::new(Self { properties })
+    }
+}
+
 impl fmt::Display for LiteralObject {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.format_properties())

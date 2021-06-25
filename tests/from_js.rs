@@ -132,7 +132,7 @@ fn member() {
     );
 }
 
-// #[test]
-// fn objects() {
-//     validate_output("object", Err(Exception::ReferenceError("x".to_owned())));
-// }
+#[test]
+fn objects() {
+    validate_output("object", Ok(Value::Undefined));
+}
