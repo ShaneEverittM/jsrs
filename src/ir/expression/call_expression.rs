@@ -3,7 +3,7 @@ use std::{cell::RefMut, collections::HashMap};
 use itertools::{EitherOrBoth, Itertools};
 
 use crate::{
-    ir::{marker::Expression, IrNode},
+    ir::{IrNode, marker::Expression},
     runtime::{exception::*, Function, Interpreter, Value},
 };
 
@@ -53,19 +53,25 @@ impl CallExpression {
 
         // bind formal parameters to actual parameters (thanks Klefstad)
         let mut context = HashMap::new();
-        for eob in function
+
+        let parameters_and_arguments = function
             .parameters
             .iter()
-            .zip_longest(self.arguments.drain(..))
-        {
-            match eob {
+            .zip_longest(self.arguments.drain(..));
+
+        for either_or_both in parameters_and_arguments {
+            match either_or_both {
+                // There is an argument for this parameter, evaluate it and place it in context
+                // for the function
                 EitherOrBoth::Both(formal, mut actual) => {
                     context.insert(formal.clone(), actual.evaluate(interpreter)?);
                 }
+                // There is no argument for this parameter, substitute undefined
                 EitherOrBoth::Left(formal) => {
                     context.insert(formal.clone(), Value::Undefined);
                 }
-                EitherOrBoth::Right(_) => panic!("Too many arguments"),
+                // There is an argument but no more parameters, do nothing per spec
+                EitherOrBoth::Right(_) => (),
             }
         }
 
