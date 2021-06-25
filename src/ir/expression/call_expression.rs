@@ -6,6 +6,7 @@ use crate::{
     ir::{IrNode, marker::Expression},
     runtime::{exception::*, Function, Interpreter, Value},
 };
+use crate::runtime::ObjectType;
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Expression, Clone)]
@@ -77,9 +78,11 @@ impl CallExpression {
 
         if function.is_built_in() {
             let name = function.name.clone();
+            // Drop here for recursion safety
             drop(function);
             interpreter.handle_built_in(&name.unwrap(), context)
         } else {
+            // Drop here for recursion safety, we've already stripped the stuff required to run
             drop(function);
             interpreter.run_with(block, context)
         }
@@ -119,11 +122,22 @@ impl IrNode for CallExpression {
 
         // We have the property that we want to call, check that it's an object
         if let Value::Object(func) = func {
-            // Borrow just long enough to evaluate
-            let rm = RefMut::map(func.borrow_mut(), |o| o.as_function());
-            self.call(rm, interpreter)
-        } else {
-            Err(TypeError("Type is not callable".to_owned()))
+            let func_borrow = func.borrow_mut();
+            if func_borrow.get_type() == ObjectType::Function {
+                // Borrow just long enough to evaluate
+                let rm = RefMut::map(func_borrow, |o| o.as_function());
+                return self.call(rm, interpreter);
+            }
         }
+
+        // Good exceptions
+        let exception_message = match &self.member_of {
+            None => format!("\'{}\' is not callable", self.name),
+            Some(object) => format!(
+                "Property \'{}\' of object \'{}\' is not callable",
+                self.name, object
+            ),
+        };
+        Err(TypeError(exception_message))
     }
 }
