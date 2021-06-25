@@ -33,6 +33,7 @@ pub struct Interpreter {
     should_break: bool,
     should_return: bool,
     return_register: Option<Value>,
+    suppress_declarations: bool,
 }
 
 impl Interpreter {
@@ -63,6 +64,7 @@ impl Interpreter {
             scope_stack: vec![global_scope],
             should_break: false,
             should_return: false,
+            suppress_declarations: false,
             return_register: None,
         }
     }
@@ -96,7 +98,12 @@ impl Interpreter {
         mut block: Scope,
         context: HashMap<String, Value>,
     ) -> Result<Value, Exception> {
-        self.enter_scope(context);
+        let mut top = false;
+        if *block.get_type() == ScopeType::Global {
+            top = true;
+        } else {
+            self.enter_scope(context);
+        }
 
         let mut last_value = Value::Undefined;
 
@@ -127,7 +134,9 @@ impl Interpreter {
             }
         }
 
-        self.leave_scope();
+        if !top {
+            self.leave_scope();
+        }
 
         Ok(last_value)
     }
@@ -151,7 +160,7 @@ impl Interpreter {
     }
 
     pub fn at_global(&self) -> bool {
-        self.scope_stack.is_empty()
+        self.scope_stack.len() == 1
     }
 
     pub fn add_variable(&mut self, key: String, value: Value) {
@@ -216,6 +225,16 @@ impl Interpreter {
     }
     pub fn returned(&self) -> bool {
         self.should_return
+    }
+
+    pub fn suppress_declarations(&mut self) {
+        self.suppress_declarations = true;
+    }
+    pub fn clear_suppress_declarations(&mut self) {
+        self.suppress_declarations = false;
+    }
+    pub fn should_suppress_declarations(&self) -> bool {
+        self.suppress_declarations
     }
 
     pub fn set_return_val(&mut self, val: Value) {

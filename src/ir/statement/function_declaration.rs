@@ -1,18 +1,18 @@
 use crate::{
-    ir::{marker::Declaration, statement::Scope, IrNode},
+    ir::{marker::Expression, statement::Scope, IrNode},
     runtime::{exception::*, Function, Interpreter, Value},
     util::*,
 };
 
 #[cfg_attr(debug_assertions, derive(Debug))]
-#[derive(Declaration, Clone)]
-pub struct FunctionDeclaration {
+#[derive(Expression, Clone)]
+pub struct FunctionExpression {
     name: String,
     parameters: Vec<String>,
     body: Scope,
 }
 
-impl FunctionDeclaration {
+impl FunctionExpression {
     pub fn new(name: String, parameters: Vec<String>, body: Scope) -> Self {
         Self {
             name,
@@ -30,7 +30,7 @@ impl FunctionDeclaration {
     }
 }
 
-impl IrNode for FunctionDeclaration {
+impl IrNode for FunctionExpression {
     fn dump(&self, indent: u32) -> String {
         let indent_str = crate::util::make_indent(indent);
         let mut output = format!(
@@ -48,8 +48,12 @@ impl IrNode for FunctionDeclaration {
             self.body.clone(),
         );
 
-        interpreter.put_go_property(&self.name, Value::Object(wrap_object(function)));
+        let function_wrapped = wrap_object(function);
 
-        success!()
+        if !interpreter.should_suppress_declarations() {
+            interpreter.put_go_property(&self.name, Value::Object(function_wrapped.clone()));
+        }
+
+        Ok(Value::Object(function_wrapped))
     }
 }

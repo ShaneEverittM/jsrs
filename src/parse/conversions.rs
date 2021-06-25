@@ -169,6 +169,23 @@ impl From<resast::expr::ObjExpr<'_>> for Box<dyn Expression> {
     }
 }
 
+impl From<resast::Func<'_>> for Box<dyn Expression> {
+    fn from(f: Func<'_>) -> Self {
+        let mut block = Scope::new(ScopeType::Function);
+        super::parser::parse_block(f.body.0, &mut block);
+        let params = f
+            .params
+            .iter()
+            .map(|param| match param {
+                FuncArg::Expr(Expr::Ident(id)) => id.name.to_string(),
+                FuncArg::Pat(Pat::Ident(id)) => id.name.to_string(),
+                _ => panic!("Unsupported parameter ident"),
+            })
+            .collect();
+        FunctionExpression::boxed(&f.id.unwrap().name, params, block)
+    }
+}
+
 impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
     fn from(expr: Expr<'_>) -> Self {
         match expr {
@@ -180,6 +197,7 @@ impl From<resast::expr::Expr<'_>> for Box<dyn Expression> {
             Expr::Update(up_expr) => up_expr.into(),
             Expr::Member(mem_expr) => mem_expr.into(),
             Expr::Obj(obj_expr) => obj_expr.into(),
+            Expr::Func(func_expr) => func_expr.into(),
             _ => unimplemented!(),
         }
     }
@@ -282,18 +300,7 @@ impl From<resast::decl::VarDecl<'_>> for Box<dyn Statement> {
 
 impl From<resast::Func<'_>> for Box<dyn Statement> {
     fn from(f: Func<'_>) -> Self {
-        let mut block = Scope::new(ScopeType::Function);
-        super::parser::parse_block(f.body.0, &mut block);
-        let params = f
-            .params
-            .iter()
-            .map(|param| match param {
-                FuncArg::Expr(Expr::Ident(id)) => id.name.to_string(),
-                FuncArg::Pat(Pat::Ident(id)) => id.name.to_string(),
-                _ => panic!("Unsupported parameter ident"),
-            })
-            .collect();
-        FunctionDeclaration::boxed(&f.id.unwrap().name, params, block)
+        ExpressionStatement::boxed(f.into())
     }
 }
 

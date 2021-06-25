@@ -29,10 +29,17 @@ impl IrNode for ObjectExpression {
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
         let mut props = HashMap::new();
         let keys_and_values = self.keys.iter_mut().zip(self.values.iter_mut());
+
+        // While evaluating the values for the properties, any function declarations should
+        // not put themselves in top level scope
+        // TODO: Is this the best way? Hard to get them there otherwise since main interpreter
+        //  eval loop is blind to what is being evaluated
+        interpreter.suppress_declarations();
         for (key, value_expr) in keys_and_values {
             let value = value_expr.evaluate(interpreter)?;
             props.insert(key.clone(), value);
         }
+        interpreter.clear_suppress_declarations();
         Ok(Value::Object(wrap_object(LiteralObject::boxed(props))))
     }
 

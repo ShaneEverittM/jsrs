@@ -2,7 +2,7 @@ pub use block_statement::{Scope, ScopeType};
 pub use break_statement::BreakStatement;
 pub use expression_statement::ExpressionStatement;
 pub use for_statement::ForStatement;
-pub use function_declaration::FunctionDeclaration;
+pub use function_declaration::FunctionExpression;
 pub use if_statement::IfStatement;
 pub use return_statement::ReturnStatement;
 pub use variable_declaration::VariableDeclaration;

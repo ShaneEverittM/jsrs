@@ -1,5 +1,8 @@
 let x = {
-    name: "Shane"
+    name: "Shane",
+    age: function fun() {
+        console.log("In age")
+    }
 }
 
-console.log(x)
+x.age()
