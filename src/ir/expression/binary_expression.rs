@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Expression, ops::BinaryOperator, IrNode},
+    ir::{IrNode, marker::Expression, ops::BinaryOperator},
     runtime::{exception::*, Interpreter, Value},
 };
 
@@ -31,10 +31,19 @@ impl IrNode for BinaryExpression {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        use Value::*;
+        // Not an error for left or right to be undefined here
         let lhs_val = self.lhs.evaluate(interpreter).unwrap_or(Value::Undefined);
         let rhs_val = self.rhs.evaluate(interpreter).unwrap_or(Value::Undefined);
 
+        let val = self.apply_op(lhs_val, rhs_val);
+
+        Ok(val)
+    }
+}
+
+impl BinaryExpression {
+    fn apply_op(&mut self, lhs_val: Value, rhs_val: Value) -> Value {
+        use Value::*;
         // Should allow this here, since it's not our job as the interpreter to guess at
         // best practices for the programmer
         #[allow(clippy::float_cmp)]
@@ -75,6 +84,6 @@ impl IrNode for BinaryExpression {
                 lhs_val, self.op, rhs_val
             ),
         };
-        Ok(val)
+        val
     }
 }
