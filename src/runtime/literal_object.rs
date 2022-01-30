@@ -12,8 +12,11 @@ pub struct LiteralObject {
 }
 
 impl LiteralObject {
+    pub fn new(properties: HashMap<String, Value>) -> Self {
+        Self {properties}
+    }
     pub fn boxed(properties: HashMap<String, Value>) -> Box<Self> {
-        Box::new(Self { properties })
+        Box::new(Self::new(properties))
     }
 }
 

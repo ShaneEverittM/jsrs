@@ -1,4 +1,4 @@
-use std::{env, string::ToString};
+use std::env;
 
 use jsrs::prelude::*;
 
@@ -13,7 +13,7 @@ fn validate_output(file_name: &str, expected: Result<Value, Exception>) {
     let program = parse_program(&input);
 
     if verbose {
-        println!("{}", program.dump(0));
+        println!("{}", program.print());
     }
 
     let mut interpreter = Interpreter::new();
@@ -22,12 +22,8 @@ fn validate_output(file_name: &str, expected: Result<Value, Exception>) {
 
     if verbose {
         match result.as_ref() {
-            Err(e) => {
-                println!("Threw Exception: {}", e.to_string());
-            }
-            Ok(result) => {
-                println!("Output: {}", result);
-            }
+            Err(e) => println!("Threw Exception: {}", e),
+            Ok(result) => println!("Output: {}", result),
         }
     }
 
@@ -51,7 +47,7 @@ fn if_no_block_test() {
 
 #[test]
 fn string_test() {
-    validate_output("string", Ok(Value::String("Strings!".to_owned())));
+    validate_output("string", Ok(Value::StringLiteral("Strings!".to_owned())));
 }
 
 #[test]
@@ -100,6 +96,11 @@ fn params() {
 }
 
 #[test]
+fn params_expressions() {
+    validate_output("parameters_expression", Ok(Value::Number(37f64)));
+}
+
+#[test]
 fn missing_params() {
     validate_output("missing_parameter", Ok(Value::Number(5f64)));
 }
@@ -134,5 +135,5 @@ fn member() {
 
 #[test]
 fn objects() {
-    validate_output("object", Ok(Value::Undefined));
+    validate_output("object", Ok(Value::Number(34f64)));
 }

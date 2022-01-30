@@ -17,10 +17,10 @@ pub enum Type {
 //  We can handle nested objects, functions (named or anonymous). Other oddities are just in
 //  shorthand, which may under the hood just be <name, value>.
 pub trait Object: std::fmt::Debug + ObjectClone + std::fmt::Display {
-    fn put(&mut self, name: String, value: Value);
+    fn put(&mut self, name: &str, value: Value);
 
     // TODO: These two should return exceptions instead of None
-    fn get(&self, name: &str) -> Option<Value>;
+    fn get(&self, name: &str) -> Option<&Value>;
 
     fn get_mut(&mut self, name: &str) -> Option<&mut Value>;
 
@@ -106,9 +106,9 @@ mod tests {
             properties: HashMap::new(),
         };
 
-        o.put("Prop".to_owned(), Value::Boolean(true));
+        o.put("Prop", Value::Boolean(true));
 
-        assert_eq!(o.get("Prop"), Some(Value::Boolean(true)));
+        assert_eq!(o.get("Prop"), Some(&Value::Boolean(true)));
     }
 
     #[test]
@@ -117,8 +117,8 @@ mod tests {
             properties: HashMap::new(),
         };
 
-        o.put("Prop".to_owned(), Value::Boolean(true));
+        o.put("Prop", Value::Boolean(true));
 
-        assert_eq!(o.get("Prop"), Some(Value::Boolean(true)));
+        assert_eq!(o.get("Prop"), Some(&Value::Boolean(true)));
     }
 }

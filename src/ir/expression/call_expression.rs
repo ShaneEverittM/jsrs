@@ -100,19 +100,20 @@ impl IrNode for CallExpression {
             // Free function
             None => {
                 // Get function as a property of the global object
-                interpreter.get_go_property(&self.name)?
+                interpreter.global_property(&self.name)?
             }
 
             // Member function
             Some(object_name) => {
                 // Find variable using scope resolution rules
-                let val = interpreter.get_variable(object_name)?;
+                let val = interpreter.variable(object_name)?;
 
                 // Check that ident resolves to an object
                 if let Value::Object(obj) = val {
                     // Borrow the object we are calling a property of
                     obj.borrow_mut()
                         .get(&self.name)
+                        .cloned()
                         .ok_or_else(|| ReferenceError(self.name.clone()))?
                 } else {
                     return Err(TypeError("Value is not an object".to_owned()));

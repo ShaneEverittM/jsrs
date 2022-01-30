@@ -68,7 +68,7 @@ impl BinaryExpression {
                     panic!("Cannot and numbers")
                 }
             },
-            (String(lhs_str), String(rhs_str)) => match self.op {
+            (StringLiteral(lhs_str), StringLiteral(rhs_str)) => match self.op {
                 BinaryOperator::StrictEqual => Value::Boolean(lhs_str == rhs_str),
                 _ => panic!("Unsupported string operation"),
             },

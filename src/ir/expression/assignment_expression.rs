@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Expression, IrNode},
+    ir::{IrNode, marker::Expression},
     runtime::{exception::*, Interpreter, Value},
 };
 
@@ -26,13 +26,8 @@ impl IrNode for AssignmentExpression {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        let new_val = self.rhs.evaluate(interpreter)?;
+        let value = self.rhs.evaluate(interpreter)?;
 
-        let edit_fn = |lvalue: &mut Value| -> Result<Value, Exception> {
-            *lvalue = new_val.clone();
-            Ok(new_val)
-        };
-
-        self.lhs.edit_lvalue(interpreter, Box::new(edit_fn))
+        self.lhs.assign(interpreter, value)
     }
 }

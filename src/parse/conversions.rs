@@ -34,7 +34,7 @@ impl From<resast::expr::Lit<'_>> for Box<dyn Expression> {
         let value = match lit {
             Lit::Number(number) => Value::Number(number.parse::<f64>().unwrap()),
             Lit::Boolean(boolean) => Value::Boolean(boolean),
-            Lit::String(string) => Value::String(string.clone_inner().into()),
+            Lit::String(string) => Value::StringLiteral(string.clone_inner().into()),
             _ => unimplemented!(),
         };
         Literal::boxed(value)

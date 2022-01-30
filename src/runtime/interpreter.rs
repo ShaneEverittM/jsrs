@@ -30,10 +30,10 @@ pub struct Interpreter {
     scope_stack: Vec<HashMap<String, Value>>,
 
     // Flag indicating if the interpreter should break out of its current context
-    should_break: bool,
+    break_flag: bool,
 
     // Flag indicating if the interpreter should return from the current function
-    should_return: bool,
+    return_flag: bool,
 
     // Register to hold return values so that expression values can "skip" up arbitrary levels
     return_register: Option<Value>,
@@ -45,7 +45,7 @@ pub struct Interpreter {
     // Just a buffer to hold the initial scope with its useful things from construction
     // until first call to interpret, at which point it gets moved to the scope stack
     // as the bottom
-    _gs_slot: Option<HashMap<String, Value>>,
+    base_global_scope: HashMap<String, Value>,
 }
 
 impl Default for Interpreter {
@@ -56,21 +56,18 @@ impl Default for Interpreter {
 
 impl Interpreter {
     pub fn new() -> Self {
-        // Create the global object
-        let global_object = Rc::new(RefCell::new(
-            Box::new(GlobalObject::default()) as Box<dyn Object>
-        ));
+        let global_object = GlobalObject::bundled();
 
-        // Create the root scope
+        // Create the top level scope
         let mut global_scope = HashMap::new();
 
         // Alias global object under these names
         global_scope.insert(
-            "globalThis".to_owned(),
+            String::from("globalThis"),
             Value::Object(Rc::clone(&global_object)),
         );
         global_scope.insert(
-            "window".to_owned(),
+            String::from("window"),
             Value::Object(Rc::clone(&global_object)),
         );
 
@@ -80,11 +77,11 @@ impl Interpreter {
         Self {
             global_object,
             scope_stack: Vec::new(),
-            should_break: false,
-            should_return: false,
+            break_flag: false,
+            return_flag: false,
             return_register: None,
             declaration_suppression_counter: 0,
-            _gs_slot: Some(global_scope),
+            base_global_scope: global_scope,
         }
     }
 
@@ -99,8 +96,7 @@ impl Interpreter {
     }
 
     pub fn run(&mut self, block: Block) -> Result<Value, Exception> {
-        let global_scope = self._gs_slot.take().unwrap();
-        match self.run_with(block, global_scope) {
+        match self.run_with(block, self.base_global_scope.clone()) {
             Ok(value) => Ok(value),
             Err(e) => {
                 self.handle_exception(e.clone());
@@ -118,10 +114,13 @@ impl Interpreter {
         mut block: Block,
         context: HashMap<String, Value>,
     ) -> Result<Value, Exception> {
+        // Running a block, so create a scope for it
         self.enter_scope(context);
 
+        // Every node in the AST may produce a value if it is Expression
         let mut last_value = Value::Undefined;
 
+        // Evaluate all of the children of this node
         for node in block.children.iter_mut() {
             last_value = node.evaluate(self)?;
 
@@ -129,9 +128,9 @@ impl Interpreter {
             Break out of evaluating block, but don't clear, since we are probably
             running inside Loop::evaluate() and it needs to stop looping. Two rust breaks
             are needed to get one JS break, one to stop evaluating the block, another to stop
-            iterating
+            iterating.
             */
-            if self.should_break {
+            if self.break_flag {
                 break;
             }
 
@@ -140,7 +139,7 @@ impl Interpreter {
             above, until we get to a function, meaning we found the function from which we
             should return. Then clear return flag, and propagate value.
             */
-            if self.should_return {
+            if self.return_flag {
                 if block.get_type() == BlockType::Function {
                     self.clear_return();
                     last_value = self.return_register.take().unwrap_or_default();
@@ -149,6 +148,7 @@ impl Interpreter {
             }
         }
 
+        // Done with the block, leave scope
         self.leave_scope();
 
         Ok(last_value)
@@ -167,7 +167,6 @@ impl Interpreter {
                 println!("{}", expr);
                 success!()
             }
-            "other" => success!(),
             _ => success!(),
         }
     }
@@ -180,23 +179,23 @@ impl Interpreter {
         self.scope_stack.last_mut().unwrap().insert(key, value);
     }
 
-    pub fn get_go_property(&mut self, name: &str) -> Result<Value, Exception> {
+    pub fn global_property(&self, name: &str) -> Result<Value, Exception> {
         self.global_object
-            .borrow_mut()
+            .borrow()
             .get(name)
+            .cloned()
             .ok_or_else(|| Exception::ReferenceError(name.to_owned()))
     }
 
-    pub fn put_go_property(&mut self, name: &str, property: Value) {
-        self.global_object
-            .borrow_mut()
-            .put(name.to_owned(), property)
+    pub fn set_global_property(&mut self, name: &str, property: Value) {
+        self.global_object.borrow_mut().put(name, property)
     }
 
     /// Get the value of a variable with name `name`, using scope resolution.
-    pub fn get_variable(&mut self, name: &str) -> Result<Value, Exception> {
-        match self.resolve_variable(name) {
-            None => match self.global_object.borrow().get(name) {
+    pub fn variable(&mut self, name: &str) -> Result<Value, Exception> {
+        let x = self.global_object.borrow();
+        match self.resolve_variable(name).cloned() {
+            None => match x.get(name).cloned() {
                 None => Err(ReferenceError(name.to_owned())),
                 Some(v) => Ok(v),
             },
@@ -220,30 +219,74 @@ impl Interpreter {
         }
     }
 
+    ///
+    /// Allows complicated inspection of a variable of the given name in the current scope.
+    ///
+    /// Useful since it is difficult to return a reference into the global object
+    /// without violating ownership rules, but give the ergonomics of having the reference in scope.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    ///
+    ///
+    /// let value = interpreter.inspect_variable("x", |var| {
+    ///     if var.some_complicated_property  {
+    ///         Value::Number(0.0)
+    ///     } else {
+    ///         Value::Number(1.0)
+    ///     }
+    /// });
+    ///
+    ///
+    ///
+    /// ```
+    pub fn inspect_variable<F>(&mut self, name: &str, inspect: F) -> Result<Value, Exception>
+    where
+        F: FnOnce(&Value) -> Result<Value, Exception>,
+    {
+        // Look up in normal scope stack
+        match self.resolve_variable(name) {
+            // If not found, check if it is a property of the global object
+            None => match self.global_object.borrow_mut().get(name) {
+                None => Err(ReferenceError(name.to_owned())),
+                Some(v) => inspect(v),
+            },
+            Some(v) => inspect(v),
+        }
+    }
+
+    pub fn assign_variable(&mut self, name: &str, value: Value) -> Result<Value, Exception> {
+        self.edit_variable(name, |lvalue: &mut Value| -> Result<Value, Exception> {
+            *lvalue = value.clone();
+            Ok(value)
+        })
+    }
+
     pub fn notify_break(&mut self) {
-        self.should_break = true;
+        self.break_flag = true;
     }
     pub fn clear_break(&mut self) {
-        self.should_break = false;
+        self.break_flag = false;
     }
     pub fn broke(&self) -> bool {
-        self.should_break
+        self.break_flag
     }
 
     pub fn notify_return(&mut self) {
-        self.should_return = true;
+        self.return_flag = true;
     }
     pub fn clear_return(&mut self) {
-        self.should_return = false;
+        self.return_flag = false;
     }
     pub fn returned(&self) -> bool {
-        self.should_return
+        self.return_flag
     }
 
     pub fn suppress_declarations(&mut self) {
         self.declaration_suppression_counter += 1
     }
-    pub fn clear_suppress_declarations(&mut self) {
+    pub fn allow_declarations(&mut self) {
         self.declaration_suppression_counter -= 1;
     }
     pub fn should_suppress_declarations(&self) -> bool {
@@ -269,22 +312,22 @@ impl Interpreter {
             .rev()
             .find_map(|scope| scope.get_mut(name))
     }
-    fn resolve_variable(&self, name: &str) -> Option<Value> {
+
+    fn resolve_variable(&self, name: &str) -> Option<&Value> {
         self.scope_stack
             .iter()
             .rev()
-            .find_map(|scope| scope.get(name).cloned())
+            .find_map(|scope| scope.get(name))
     }
 
     fn populate_built_ins(global_object: Rc<RefCell<Box<dyn Object>>>) {
-        global_object.borrow_mut().put(
-            "console".to_owned(),
-            Value::Object(wrap_object(Console::boxed())),
-        );
+        global_object
+            .borrow_mut()
+            .put("console", Console::new().value());
     }
 
     fn handle_exception(&mut self, _exception: Exception) {
         #[cfg(not(feature = "suppress_exceptions"))]
-        eprintln!("{}", _exception.to_string());
+        eprintln!("{}", _exception);
     }
 }

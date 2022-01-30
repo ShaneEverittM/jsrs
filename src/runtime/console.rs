@@ -9,21 +9,28 @@ use crate::{
 #[derive(Object, Clone)]
 #[object_type(Object)]
 pub struct Console {
+    #[properties]
     properties: HashMap<String, Value>,
 }
 
 impl Console {
-    pub fn boxed() -> Box<Self> {
+    pub fn new() -> Self {
         let mut properties = HashMap::new();
 
         let log_function_built_in =
-            Function::built_in(Some("console_log".to_owned()), vec!["expr".to_owned()]);
+            Function::built_in(Some("console_log".to_string()), vec!["expr".to_string()]);
 
-        let log_function_object = wrap_object(log_function_built_in);
+        let log_function_object = log_function_built_in.value();
 
-        properties.insert("log".to_owned(), Value::Object(log_function_object));
+        properties.insert("log".to_string(), log_function_object);
 
-        Box::new(Self { properties })
+        Self { properties }
+    }
+}
+
+impl Default for Console {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

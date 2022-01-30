@@ -51,7 +51,7 @@ impl IrNode for FunctionExpression {
         let function_wrapped = wrap_object(function);
 
         if !interpreter.should_suppress_declarations() {
-            interpreter.put_go_property(&self.name.as_ref().unwrap(), Value::Object(function_wrapped.clone()));
+            interpreter.set_global_property(self.name.as_ref().unwrap(), Value::Object(function_wrapped.clone()));
         }
 
         Ok(Value::Object(function_wrapped))

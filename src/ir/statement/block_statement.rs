@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Statement, IrNode},
+    ir::{IrNode, marker::Statement},
     runtime::{exception::*, Interpreter, Value},
 };
 
@@ -42,6 +42,10 @@ impl Block {
 
     pub fn get_type(&self) -> BlockType {
         self.scope_type.clone()
+    }
+
+    pub fn print(&self) -> String {
+        self.dump(0)
     }
 }
 

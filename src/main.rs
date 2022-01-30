@@ -1,5 +1,3 @@
-use std::string::ToString;
-
 use jsrs::prelude::*;
 
 fn main() {
@@ -7,18 +5,12 @@ fn main() {
 
     let program = parse_program(&input);
 
-    println!("{}", program.dump(0));
+    println!("{}", program.print());
 
-    let mut interpreter = Interpreter::default();
-
-    let result = interpreter.run(program);
+    let result = Interpreter::default().run(program);
 
     match result {
-        Err(e) => {
-            println!("Threw Exception: {}", e.to_string());
-        }
-        Ok(result) => {
-            println!("Output: {}", result);
-        }
+        Err(e) => println!("Threw Exception: {}", e),
+        Ok(result) => println!("Output: {}", result),
     }
 }

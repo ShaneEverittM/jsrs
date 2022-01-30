@@ -1,5 +1,5 @@
 use crate::{
-    ir::{marker::Expression, IrNode},
+    ir::{IrNode, marker::Expression},
     runtime::{Exception, Interpreter, Value},
 };
 
@@ -31,14 +31,10 @@ impl IrNode for Variable {
     }
 
     fn evaluate(&mut self, interpreter: &mut Interpreter) -> Result<Value, Exception> {
-        interpreter.get_variable(&self.name)
+        interpreter.variable(&self.name)
     }
 
-    fn edit_lvalue(
-        &mut self,
-        interpreter: &mut Interpreter,
-        edit: Box<dyn FnOnce(&mut Value) -> Result<Value, Exception>>,
-    ) -> Result<Value, Exception> {
-        interpreter.edit_variable(&self.name, edit)
+    fn assign(&mut self, interpreter: &mut Interpreter, value: Value) -> Result<Value, Exception> {
+        interpreter.assign_variable(&self.name, value)
     }
 }

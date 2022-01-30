@@ -2,6 +2,7 @@ use std::{collections::HashMap, fmt};
 
 use crate::runtime::{Object, Value};
 
+#[allow(unused)]
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Object, Clone)]
 #[object_type(String)]
@@ -17,6 +18,7 @@ impl JsString {
             str: str.to_owned(),
         }
     }
+
     pub fn boxed(str: &str) -> Box<Self> {
         Box::new(Self {
             properties: HashMap::new(),

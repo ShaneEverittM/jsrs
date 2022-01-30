@@ -35,6 +35,59 @@ pub fn wrap_object(obj: Box<dyn Object>) -> Rc<RefCell<Box<dyn Object>>> {
     Rc::new(RefCell::new(obj))
 }
 
+pub trait Bundled {
+    fn bundled() -> Rc<RefCell<Box<dyn Object>>>
+    where
+        Self: Default;
+
+    fn bundle(self) -> Rc<RefCell<Box<dyn Object>>>;
+
+    fn value(self) -> crate::runtime::Value;
+
+    fn wrap(self: Box<Self>) -> Rc<RefCell<Box<dyn Object>>>;
+}
+
+impl<O> Bundled for O
+where
+    O: 'static + Object,
+{
+    fn bundled() -> Rc<RefCell<Box<dyn Object>>>
+    where
+        Self: Default,
+    {
+        Rc::new(RefCell::new(Box::new(Self::default())))
+    }
+
+    fn bundle(self) -> Rc<RefCell<Box<dyn Object>>> {
+        Rc::new(RefCell::new(Box::new(self)))
+    }
+
+    fn value(self) -> crate::runtime::Value {
+        crate::runtime::Value::Object(Rc::new(RefCell::new(Box::new(self))))
+    }
+
+    fn wrap(self: Box<Self>) -> Rc<RefCell<Box<dyn Object>>> {
+        Rc::new(RefCell::new(self))
+    }
+}
+
+pub fn bundle_object<O: 'static + Object>(obj: O) -> Rc<RefCell<Box<dyn Object>>> {
+    Rc::new(RefCell::new(Box::new(obj)))
+}
+
+pub trait Boxed {
+    fn boxed() -> Box<Self>;
+}
+
+impl<O> Boxed for O
+where
+    O: Default,
+{
+    fn boxed() -> Box<Self> {
+        Box::new(Self::default())
+    }
+}
+
 pub trait OnSuccess<T, E> {
     fn finally<F: FnOnce(T)>(self, op: F) -> Result<(), E>;
 }

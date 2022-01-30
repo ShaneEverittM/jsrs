@@ -1,10 +1,11 @@
-use crate::prelude::LiteralObject;
-use crate::util::wrap_object;
-use crate::{
-    ir::{marker::Expression, IrNode},
-    runtime::{exception::*, Interpreter, Value},
-};
 use std::collections::HashMap;
+
+use crate::{
+    ir::{IrNode, marker::Expression},
+    runtime::{exception::*, Interpreter, Value},
+    util::*,
+};
+use crate::prelude::LiteralObject;
 
 #[cfg_attr(debug_assertions, derive(Debug))]
 #[derive(Expression, Clone)]
@@ -39,15 +40,8 @@ impl IrNode for ObjectExpression {
             let value = value_expr.evaluate(interpreter)?;
             props.insert(key.clone(), value);
         }
-        interpreter.clear_suppress_declarations();
-        Ok(Value::Object(wrap_object(LiteralObject::boxed(props))))
-    }
+        interpreter.allow_declarations();
 
-    // fn edit_lvalue(
-    //     &mut self,
-    //     interpreter: &mut Interpreter,
-    //     edit: Box<dyn FnOnce(&mut Value) -> Result<Value, Exception>>,
-    // ) -> Result<Value, Exception> {
-    //     todo!()
-    // }
+        Ok(Value::Object(LiteralObject::new(props).bundle()))
+    }
 }
